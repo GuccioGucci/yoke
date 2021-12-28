@@ -285,7 +285,7 @@ Here's an example:
 
 ```
 resource "aws_ecs_task_definition" "td" {
-  family = "${var.stage}-${local.svc_name}"
+  family = ...
   ...
 }
 
@@ -294,8 +294,6 @@ data "aws_ecs_task_definition" "current_td" {
 }
 
 resource "aws_ecs_service" "esv" {
-  name = "${var.stage}-${local.svc_name}"
-  cluster = var._shared.ecs_cluster.arn
   task_definition = "${aws_ecs_task_definition.td.family}:${max(aws_ecs_task_definition.td.revision,data.aws_ecs_task_definition.current_td.revision)}"
   ...
 ```
@@ -309,12 +307,10 @@ Here's an example:
 
 ```
 data "aws_ecs_task_definition" "current_td" {
-  task_definition = "${var.stage}-${local.svc_name}"
+  task_definition = ...
 }
 
 resource "aws_ecs_service" "esv" {
-  name = "${var.stage}-${local.svc_name}"
-  cluster = var._shared.ecs_cluster.arn
   task_definition = "${data.aws_ecs_task_definition.current_td.family}:${data.aws_ecs_task_definition.current_td.revision}"
   ...
 }
@@ -364,7 +360,7 @@ module "main" {
 }
 ```
 
-You can then prepare soe `bogus` task definitions, just for this reason, in any target environment (**nonprod** and **prod**). They would be named after the HTTP port they expose, in order to configure the proper one, accordingly to current application behaviour:
+You can then prepare soe `bogus` task definitions, just for this reason, in any target environment (eg: **nonprod**, **prod**). They would be named after the HTTP port they expose, in order to configure the proper one, accordingly to current application behaviour:
 
 * `bogus-8080`
 * `bogus-8090`
@@ -372,7 +368,7 @@ You can then prepare soe `bogus` task definitions, just for this reason, in any 
 
 They are expected to reply with a proper `200 OK` on any endpoint, so you could configure the proper health-check as it would be for the application. For details, see [bogus docker images](docker/bogus).
 
-Please, note that in order to migrate from bogus to application task definition, you have to keep the same container **name**, otherwise the the load balancer would fail to re-configure. So, please use `application` as a name for this.
+Please, note that in order to migrate from bogus to application task definition, you have to keep the same container **name**, otherwise the the load balancer would fail to re-configure. For example, use `application` as a name for this.
 
 ```
 resource "aws_ecs_service" "esv" {
@@ -401,10 +397,11 @@ To run tests, execute:
 ```
 
 These are the libs we're using:
+
 * https://github.com/sstephenson/bats
 * https://github.com/ztombol/bats-docs
-    * https://github.com/ztombol/bats-support
-    * https://github.com/ztombol/bats-assert
+  * https://github.com/ztombol/bats-support
+  * https://github.com/ztombol/bats-assert
 
 <a name='contributions'></a>
 ## Contributions
