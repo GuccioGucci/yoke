@@ -1,0 +1,60 @@
+pipeline{
+    agent { label 'aws && docker' }
+    options { timestamps () }
+
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prd'], description: 'Target environment')
+        string(name: 'TAG', defaultValue: 'latest', description: 'Docker image tag to deploy')
+    }
+
+    environment {
+        APPLICATION = '...' // #CHANGEME
+        SERVICE = '...' // #CHANGEME
+        ECS_CLUSTER = 'cls01'
+        TIMEOUT = '300'
+        YOKE_VERSION = '*/main'
+
+        DOCKER_REGISTRY = 'registry.docker.my'
+        DEV_JENKINS = credentials('dev-jenkins')
+    }
+
+    stages {
+        stage("Execution description") {
+            steps {
+                script {
+                    currentBuild.description = "environment: ${params.ENVIRONMENT} - tag: ${params.TAG}"
+                }
+            }
+        }
+
+        stage("Deploy") {
+            steps {
+                dir('yoke') {
+                    checkout(
+                        changelog: false, poll: false,
+                        scm: [
+                            $class: 'GitSCM', 
+                            branches: [[ name: YOKE_VERSION ]], 
+                            extensions: [], 
+                            userRemoteConfigs: [[ url: 'https://github.com/GuccioGucci/yoke.git' ]]
+                        ]
+                    )
+                }
+
+                script {
+                    def command_line = "./yoke/yoke install -c $ECS_CLUSTER -s ${params.ENVIRONMENT}-$SERVICE -f values-${params.ENVIRONMENT}.yaml -t ${params.TAG} --timeout $TIMEOUT"
+
+                    if (params.ENVIRONMENT == 'prd') {
+                        // force AWS profile to 'prd', in PRD only
+                        command_line = "export AWS_PROFILE=prd ; $command_line"
+                    } else {
+                        // keep latest task definition, on DEV and QA only
+                        command_line = "$command_line --prune 2"
+                    }
+
+                    sh(command_line)
+                }
+            }
+        }
+    }
+}

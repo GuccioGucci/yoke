@@ -1,0 +1,8 @@
+server {
+    listen ${NGINX_PORT};
+
+    location / {
+        add_header Content-Type text/plain;
+        return 200 'Pong';
+    }
+}

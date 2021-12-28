@@ -1,0 +1,104 @@
+{
+    "taskDefinition": {
+        "taskDefinitionArn": "arn:aws:ecs:us-east-1:123456789012:task-definition/hello-world-dev:59",
+        "containerDefinitions": [
+            {
+                "name": "application",
+                "image": "registry.docker.my/hello-world:6e973c2-116",
+                "repositoryCredentials": {
+                    "credentialsParameter": "registry.docker.my/readonly"
+                },
+                "cpu": 0,
+                "portMappings": [
+                    {
+                        "containerPort": 8080,
+                        "hostPort": 8080,
+                        "protocol": "tcp"
+                    }
+                ],
+                "essential": true,
+                "environment": [],
+                "mountPoints": [
+                    {
+                        "sourceVolume": "shared",
+                        "containerPath": "/data"
+                    }
+                ],
+                "volumesFrom": [],
+                "secrets": [],
+                "logConfiguration": {
+                    "logDriver": "awslogs",
+                    "options": {
+                        "awslogs-group": "hello-world-dev",
+                        "awslogs-region": "us-east-1",
+                        "awslogs-stream-prefix": "ecs"
+                    }
+                }
+            }
+        ],
+        "family": "hello-world-dev",
+        "taskRoleArn": "arn:aws:iam::123456789012:role/hello-world-dev",
+        "executionRoleArn": "arn:aws:iam::123456789012:role/hello-world-dev",
+        "networkMode": "awsvpc",
+        "revision": 60,
+        "volumes": [
+            {
+                "name": "shared",
+                "efsVolumeConfiguration": {
+                    "fileSystemId": "fs-12345678",
+                    "rootDirectory": "/",
+                    "transitEncryption": "ENABLED",
+                    "authorizationConfig": {
+                        "accessPointId": "fsap-1234567890123456789",
+                        "iam": "ENABLED"
+                    }
+                }
+            }
+        ],
+        "status": "ACTIVE",
+        "requiresAttributes": [
+            {
+                "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+            },
+            {
+                "name": "ecs.capability.execution-role-awslogs"
+            },
+            {
+                "name": "ecs.capability.efsAuth"
+            },
+            {
+                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+            },
+            {
+                "name": "ecs.capability.efs"
+            },
+            {
+                "name": "ecs.capability.private-registry-authentication.secretsmanager"
+            },
+            {
+                "name": "com.amazonaws.ecs.capability.task-iam-role"
+            },
+            {
+                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
+            },
+            {
+                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+            },
+            {
+                "name": "ecs.capability.task-eni"
+            }
+        ],
+        "placementConstraints": [],
+        "compatibilities": [
+            "EC2",
+            "FARGATE"
+        ],
+        "requiresCompatibilities": [
+            "FARGATE"
+        ],
+        "cpu": "512",
+        "memory": "1024",
+        "registeredAt": "2021-04-06T11:06:15.893000+02:00",
+        "registeredBy": "arn:aws:sts::123456789012:assumed-role/roles-rw/foo.bar"
+    }
+}

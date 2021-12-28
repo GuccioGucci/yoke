@@ -1,0 +1,46 @@
+{
+    "SecurityGroups": [
+        {
+            "Description": "hello-world-dev",
+            "GroupName": "hello-world-dev",
+            "IpPermissions": [
+                {
+                    "FromPort": 8080,
+                    "IpProtocol": "tcp",
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": [],
+                    "ToPort": 8080,
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupId": "sg-abcdefghil1234567",
+                            "UserId": "123456789012"
+                        }
+                    ]
+                }
+            ],
+            "OwnerId": "123456789012",
+            "GroupId": "sg-abcdefghil1234567",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": [],
+                    "UserIdGroupPairs": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "hello-world-dev"
+                }
+            ],
+            "VpcId": "vpc-12345678"
+        }
+    ]
+}

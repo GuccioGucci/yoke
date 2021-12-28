@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+function fail(){
+    echo "$*" ; exit 1
+}
+
+NAME="$1"
+ATTRIBUTE="$2"
+
+function upcase_first_char() {
+    local value="$1"
+    echo "$( echo ${value:0:1} | tr '[:lower:]' '[:upper:]' )${value:1}"
+}
+
+aws efs describe-access-points \
+    | jq -rce '.AccessPoints[] | select(.Tags[].Key == "Name" and .Tags[].Value == "'$NAME'") | .'$( upcase_first_char $ATTRIBUTE)''
+[[ $? -eq 0 ]] || fail "NOT-FOUND[$NAME,$ATTRIBUTE]"

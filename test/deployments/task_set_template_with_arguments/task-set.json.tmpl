@@ -1,0 +1,19 @@
+{
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "subnets": [ ],
+            "securityGroups": [
+                "{{ shell "aws_security_group hello-world-" .environment.name }}"
+            ],
+            "assignPublicIp": "DISABLED"
+        }
+    },
+    "loadBalancers": [ ],
+    "serviceRegistries": [ ],
+    "launchType": "FARGATE",
+    "platformVersion": "LATEST",
+    "scale": {
+        "value": 100,
+        "unit": "PERCENT"
+    }
+}

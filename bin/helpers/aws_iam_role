@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+function fail(){
+    echo "$*" ; exit 1
+}
+
+NAME="$1"
+RESULT=$( aws iam get-role --role-name $NAME )
+[[ $? -eq 0 ]] || fail "NOT-FOUND[$NAME]"
+echo $RESULT | jq -r ".Role.Arn"

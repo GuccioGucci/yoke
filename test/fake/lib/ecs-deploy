@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source "${BASH_SOURCE%/*}/../common"
+
+fake_log_in "$( basename $0 ) $*"

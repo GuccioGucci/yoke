@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+
+#defaults
+COMMAND=
+CLUSTER=
+SERVICE=
+VALUES=
+IMAGE_TAG=
+WORKING_DIR="deployment"
+TASK_DEFINITION="task-definition.json.tmpl"
+TASK_SET="task-set.json.tmpl"
+CONFIRMATION="confirm.sh.tmpl"
+DEBUG="false"
+PRUNE_TASK_DEFINITIONS=
+TIMEOUT="300"
+DRY_RUN="false"
+
+CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PATH="$PATH:$CURRENT_DIR/lib/ecs-deploy:$CURRENT_DIR/lib/gucci:$CURRENT_DIR/bin/helpers"
+
+# functions
+
+function show_usage() {
+    cat << EOL
+usage: $0 command [parameters]
+
+command:
+    update                  update remote task definition with given image tag
+    install                 install local task definition (task-definition.json.tmpl), using given image tag
+
+parameters:
+    -h|--help               show this usage
+    -v|--version            show version info
+    -d|--debug              debug mode, verbose (default: $DEBUG)
+    -c|--cluster value      ecs cluster (eg: cls01)
+    -s|--service value      ecs service (eg: hello-world-dev)
+    -t|--tag value          docker image tag (eg: 1ab2c3-12)
+    -w|--working-dir value  where to search for resources (default: $WORKING_DIR)
+    -f|--values value       values file (eg: values-dev.yaml)
+    --prune value           only keep given task definitions (eg: 5)
+    --timeout value         timeout (default: $TIMEOUT)
+    --dry-run               dry-run mode, avoid any deployment (default: $DRY_RUN)
+EOL
+}
+
+function show_version() {
+    [[ "$DEBUG" != "false" ]] && log "showing version"
+    echo "(templating) gucci: $( gucci --version )"
+    echo "(deployment) ecs-deploy: $( ecs-deploy --version )"
+}
+
+function log() {
+    echo -e "[$( date "+%Y-%m-%d %H:%M:%S" )] $*"
+}
+
+function template_on() {
+  ( cd $( realpath ${WORKING_DIR} ) ; gucci $* )
+}
+
+function do_initialize() {
+    # mandatory command
+    [[ -z "$COMMAND" ]] && { echo "no command provided" ; show_usage ; exit 1; }
+    [[ "$COMMAND" != "update" && "$COMMAND" != "install" ]] && { echo "unsupported command" ; show_usage ; exit 1; }
+    
+    # mandatory parameters
+    [[ -z "$CLUSTER" ]] && { echo "no cluster provided" ; show_usage ; exit 1; }
+    [[ -z "$SERVICE" ]] && { echo "no service provided" ; show_usage ; exit 1; }
+    [[ -z "$IMAGE_TAG" ]] && { echo "no image provided" ; show_usage ; exit 1; }
+    
+    # install-specific initialization
+    if [[ "$COMMAND" == "install" ]]; then
+      init_values      
+      init_task_definition
+      init_task_set
+      init_confirmation
+    fi
+
+    [[ "$DEBUG" != "false" ]] && log "task-definition: $( cat $TASK_DEFINITION )"
+}
+
+function init_values() {
+  if [[ ! -z "$VALUES" ]]; then
+      VALUES="$( realpath ${WORKING_DIR}/$VALUES )"
+      log "values: $VALUES"
+  fi
+}
+
+function init_task_definition() {
+  local command_line=""
+  TASK_DEFINITION="$( realpath ${WORKING_DIR}/${TASK_DEFINITION} )"
+  log "task-definition: ${TASK_DEFINITION}"
+  
+  original_task_definition=$TASK_DEFINITION
+  TASK_DEFINITION="/tmp/task-definition.json.$RANDOM"
+  log "(current) task-definition: $TASK_DEFINITION"
+  
+  if [[ ! -z "$VALUES" ]]; then
+      command_line="-f $VALUES"
+  fi
+  
+  template_on $command_line $original_task_definition > $TASK_DEFINITION || {
+      log "cannot prepare task-definition";
+      exit 1;
+  }
+}
+
+function init_task_set() {
+  local command_line=""
+  TASK_SET="$( realpath ${WORKING_DIR}/${TASK_SET} )"
+  
+  if [[ -f $TASK_SET ]]; then
+    log "task-set: $TASK_SET"
+    original_task_set=$TASK_SET
+    TASK_SET="/tmp/task-set.json.$RANDOM"
+    log "(current) task-set: $TASK_SET"
+  
+    if [[ ! -z "$VALUES" ]]; then
+        command_line="-f $VALUES"
+    fi
+  
+    template_on $command_line $original_task_set > $TASK_SET || {
+        log "cannot prepare task-set";
+        exit 1;
+    }
+  fi
+}
+
+function init_confirmation() {
+  local command_line=""
+  CONFIRMATION="$( realpath ${WORKING_DIR}/${CONFIRMATION} )"
+  
+  if [[ -f $CONFIRMATION ]]; then
+    log "confirmation: $CONFIRMATION"
+    original_confirmation=$CONFIRMATION
+    CONFIRMATION="/tmp/confirm.sh.$RANDOM"
+    log "(current) confirmation: $CONFIRMATION"
+  
+    if [[ ! -z "$VALUES" ]]; then
+        command_line="-f $VALUES"
+    fi
+  
+    template_on $command_line $original_confirmation > $CONFIRMATION || {
+        log "cannot prepare confirmation";
+        exit 1;
+    }
+    
+    chmod +x $CONFIRMATION
+  fi
+}
+
+function on_install_flags() {
+  local flags="--task-definition-file $TASK_DEFINITION"
+  [[ -f $TASK_SET ]] && flags="$flags --task-set-file $TASK_SET"
+  [[ -f $CONFIRMATION ]] && flags="$flags --canary-confirmation $CONFIRMATION" || flags="$flags --canary-confirmation wait_timeout"
+  echo "$flags"
+}
+
+function do_deploy() {
+    local command_line=""
+    [[ "$COMMAND" == "update" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image --timeout $TIMEOUT"
+    [[ "$COMMAND" == "install" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( on_install_flags ) --timeout $TIMEOUT"
+    [[ ! -z "$PRUNE_TASK_DEFINITIONS" ]] && command_line="$command_line --max-definitions $PRUNE_TASK_DEFINITIONS"
+
+    [[ "$DEBUG" != "false" ]] && {
+        command_line="$command_line --verbose";
+        log "PATH: $PATH";
+        log "dry-run: $DRY_RUN"
+        log "ecs-deploy command line: $command_line";
+    }
+    
+    [[ "$DRY_RUN" != "false" ]] && exit 0
+    ecs-deploy $command_line
+}
+
+# main
+
+$CURRENT_DIR/lib/update
+
+[[ $# -eq 0 ]] && show_usage && exit 1
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        -w|--working-dir)
+        WORKING_DIR="$2"
+        shift 2
+        ;;
+        -c|--cluster)
+        CLUSTER="$2"
+        shift 2
+        ;;
+        -s|--service)
+        SERVICE="$2"
+        shift 2
+        ;;
+        -t|--tag)
+        IMAGE_TAG="$2"
+        shift 2
+        ;;
+        -f|--values)
+        VALUES="$2"
+        shift 2
+        ;;
+        --prune)
+        PRUNE_TASK_DEFINITIONS="$2"
+        shift 2
+        ;;
+        --timeout)
+        TIMEOUT="$2"
+        shift 2
+        ;;
+        -d|--debug)
+        DEBUG="true"
+        shift 1
+        ;;
+        --dry-run)
+        DRY_RUN="true"
+        shift 1
+        ;;
+        -v|--version)
+        show_version ; exit 0
+        ;;
+        -h|--help)
+        show_usage ; exit 0
+        ;;
+        -*|--*)
+        show_usage ; exit 1
+        ;;
+        *)
+        COMMAND="$1"
+        shift 1
+        ;;
+    esac
+done
+
+do_initialize
+do_deploy

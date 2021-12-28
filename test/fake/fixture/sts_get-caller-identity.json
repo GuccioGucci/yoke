@@ -1,0 +1,5 @@
+{
+    "UserId": "AROA6IAD5HVVK6QUBIYKY:foo.bar",
+    "Account": "123456789012",
+    "Arn": "arn:aws:sts::123456789012:assumed-role/roles-rw/foo.bar"
+}

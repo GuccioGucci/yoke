@@ -1,0 +1,52 @@
+{
+    "AccessPoints": [
+        {
+            "ClientToken": "ABCD1234-ABCD-1234-ABCD-ABCDEF123456",
+            "Tags": [],
+            "AccessPointId": "fsap-123456789012345678a",
+            "AccessPointArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:access-point/fsap-123456789012345678a",
+            "FileSystemId": "fs-12345678",
+            "PosixUser": {
+                "Uid": 0,
+                "Gid": 0
+            },
+            "RootDirectory": {
+                "Path": "/app",
+                "CreationInfo": {
+                    "OwnerUid": 0,
+                    "OwnerGid": 0,
+                    "Permissions": "755"
+                }
+            },
+            "OwnerId": "123456789012",
+            "LifeCycleState": "available"
+        },
+        {
+            "ClientToken": "ABCD1234-ABCD-1234-ABCD-ABCDEF123457",
+            "Name": "hello-world-dev-efs",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "hello-world-dev-efs"
+                }
+            ],
+            "AccessPointId": "fsap-1234567890123456789",
+            "AccessPointArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:access-point/fsap-1234567890123456789",
+            "FileSystemId": "fs-12345678",
+            "PosixUser": {
+                "Uid": 0,
+                "Gid": 0
+            },
+            "RootDirectory": {
+                "Path": "/",
+                "CreationInfo": {
+                    "OwnerUid": 0,
+                    "OwnerGid": 0,
+                    "Permissions": "755"
+                }
+            },
+            "OwnerId": "123456789012",
+            "LifeCycleState": "available"
+        }
+    ]
+}

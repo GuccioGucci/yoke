@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+    options { timestamps () }
+
+    triggers {
+        pollSCM('* * * * *')
+    }
+
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Branch or tag to build')
+        booleanParam(name: 'DEPLOY', defaultValue: true, description: 'Start deploying after build')
+    }
+
+    environment {
+        APPLICATION = "..." // #CHANGEME
+        DOCKER_REGISTRY = 'registry.docker.my'
+
+        GIT_COMMIT_SHA = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+        TAG = "$GIT_COMMIT_SHA-${currentBuild.number}"
+    }
+
+    stages {
+
+        stage("Execution description") {
+            steps {
+                script {
+                    currentBuild.description = "branch: ${params.BRANCH} - tag: ${TAG} - deploy: ${params.DEPLOY}"
+                }
+            }
+        }
+
+        stage("Build and test") {
+            steps {
+                echo "Build and Test $APPLICATION:$TAG Image"
+
+                // this is just an example for gradle -- see #CHANGEME
+                // for any other language/platform, replace with proper build & test steps,
+                // while still pushing Docker image with:
+                //  - image repository set to $DOCKER_REGISTRY/$APPLICATION:latest
+                //  - image tag set to $TAG
+
+                sh """
+                    ./gradlew -Djib.to.tags=$TAG clean test jib \
+                              --image=$DOCKER_REGISTRY/$APPLICATION:latest #CHANGEME
+                """
+            }
+        }
+
+        stage("Deploy on DEV") {
+            when {
+                expression {
+                    params.BRANCH == 'master' && params.DEPLOY
+                }
+            }
+            steps {
+                build(
+                    job: "${APPLICATION}_deploy", // remember to create a dedicated ${APPLICATION}_deploy job!
+                    parameters: [
+                        string(name: 'ENVIRONMENT', value: 'dev'),
+                        string(name: 'TAG', value: TAG)
+                    ]
+                )
+            }
+        }
+
+        stage("Deploy on PROD") {
+            options {
+              timeout(time: 5, unit: 'MINUTES')
+            }
+            input {
+              message 'Proceed with PROD?'
+            }
+            when {
+                beforeInput true
+                expression {
+                    params.BRANCH == 'master' && params.DEPLOY
+                }
+            }
+            steps {
+                build(
+                    job: "${APPLICATION}_deploy", // #CHANGEME (and rememnber to create a dedicated ${APPLICATION}_deploy job!)
+                    parameters: [
+                        string(name: 'ENVIRONMENT', value: 'prod'),
+                        string(name: 'TAG', value: TAG)
+                    ]
+                )
+            }
+        }
+    }
+}

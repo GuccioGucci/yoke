@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+source "${BASH_SOURCE%/*}/../common"
+
+fake_log_in "$( basename $0 ) $*"
+
+response_file=$( to_response_file "$*" )
+[[ -f $response_file ]] || {
+    fake_log_err "not found: $response_file"
+    exit 254;
+}
+
+fake_log_out "response from file: $response_file"
+cat "$response_file" ; exit 0

@@ -1,0 +1,3 @@
+environment:
+  name: qa
+  docker_registry: registry.docker.my

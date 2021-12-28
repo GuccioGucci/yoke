@@ -1,0 +1,28 @@
+{
+	"taskDefinition": {
+        "volumes": [
+            {
+                "efsVolumeConfiguration": {
+                    "fileSystemId": "{{ shell "aws_efs_ap hello-world-dev-efs fileSystemId" }}",
+                    "authorizationConfig": {
+                        "iam": "ENABLED",
+                        "accessPointId": "{{ shell "aws_efs_ap hello-world-dev-efs accessPointId" }}"
+                    },
+                    "transitEncryption": "ENABLED",
+                    "rootDirectory": "/"
+                },
+                "name": "ap"
+            }
+        ],
+		"containerDefinitions": [
+			{
+                "mountPoints": [
+                    {
+                        "containerPath": "/data",
+                        "sourceVolume": "ap"
+                    }
+                ]
+			}
+		]
+	}
+}

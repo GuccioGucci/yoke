@@ -1,0 +1,89 @@
+{
+    "services": [
+        {
+            "serviceArn": "arn:aws:ecs:us-east-1:123456789012:service/cls01/hello-world-dev",
+            "serviceName": "hello-world-dev",
+            "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/cls01",
+            "loadBalancers": [
+                {
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/hello-world-dev-9a8/1234567890123456",
+                    "containerName": "application",
+                    "containerPort": 8080
+                }
+            ],
+            "serviceRegistries": [
+                {
+                    "registryArn": "arn:aws:servicediscovery:us-east-1:123456789012:service/srv-123456789012345678"
+                }
+            ],
+            "status": "ACTIVE",
+            "desiredCount": 1,
+            "runningCount": 1,
+            "pendingCount": 0,
+            "launchType": "FARGATE",
+            "platformVersion": "LATEST",
+            "taskDefinition": "arn:aws:ecs:us-east-1:123456789012:task-definition/hello-world-dev:58",
+            "deploymentConfiguration": {
+                "deploymentCircuitBreaker": {
+                    "enable": false,
+                    "rollback": false
+                },
+                "maximumPercent": 200,
+                "minimumHealthyPercent": 100
+            },
+            "deployments": [
+                {
+                    "id": "ecs-svc/12345667890",
+                    "status": "PRIMARY",
+                    "taskDefinition": "arn:aws:ecs:us-east-1:123456789012:task-definition/hello-world-dev:58",
+                    "desiredCount": 1,
+                    "pendingCount": 0,
+                    "runningCount": 1,
+                    "failedTasks": 0,
+                    "createdAt": "2021-04-05T19:19:58.405000+02:00",
+                    "updatedAt": "2021-04-05T19:22:56.204000+02:00",
+                    "launchType": "FARGATE",
+                    "platformVersion": "1.4.0",
+                    "networkConfiguration": {
+                        "awsvpcConfiguration": {
+                            "subnets": [
+                                "subnet-1234567a",
+                                "subnet-1234567b"
+                            ],
+                            "securityGroups": [
+                                "sg-12345678901234567"
+                            ],
+                            "assignPublicIp": "DISABLED"
+                        }
+                    },
+                    "rolloutState": "COMPLETED",
+                    "rolloutStateReason": "ECS deployment ecs-svc/12345667890 completed."
+                }
+            ],
+            "roleArn": "arn:aws:iam::123456789012:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+            "events": [ ],
+            "createdAt": "2021-03-18T18:32:27.785000+01:00",
+            "placementConstraints": [],
+            "placementStrategy": [],
+            "networkConfiguration": {
+                "awsvpcConfiguration": {
+                    "subnets": [
+                        "subnet-1234567a",
+                        "subnet-1234567b"
+                    ],
+                    "securityGroups": [
+                        "sg-12345678901234567"
+                    ],
+                    "assignPublicIp": "DISABLED"
+                }
+            },
+            "healthCheckGracePeriodSeconds": 0,
+            "schedulingStrategy": "REPLICA",
+            "createdBy": "arn:aws:iam::123456789012:role/roles-rw",
+            "enableECSManagedTags": false,
+            "propagateTags": "NONE",
+            "enableExecuteCommand": false
+        }
+    ],
+    "failures": []
+}

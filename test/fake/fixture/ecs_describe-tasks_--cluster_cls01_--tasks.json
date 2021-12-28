@@ -1,0 +1,63 @@
+{
+    "tasks": [
+        {
+            "attachments": [],
+            "availabilityZone": "us-east-1b",
+            "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/cls01",
+            "connectivity": "CONNECTED",
+            "connectivityAt": "2021-04-05T19:20:27.670000+02:00",
+            "containers": [
+                {
+                    "containerArn": "arn:aws:ecs:us-east-1:123456789012:container/cls01/123456789012345678901234567890ab/abcd1234-abcd-1234-abcd-abcdef123456",
+                    "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/cls01/123456789012345678901234567890ab",
+                    "name": "application",
+                    "image": "registry.docker.my/hello-world:6e973c2-116",
+                    "runtimeId": "123456789012345678901234567890ab-524788293",
+                    "lastStatus": "RUNNING",
+                    "exitCode": 0,
+                    "networkBindings": [],
+                    "networkInterfaces": [
+                        {
+                            "attachmentId": "abcd1234-abcd-1234-abcd-abcdef123456",
+                            "privateIpv4Address": "1.2.3.4"
+                        }
+                    ],
+                    "healthStatus": "UNKNOWN",
+                    "cpu": "0"
+                }
+            ],
+            "cpu": "512",
+            "createdAt": "2021-04-05T19:20:22.160000+02:00",
+            "desiredStatus": "STOPPED",
+            "enableExecuteCommand": false,
+            "executionStoppedAt": "2021-04-06T11:18:38+02:00",
+            "group": "service:hello-world-dev",
+            "healthStatus": "UNKNOWN",
+            "lastStatus": "RUNNING",
+            "launchType": "FARGATE",
+            "memory": "1024",
+            "overrides": {
+                "containerOverrides": [
+                    {
+                        "name": "application"
+                    }
+                ],
+                "inferenceAcceleratorOverrides": []
+            },
+            "platformVersion": "1.4.0",
+            "pullStartedAt": "2021-04-05T19:20:42.061000+02:00",
+            "pullStoppedAt": "2021-04-05T19:21:04.061000+02:00",
+            "startedAt": "2021-04-05T19:21:21.798000+02:00",
+            "startedBy": "ecs-svc/12345667890",
+            "stopCode": "ServiceSchedulerInitiated",
+            "stoppedAt": "2021-04-06T11:19:09.492000+02:00",
+            "stoppedReason": "Scaling activity initiated by (deployment ecs-svc/12345667890)",
+            "stoppingAt": "2021-04-06T11:18:22.351000+02:00",
+            "tags": [],
+            "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/cls01/123456789012345678901234567890ab",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:123456789012:task-definition/hello-world-dev:59",
+            "version": 8
+        }
+    ],
+    "failures": []
+}

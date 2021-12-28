@@ -1,0 +1,16 @@
+{
+	"taskDefinition": {
+        "family": "{{ shell "test_echo hello-world-dev" }}",
+		"containerDefinitions": [
+			{
+        "portMappings": [ { "containerPort": {{ shell "test_echo 8080" }} } ],
+        "environment": [
+            {
+                "name": "SERVICE_NAME",
+                "value": "{{ shell "test_echo hello-world-" .environment.name }}"
+            }
+        ]
+			}
+		]
+	}
+}

@@ -1,0 +1,44 @@
+{
+  "taskDefinition": {
+    "family": "${SERVICE}-{{ .environment.name }}",
+    "executionRoleArn": "{{ shell "aws_iam_role ${SERVICE}-" .environment.name }}",
+    "taskRoleArn": "{{ shell "aws_iam_role ${SERVICE}-" .environment.name }}",
+    "placementConstraints": [ ],
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "cpu": "512",
+    "memory": "1024",
+    "volumes": [ ],
+    "containerDefinitions": [
+      {
+        "name": "application",
+        "image": "{{ .environment.docker_registry }}/${APPLICATION}:latest",
+        "repositoryCredentials": {
+          "credentialsParameter": "{{ .environment.docker_registry }}/readonly"
+        },
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${SERVICE}-{{ .environment.name }}",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "ecs"
+          }
+        },
+        "portMappings": [
+          {
+            "containerPort": ${CONTAINER_PORT}
+          }
+        ],
+        "environment": [
+          {
+            "name": "SERVICE_NAME",
+            "value": "${SERVICE}-{{ .environment.name }}"
+          }
+        ],
+        "secrets": [ ]
+      }
+    ]
+  }
+}

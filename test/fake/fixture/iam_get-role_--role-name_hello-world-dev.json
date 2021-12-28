@@ -1,0 +1,32 @@
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "hello-world-dev",
+        "RoleId": "ABCDE12345ABCDE12345AB",
+        "Arn": "arn:aws:iam::123456789012:role/hello-world-dev",
+        "CreateDate": "2021-03-18T17:32:22+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ecs-tasks.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "MaxSessionDuration": 3600,
+        "PermissionsBoundary": {
+            "PermissionsBoundaryType": "Policy",
+            "PermissionsBoundaryArn": "arn:aws:iam::123456789012:policy/permboundary"
+        },
+        "Tags": [],
+        "RoleLastUsed": {
+            "LastUsedDate": "2021-04-06T08:47:41+00:00",
+            "Region": "us-east-1"
+        }
+    }
+}
