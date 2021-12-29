@@ -368,7 +368,7 @@ Here's a draft `task-definition.json.tmpl`:
 }
 ```
 
-For example, with `Ktor` and `Jib`, you'd probably need:
+For example, with [Ktor](https://ktor.io/) and [Jib](https://github.com/GoogleContainerTools/jib), you'd probably need:
 
 ```
 {{- $applicationConfigurationOverride := "application-override.conf" -}}
@@ -380,7 +380,7 @@ Then, you only need to enable overriding in `Ktor` application config, relying o
 include "config/application-override.conf"
 ```
 
-For `Spring Boot` application, you'd probably need:
+For [Spring Boot](https://spring.io/projects/spring-boot) application, you'd probably need:
 
 ```
 {{- $applicationConfigurationOverride := "application-override.properties" -}} # or application-override.yaml
@@ -388,19 +388,21 @@ For `Spring Boot` application, you'd probably need:
 ```
 
 Then, add this to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent):
+
 ```
 java -jar service.jar ... \
      --spring.config.additional-location=config/application-override.properties # or application-override.yaml
 ```
 
 Finally, you can prepare env-specific application configuration overrides, under same working-dir folder (eg: `deployment`):
+
 ```
 deployment/
 └── config/
     ├──dev/
-    |  └── application-override.conf
+    │  └── application-override.conf
     ├──qa/
-    |  └── application-override.conf
+    │  └── application-override.conf
     └──prd/
        └── application-override.conf
 ```
