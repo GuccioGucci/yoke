@@ -8,14 +8,15 @@
   * [Update](#update)
   * [Install](#install)
   * [Helpers](#helpers)
-* [Templates](#templates)
-  * [Deployment](#deployment)
-    * [Application configuration override](#application-configuration-override)
-  * [Pipelines](#pipelines)
 * [Provisioning: Terraform](#provisioning-terraform)
   * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live)
   * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only)
   * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus)
+* [Extra](#extra)
+  * [Templates](#templates)
+    * [Deployment](#deployment)
+    * [Pipelines: Jenkins](#pipelines-jenkins)
+  * [Application configuration override](#application-configuration-override)
 * [Contributing](#contributing)
   * [Tests](#tests)
   * [Contributions](#contributions)
@@ -84,6 +85,8 @@ parameters:
     --dry-run               dry-run mode, avoid any deployment (default: true)
 ```
 
+`yoke` supports two different modes: **update** mode and **install** mode. Given your context (migrating an existing application, or developing a new application) you can choose the one that fits you best. Please, see next sections for details, and [Provisioning: Terraform](#provisioning-terraform) section to understand the impact on resource provisioning.
+
 <a name='update'></a>
 ## Update
 
@@ -136,147 +139,6 @@ For the template (`task-definition.json.tmpl`) you can use some supported functi
 ...
 "accessPointId": "{{ shell "aws_efs_ap hello-world-" .environment.name "-efs accessPointId" }}"
 ```
-
-<a name='templates'></a>
-# Templates
-
-Sample templates are provided, in order to support adopting the process.
-
-<a name='deployment'></a>
-## Deployment
-
-A deployment template is provided in [templates/deployment](templates/deployment). Copy & paste it in your application suorces, for example on root folder.
-
-Sample values files should be ready to be used, while you should edit [`task-definition.json.tmpl`](templates/deployment/task-definition.json.tmpl):
-
-* replace `${APPLICATION}` with your application name. This is also expected to be the docker repository image name
-* replace `${CONTAINER_PORT}` with load-balanced HTTP port for your application, as in your provisioning configuration (eg: Terraform)
-* replace `${SERVICE}` with your service name, in order match `${SERVICE}-{{ .environment.name }}` with your provisioning configuration (eg: Terraform)
-
-<a name='application-configuration-override'></a>
-### Application configuration override
-
-Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of enviroment variables, defined in every value file, we can leverage on language or framework specific tecniques for injecting complete application configuration file, for a given environemnt, at run-time (you'd probably leave few environment variables anyway, eg: those used by Dockerfile or other resources).
-
-The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words
-
-* a dedicated *ephemeral* `application-config` container is defined, with the only purpose of creating a dedicated configuration file. Configuration file's content is read from a `$DATA` environment variable
-* `application` container depends on `application-config` container to be COMPLETE (so it can then terminate, once done). This is to ensure configuration file would already be prepared, at application startup
-* `$DATA` environment variable into `application-config` container definition is then valued with original file content, encoded to base64 (that should preserve any special char and newlines)
-
-Here's a draft `task-definition.json.tmpl`:
-
-```
-{{/*
-  $configurationPath and $applicationConfigurationOverride are set to match docker configuration (eg: Jib, Dockerfile or other tooling for preparing docker images)
-  please keep them in synch, would they be migrated.
-*/}}
-{{- $applicationConfigurationOverride := "..." -}} # eg: application-override.yaml
-{{- $configurationPath := "..." -}} # eg: /app/config
-{
-  "taskDefinition": {
-   ...
-    "volumes": [
-      {
-        "host": {
-        },
-        "name": "application-config"
-      }
-    ],
-    "containerDefinitions": [
-      {
-        "name": "application",
-        ...
-        "dependsOn": [
-          {
-            "containerName": "application-config",
-            "condition": "COMPLETE"
-          }
-        ],
-        "mountPoints": [
-          {
-            "containerPath": "{{ $configurationPath }}",
-            "sourceVolume": "application-config"
-          }
-        ]
-      },
-      {
-        "name": "application-config",
-        "essential": false,
-        "image": "bash",
-        "command": [
-          "-c",
-          "echo $DATA | base64 -d - | tee {{ $configurationPath }}/{{ $applicationConfigurationOverride }}"
-        ],
-        "environment": [
-          {
-            "name": "DATA",
-            "value": "{{ shell "openssl base64 -A -in config/" .environment.name "/" $applicationConfigurationOverride }}"
-          }
-        ],
-        "mountPoints": [
-          {
-            "containerPath": "{{ $configurationPath }}",
-            "sourceVolume": "application-config"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-For example, with `Ktor` and `Jib`, you'd probably need:
-
-```
-{{- $applicationConfigurationOverride := "application-override.conf" -}}
-{{- $configurationPath := "/app/resources/config" -}}
-```
-
-Then, you only need to enable overriding in `Ktor` application config, relying on [HOCON "include"](https://github.com/lightbend/config/blob/main/HOCON.md#includes) capability, adding this as the very last line in application.conf file:
-```
-include "config/application-override.conf"
-```
-
-For `Spring Boot` application, you'd probably need:
-
-```
-{{- $applicationConfigurationOverride := "application-override.properties" -}} # or application-override.yaml
-{{- $configurationPath := "/opt/service/config" -}}
-```
-
-Then, add this to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent):
-```
-java -jar service.jar ... \
-     --spring.config.additional-location=config/application-override.properties # or application-override.yaml
-```
-
-Finally, you can prepare env-specific application configuration overrides, under same working-dir folder (eg: `deployment`):
-```
-deployment/
-└── config/
-    ├──dev/
-    |  └── application-override.conf
-    ├──qa/
-    |  └── application-override.conf
-    └──prd/
-       └── application-override.conf
-```
-
-<a name='pipelines'></a>
-## Pipelines
-
-In order to integrate with Jenkins, sample templates are provided in [templates/pipeline](templates/pipeline):
-
-* [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (DEV, PROD)
-  * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
-  * create a Jenkins job using this `Jenkinsfile` as the pipeline
-* [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
-  * set `APPLICATION` to your application name (as in previous step)
-  * set `SERVICE` to your service name, in order match `${params.ENVIRONMENT}-${SERVICE}` with your Terraform configuration
-  * create a Jenkins job using this `Jenkinsfile.deploy` as the pipeline, named `${APPLICATION}_deploy`
-
-Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `master` branch, in order to keep control of yoke version, since it lacks any proper distribution channel at the moment (nexus, yum, etc.). To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.
 
 <a name='provisioning-terraform'></a>
 # Provisioning: Terraform
@@ -388,6 +250,150 @@ resource "aws_ecs_service" "esv" {
 ```
 
 As reference, here's a [description of the approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
+
+<a name='extra'></a>
+# Extra
+
+This section contains resources and guidelines in adopting the process. Please, consider this additional contribution as being very specific to what we've been using in [GuccioGucci](https://github.com/GuccioGucci/), anyway we hope it's common enough to be useful to you as well.
+
+<a name='templates'></a>
+## Templates
+
+<a name='deployment'></a>
+### Deployment
+
+A deployment template is provided in [templates/deployment](templates/deployment). Copy & paste it in your application suorces, for example on root folder.
+
+Sample values files should be ready to be used, while you should edit [`task-definition.json.tmpl`](templates/deployment/task-definition.json.tmpl):
+
+* replace `${APPLICATION}` with your application name. This is also expected to be the docker repository image name
+* replace `${CONTAINER_PORT}` with load-balanced HTTP port for your application, as in your provisioning configuration (eg: Terraform)
+* replace `${SERVICE}` with your service name, in order match `${SERVICE}-{{ .environment.name }}` with your provisioning configuration (eg: Terraform)
+
+<a name='pipelines-jenkins'></a>
+### Pipelines: Jenkins
+
+In order to integrate with [Jenkins](https://www.jenkins.io/), sample templates are provided in [templates/pipeline](templates/pipeline):
+
+* [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (DEV, PROD)
+  * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
+  * create a Jenkins job using this `Jenkinsfile` as the pipeline
+* [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
+  * set `APPLICATION` to your application name (as in previous step)
+  * set `SERVICE` to your service name, in order match `${params.ENVIRONMENT}-${SERVICE}` with your Terraform configuration
+  * create a Jenkins job using this `Jenkinsfile.deploy` as the pipeline, named `${APPLICATION}_deploy`
+
+Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `master` branch, in order to keep control of yoke version, since it lacks any proper distribution channel at the moment (nexus, yum, etc.). To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.
+
+<a name='application-configuration-override'></a>
+## Application configuration override
+
+Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of enviroment variables, defined in every value file, we can leverage on language or framework specific tecniques for injecting complete application configuration file, for a given environemnt, at run-time (you'd probably leave few environment variables anyway, eg: those used by Dockerfile or other resources).
+
+The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words
+
+* a dedicated *ephemeral* `application-config` container is defined, with the only purpose of creating a dedicated configuration file. Configuration file's content is read from a `$DATA` environment variable
+* `application` container depends on `application-config` container to be COMPLETE (so it can then terminate, once done). This is to ensure configuration file would already be prepared, at application startup
+* `$DATA` environment variable into `application-config` container definition is then valued with original file content, encoded to base64 (that should preserve any special char and newlines)
+
+Here's a draft `task-definition.json.tmpl`:
+
+```
+{{/*
+  $configurationPath and $applicationConfigurationOverride are set to match docker configuration (eg: Jib, Dockerfile or other tooling for preparing docker images)
+  please keep them in synch, would they be migrated.
+*/}}
+{{- $applicationConfigurationOverride := "..." -}} # eg: application-override.yaml
+{{- $configurationPath := "..." -}} # eg: /app/config
+{
+  "taskDefinition": {
+   ...
+    "volumes": [
+      {
+        "host": {
+        },
+        "name": "application-config"
+      }
+    ],
+    "containerDefinitions": [
+      {
+        "name": "application",
+        ...
+        "dependsOn": [
+          {
+            "containerName": "application-config",
+            "condition": "COMPLETE"
+          }
+        ],
+        "mountPoints": [
+          {
+            "containerPath": "{{ $configurationPath }}",
+            "sourceVolume": "application-config"
+          }
+        ]
+      },
+      {
+        "name": "application-config",
+        "essential": false,
+        "image": "bash",
+        "command": [
+          "-c",
+          "echo $DATA | base64 -d - | tee {{ $configurationPath }}/{{ $applicationConfigurationOverride }}"
+        ],
+        "environment": [
+          {
+            "name": "DATA",
+            "value": "{{ shell "openssl base64 -A -in config/" .environment.name "/" $applicationConfigurationOverride }}"
+          }
+        ],
+        "mountPoints": [
+          {
+            "containerPath": "{{ $configurationPath }}",
+            "sourceVolume": "application-config"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+For example, with `Ktor` and `Jib`, you'd probably need:
+
+```
+{{- $applicationConfigurationOverride := "application-override.conf" -}}
+{{- $configurationPath := "/app/resources/config" -}}
+```
+
+Then, you only need to enable overriding in `Ktor` application config, relying on [HOCON "include"](https://github.com/lightbend/config/blob/main/HOCON.md#includes) capability, adding this as the very last line in application.conf file:
+```
+include "config/application-override.conf"
+```
+
+For `Spring Boot` application, you'd probably need:
+
+```
+{{- $applicationConfigurationOverride := "application-override.properties" -}} # or application-override.yaml
+{{- $configurationPath := "/opt/service/config" -}}
+```
+
+Then, add this to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent):
+```
+java -jar service.jar ... \
+     --spring.config.additional-location=config/application-override.properties # or application-override.yaml
+```
+
+Finally, you can prepare env-specific application configuration overrides, under same working-dir folder (eg: `deployment`):
+```
+deployment/
+└── config/
+    ├──dev/
+    |  └── application-override.conf
+    ├──qa/
+    |  └── application-override.conf
+    └──prd/
+       └── application-override.conf
+```
 
 <a name='contributing'></a>
 # Contributing
