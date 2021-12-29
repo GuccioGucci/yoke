@@ -20,6 +20,7 @@
 * [Contributing](#contributing)
   * [Tests](#tests)
   * [Contributions](#contributions)
+* [License](#license)
 
 <a name='about'></a>
 # About
@@ -427,3 +428,10 @@ Here's a list of contributions we did to involved open-source projects:
   * PR to support canary releases on EXTERNAL deployments, [here](https://github.com/silinternational/ecs-deploy/pull/231)
 * [noqcks/gucci](https://github.com/noqcks/gucci)
   * PR on enriching shell function to support multiple arguments, [here](https://github.com/noqcks/gucci/pull/30)
+
+<a name='license'></a>
+# License
+
+Copyright 2021 Gucci.
+
+Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
