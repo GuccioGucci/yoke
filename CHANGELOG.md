@@ -67,3 +67,11 @@
 ## 0.1
 
 * initial version, with support for "update" and "install"
+
+# TODO
+
+* (TODO) distribution as binary packages
+* (TODO) check preconditions, platform: aws, jq
+* (TODO) rollback, by default or optionally
+* (TODO) deploy scheduled tasks
+* (TODO) support for secrets
