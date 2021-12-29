@@ -1,5 +1,7 @@
 # Changelog
 
+Versions before 2.0 were only available on internal repository, before open-sourcing the project.
+
 ## 2.0 (Current)
 
 * open-sourcing: initial import, from private repo
@@ -70,8 +72,9 @@
 
 # TODO
 
-* (TODO) distribution as binary packages
-* (TODO) check preconditions, platform: aws, jq
-* (TODO) rollback, by default or optionally
-* (TODO) deploy scheduled tasks
-* (TODO) support for secrets
+* distribution as binary packages
+* check preconditions, platform: aws, jq
+* rollback, by default or optionally
+* canary release: more complex scenario
+* deploy scheduled tasks
+* support for secrets
