@@ -1,9 +1,10 @@
 # Table of contents
 
 * [About](#about)
+  * [Motivation](#motivation)
   * [How it works](#how-it-works)
-  * [What's in a name?](#whats-in-a-name)
-* [How to use it](#how-to-use-it)
+  * [Origin](#origin)
+* [Usage](#usage)
   * [Update](#update)
   * [Install](#install)
   * [Helpers](#helpers)
@@ -22,26 +23,32 @@
 <a name='about'></a>
 # About
 
-`yoke` is a simple tool for supporting deployment of EC2 services (mainly FARGATE), trying to decouple **provisioning** (typically defined with Terraform) from actual **deployment** (performed with CLI tools, such as `aws`).
+`yoke` is a simple tool for deploying services on [Amazon Elastic Container Service](https://aws.amazon.com/ecs/) (AWS ECS). Its approach tries supporting [Continuous Delivery](https://continuousdelivery.com/), decoupling resources **provisioning** from application **deployment**, ensuring you can:
 
-For example: you change the application to read a new configuration value (in the source code), and you change the deployment to inject that configuration value (as environment variable, or even as a secret parameter). All in one single commit, and you're ready to deploy the application! (yep, for secret parameters, you still have to provision them apart, eg: by hand with `aws` cli. But that's another story).
+* **deploy a given application version**, to rollout new versions, or rollback to a previous version
+* **build once, deploy everywhere**, decoupling build and deploy processes, given we correlate application version and deployment descriptors
+* **keep application and deployment descriptors close together**, ensuring they stay in synch
 
-Here they are some common scenario covered:
-* **build once, deploy everywhere**, decoupling build and deploy processes (given we correlate image tag with deployment descriptor)
-* **deploy a given version**, as part of a continous-delivery process, or to perform a rollback (just in case...)
-* **keep application code and deployment descriptor close together**, ensuring they stay in synch
+<a name='motivation'></a>
+# Motivation
+
+In [GuccioGucci](https://github.com/GuccioGucci/) we've been using ECS for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` CLI](https://aws.amazon.com/cli/) for performing application deployment.
+
+When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` CLI first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every ECS environment (eg: `dev`, `qa` and `prd`).
+
+We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue togheter few open-source tools. Next section will explain how.
 
 <a name='how-it-works'></a>
 ## How it works
 
 Frankly speaking, it's just a wrapper around other tools:
 * [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy): simple script for deploying to AWS ECS. Itself, it's a wrapper around `aws` and `jq`
-* [noqcks/gucci](https://github.com/noqcks/gucci): standalone [Go template engine](https://golang.org/pkg/text/templates/) (available for Linux and Macos only, sorry no Windows!). isn't it funny that it is named `gucci`? really!
+* [noqcks/gucci](https://github.com/noqcks/gucci): standalone [Go template engine](https://golang.org/pkg/text/templates/). (Isn't it funny that it is named `gucci`? Really!)
 
-So, it's mainly composing an `ecs-deploy` command-line, and additionally preparing a proper actual task-definition from a given template and a "values" file, holding per-environment YAML data.
+So, `yoke` it's mainly composing an `ecs-deploy` command-line, and additionally preparing a proper actual task-definition file, from given template and "values" YAML files (holding per-environment data).
 
-<a name='whats-in-a-name'></a>
-## What's in a name
+<a name='origin'></a>
+## Origin
 
 It was initially inspired by past experience with [Helm](https://helm.sh/), which is the Kubernetes (k8s) package manager (in few words, the tool to discover and install k8s applications -- *charts* in Helm jargon).
 
@@ -51,8 +58,8 @@ Anyway, if you don't get it, sounds like "joke".
 
 ![flight yoke system](docs/flight-yoke-system.jpg "Flight yoke system")
 
-<a name='how-to-use-it'></a>
-# How to use it
+<a name='usage'></a>
+# Usage
 
 Usage help:
 
@@ -264,7 +271,7 @@ In order to integrate with Jenkins, sample templates are provided in [templates/
 * [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (DEV, PROD)
   * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
   * create a Jenkins job using this `Jenkinsfile` as the pipeline
-* [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with joke in order to deploy on ECS
+* [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
   * set `APPLICATION` to your application name (as in previous step)
   * set `SERVICE` to your service name, in order match `${params.ENVIRONMENT}-${SERVICE}` with your Terraform configuration
   * create a Jenkins job using this `Jenkinsfile.deploy` as the pipeline, named `${APPLICATION}_deploy`
