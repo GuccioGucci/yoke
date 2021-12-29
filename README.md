@@ -274,7 +274,11 @@ Sample values files should be ready to be used, while you should edit [`task-def
 <a name='pipelines-jenkins'></a>
 ### Pipelines: Jenkins
 
-In order to integrate with [Jenkins](https://www.jenkins.io/), sample templates are provided in [templates/pipeline](templates/pipeline):
+While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is the following:
+
+![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipeliens, Jenkins: main")
+
+For doing so, sample templates are provided in [templates/pipeline](templates/pipeline):
 
 * [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (`dev`, `qa` and `prd`)
   * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
