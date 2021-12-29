@@ -274,9 +274,12 @@ Sample values files should be ready to be used, while you should edit [`task-def
 <a name='pipelines-jenkins'></a>
 ### Pipelines: Jenkins
 
-While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is using one main pipeline for orchestrating build, test and deployment on all environments (`dev`, `qa` and `prd`), while delegating deployment to a dedicated pipeline. The main pipeline would build application version for a given commit (on target `branch`), while the deployment pipeline would be executed multiple times, for individual `environments`, accordingly to given branch (eg: limiting branches other than `main`/`master`/`trunk` to dev, proposing `main`/`master`/`trunk` branch to all available envs).
+While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is using one main pipeline for orchestrating build, test and deployment on all environments (`dev`, `qa` and `prd`), while delegating deployment to a dedicated pipeline.
 
 ![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipeliens, Jenkins: main")
+
+The main pipeline would build application version for a given commit (on target `branch`), while the deployment pipeline would be executed multiple times, for individual `environments`, accordingly to given branch (eg: limiting branches other than `main`/`master`/`trunk` to dev, proposing `main`/`master`/`trunk` branch to all available envs).
+
 ![Pipelines, Jenkins: deploy](docs/pipelines-jenkins-deploy.png "Pipeliens, Jenkins: deploy")
 
 For doing so, sample templates are provided in [templates/pipeline](templates/pipeline):
