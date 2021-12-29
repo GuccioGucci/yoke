@@ -275,7 +275,7 @@ Sample values files should be ready to be used, while you should edit [`task-def
 
 In order to integrate with [Jenkins](https://www.jenkins.io/), sample templates are provided in [templates/pipeline](templates/pipeline):
 
-* [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (DEV, PROD)
+* [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (`dev`, `qa` and `prd`)
   * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
   * create a Jenkins job using this `Jenkinsfile` as the pipeline
 * [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS

@@ -63,6 +63,30 @@ pipeline {
             }
         }
 
+        stage("Deploy on QA") {
+            options {
+              timeout(time: 5, unit: 'MINUTES')
+            }
+            input {
+              message 'Proceed with QA?'
+            }
+            when {
+                beforeInput true
+                expression {
+                    params.BRANCH == 'master' && params.DEPLOY
+                }
+            }
+            steps {
+                build(
+                    job: "${APPLICATION}_deploy", // #CHANGEME (and rememnber to create a dedicated ${APPLICATION}_deploy job!)
+                    parameters: [
+                        string(name: 'ENVIRONMENT', value: 'qa'),
+                        string(name: 'TAG', value: TAG)
+                    ]
+                )
+            }
+        }
+
         stage("Deploy on PROD") {
             options {
               timeout(time: 5, unit: 'MINUTES')
@@ -80,7 +104,7 @@ pipeline {
                 build(
                     job: "${APPLICATION}_deploy", // #CHANGEME (and rememnber to create a dedicated ${APPLICATION}_deploy job!)
                     parameters: [
-                        string(name: 'ENVIRONMENT', value: 'prod'),
+                        string(name: 'ENVIRONMENT', value: 'prd'),
                         string(name: 'TAG', value: TAG)
                     ]
                 )
