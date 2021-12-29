@@ -274,13 +274,13 @@ Sample values files should be ready to be used, while you should edit [`task-def
 <a name='pipelines-jenkins'></a>
 ### Pipelines: Jenkins
 
-While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is the following:
+While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is using one main pipeline for orchestrating build, test and deployment on all environments (`dev`, `qa` and `prd`), while delegating deployment to a dedicated pipeline. The main pipeline would build application version for a given commit (on target `branch`), while the deployment pipeline would be executed multiple times, for individual `environments`, accordingly to given branch (eg: limiting branches other than `main`/`master`/`trunk` to dev, proposing `main`/`master`/`trunk` branch to all available envs).
 
 ![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipeliens, Jenkins: main")
 
 For doing so, sample templates are provided in [templates/pipeline](templates/pipeline):
 
-* [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline, orchestrating build & test and deployment on all environments (`dev`, `qa` and `prd`)
+* [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline
   * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
   * create a Jenkins job using this `Jenkinsfile` as the pipeline
 * [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
