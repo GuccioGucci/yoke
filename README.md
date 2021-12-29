@@ -282,6 +282,7 @@ In order to integrate with [Jenkins](https://www.jenkins.io/), sample templates 
 * [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
   * set `APPLICATION` to your application name (as in previous step)
   * set `SERVICE` to your service name, in order match `${params.ENVIRONMENT}-${SERVICE}` with your Terraform configuration
+  * customize any `prd`-specific tasks that you want to perform (eg: configuring AWS profiles and/or promoting images from nonprod to prod docker registries)
   * create a Jenkins job using this `Jenkinsfile.deploy` as the pipeline, named `${APPLICATION}_deploy`
 
 Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `master` branch, in order to keep control of yoke version, since it lacks any proper distribution channel at the moment (nexus, yum, etc.). To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.

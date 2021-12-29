@@ -34,7 +34,7 @@ pipeline{
                 }
             }
             steps {
-                // do anything specific for production, eg: promoting docker images from nonprod to pro registry
+                // do anything specific for production, eg: promoting docker images from nonprod to prod docker registries
                 // ...
             }
         }
