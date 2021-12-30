@@ -8,6 +8,14 @@ function fail() {
     echo "$message" ; exit 1
 }
 
+# required dependencies
+
+command -v "aws" > /dev/null 2>&1 || fail "Please, install aws (version 2)"
+command -v "jq" > /dev/null 2>&1 || fail "Please, install jq"
+command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
+command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
+command -v "git" > /dev/null 2>&1 || fail "Please, install git"
+
 # application tools
 
 [[ -d $CURRENT_DIR/ecs-deploy ]] || {
