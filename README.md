@@ -93,6 +93,8 @@ Updating bats-support
 <a name='usage'></a>
 # Usage
 
+In order to use it, please ensure you have a proper AWS setup. For example, ensuring `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_DEFAULT_REGION` (or alternatively `AWS_SHARED_CREDENTIALS_FILE` only) environment variables are set.
+
 Usage help:
 
 ```
