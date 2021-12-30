@@ -6,6 +6,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 * open-sourcing: initial import, from private repo
 * open-sourcing: apps and test dependencies to lib, installed at run-time
+* check required dependencies
 
 ## 1.6
 
@@ -73,8 +74,8 @@ Versions before 2.0 were only available on internal repository, before open-sour
 # TODO
 
 * distribution as binary packages
-* check preconditions, platform: aws, jq
 * rollback, by default or optionally
 * canary release: more complex scenario
 * deploy scheduled tasks
 * support for secrets
+* support for Windows

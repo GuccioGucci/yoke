@@ -64,6 +64,8 @@ Anyway, if you don't get it, sounds like "joke".
 <a name='installation'></a>
 # Installation
 
+Given it's a bash script, it should be supported in most Unix-like OS (Linux, MacOS). Even if potentially possible, no support is granted on Windows at the moment, mainly due to the lack of a Windows artifact of gucci 1.4.x (while it's available from version 1.5.x). Future support for Windows could be planned.
+
 These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
 
 * [aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) cli (version 2)
