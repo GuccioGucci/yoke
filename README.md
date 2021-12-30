@@ -463,8 +463,8 @@ Here's a list of contributions we did to involved open-source projects:
 
 * [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy)
   * confirmed a bug on task-definition file not working, [here](https://github.com/silinternational/ecs-deploy/pull/215)
-  * PR to migrate --tag-only to apply on main container definition only (being the first one), [here](https://github.com/silinternational/ecs-deploy/pull/227)
-  * PR to support canary releases on EXTERNAL deployments, [here](https://github.com/silinternational/ecs-deploy/pull/231)
+  * PR to migrate `--tag-only` to apply on main container definition only (being the first one), [here](https://github.com/silinternational/ecs-deploy/pull/227)
+  * PR to support canary releases on `EXTERNAL` deployments, [here](https://github.com/silinternational/ecs-deploy/pull/231)
 * [noqcks/gucci](https://github.com/noqcks/gucci)
   * PR on enriching shell function to support multiple arguments, [here](https://github.com/noqcks/gucci/pull/30)
 
