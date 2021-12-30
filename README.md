@@ -44,7 +44,7 @@ We then started looking for something supporting our scenario, and found it was 
 <a name='how-it-works'></a>
 ## How it works
 
-Frankly speaking, it's just a wrapper around other tools:
+Frankly speaking, it's just a wrapper around other tools (actually, [enriched forks](#contributing)):
 * [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy): simple script for deploying to AWS ECS. Itself, it's a wrapper around `aws` and `jq`
 * [noqcks/gucci](https://github.com/noqcks/gucci): standalone [Go template engine](https://golang.org/pkg/text/templates/). (Isn't it funny that it is named `gucci`? Really!)
 
@@ -467,6 +467,8 @@ Here's a list of contributions we did to involved open-source projects:
   * PR to support canary releases on EXTERNAL deployments, [here](https://github.com/silinternational/ecs-deploy/pull/231)
 * [noqcks/gucci](https://github.com/noqcks/gucci)
   * PR on enriching shell function to support multiple arguments, [here](https://github.com/noqcks/gucci/pull/30)
+
+Note that while waiting for some PR to be merged, we're using forks.
 
 <a name='license'></a>
 # License
