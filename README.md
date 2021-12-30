@@ -64,11 +64,15 @@ Anyway, if you don't get it, sounds like "joke".
 <a name='installation'></a>
 # Installation
 
-Please, ensure you have `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation) installed: configured `aws cli` and `jq`.
+These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
 
-Currently, `yoke` is available as source code only (but we plan to distribute sources and/or binaries releases). It's composed by a main `yoke` script, plus few helper scripts and dependencies expected to be available in the `PATH`. You don't have to care about filesystem and `PATH`, but a full repository clone is required. Direct dependencies (for both application and tests) will be automatically installed on firt execution.
+* [aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) CLI v2
+* [jq](https://github.com/stedolan/jq/wiki/Installation)
+* [git](https://git-scm.com/)
+* [curl](http://curl.haxx.se/)
+* [coreutils](https://www.gnu.org/software/coreutils/)
 
-So, here's how to install it:
+Additional dependencies (for both application and tests) expected to be available in the `PATH` will be automatically installed on firt execution. Since at the moment the tool is available as source code only (but planned to be distributed with source and/or binary releases), here's how to install it:
 
 ```
 $ git clone https://github.com/GuccioGucci/yoke.git
