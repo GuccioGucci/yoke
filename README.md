@@ -35,9 +35,9 @@
 <a name='motivation'></a>
 # Motivation
 
-In [GuccioGucci](https://github.com/GuccioGucci/) we've been using ECS for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` CLI](https://aws.amazon.com/cli/) for performing application deployment.
+In [GuccioGucci](https://github.com/GuccioGucci/) we've been using ECS for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` cli](https://aws.amazon.com/cli/) for performing application deployment.
 
-When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` CLI first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every ECS environment (eg: `dev`, `qa` and `prd`).
+When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` cli first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every ECS environment (eg: `dev`, `qa` and `prd`).
 
 We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue togheter few open-source tools. Next section will explain how.
 
@@ -66,7 +66,7 @@ Anyway, if you don't get it, sounds like "joke".
 
 These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
 
-* [aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) CLI v2
+* [aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) cli (version 2)
 * [jq](https://github.com/stedolan/jq/wiki/Installation)
 * [git](https://git-scm.com/)
 * [curl](http://curl.haxx.se/)
