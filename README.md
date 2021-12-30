@@ -4,6 +4,7 @@
   * [Motivation](#motivation)
   * [How it works](#how-it-works)
   * [Origin](#origin)
+* [Installation](#installation)
 * [Usage](#usage)
   * [Update](#update)
   * [Install](#install)
@@ -59,6 +60,29 @@ Then the anology was: `helm` (the ship's wheel) is for `k8s` (again, whit a seve
 Anyway, if you don't get it, sounds like "joke".
 
 ![flight yoke system](docs/flight-yoke-system.jpg "Flight yoke system")
+
+<a name='installation'></a>
+# Installation
+
+Please, ensure you have `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation) installed: configured `aws cli` and `jq`.
+
+Currently, `yoke` is available as source code only (but we plan to distribute sources and/or binaries releases). It's composed by a main `yoke` script, plus few helper scripts and dependencies expected to be available in the `PATH`. You don't have to care about filesystem and `PATH`, but a full repository clone is required. Direct dependencies (for both application and tests) will be automatically installed on firt execution.
+
+So, here's how to install it:
+
+```
+$ git clone https://github.com/GuccioGucci/yoke.git
+$ cd yoke
+$ ./yoke --version
+
+Updating ecs-deploy
+Updating gucci
+Updating bats
+Updating bats-assert
+Updating bats-support
+(templating) gucci: gucci version 1.4.0
+(deployment) ecs-deploy: 3.10.2
+```
 
 <a name='usage'></a>
 # Usage
