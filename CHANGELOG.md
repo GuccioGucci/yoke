@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## 2.0 (Current)
+## 2.0
 
 * open-sourcing: initial import, from private repo
 * open-sourcing: apps and test dependencies to lib, installed at run-time
