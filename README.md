@@ -50,6 +50,8 @@ Frankly speaking, it's just a wrapper around other tools (actually, [enriched fo
 
 So, `yoke` it's mainly composing an `ecs-deploy` command-line, and additionally preparing a proper actual task-definition file, from given template and "values" YAML files (holding per-environment data).
 
+Currently, we mainly promote using `yoke` with services provisioned as `ECS` [deployment controller](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentController.html), with is the default one. Experimental support for `EXTERNAL` deployment controller is in progress, in order to support [canary releases](https://martinfowler.com/bliki/CanaryRelease.html). Please, see [contributions](#contributions) section for details.
+
 <a name='origin'></a>
 ## Origin
 
