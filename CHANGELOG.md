@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## 2.1 (Current)
+
+* minimal support for Windows
+
 ## 2.0
 
 * open-sourcing: initial import, from private repo
@@ -78,4 +82,3 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * canary release: more complex scenario
 * deploy scheduled tasks
 * support for secrets
-* support for Windows
