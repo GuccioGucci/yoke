@@ -411,9 +411,25 @@ Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of
 <a name='application-configuration-override'></a>
 ## Application configuration override
 
-Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of environment variables, defined in every value file, we can leverage on language or framework specific techniques for injecting complete application configuration file, for a given environment, at run-time (you'd probably leave few environment variables anyway, eg: those used by `Dockerfile` or other resources).
+Given task-definition is prepared at deploy-time, it could be used to override application configurations, with external resources. For example, you can prepare environment-specific application configuration override files, under same working-dir folder (eg: `deployment/config`):
 
-The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words
+```
+deployment/
+└── config/
+    ├──dev/
+    │  └── application-override.conf
+    ├──qa/
+    │  └── application-override.conf
+    └──prd/
+       └── application-override.conf
+```
+
+In other words, this would allow configuring the bare minimum environment variables possible (while still adhering to [12 Factor App](https://12factor.net/config) approach). For example, cleaning up `environment` node, only leaving those used by `Dockerfile` or other resources
+. On the other hand, we'd preserve `secrets` node (then being injected as environment variables as well).
+
+For doing so, we can leverage on language or framework specific techniques for injecting complete or partial application configuration files, for a given environment, at run-time. See following sections for few specific examples.
+
+The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words:
 
 * a dedicated *ephemeral* `application-config` container is defined, with the only purpose of creating a dedicated configuration file. Configuration file's content is read from a `DATA` environment variable
 * `application` container depends on `application-config` container to be `COMPLETE`, so it can then terminate once done (see [here](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ContainerDependency.html) for reference). This is to ensure configuration file would already be prepared, at application startup
@@ -480,6 +496,8 @@ Here's a draft `task-definition.json.tmpl`:
 }
 ```
 
+### Ktor and Jib
+
 For example, with [Ktor](https://ktor.io/) and [Jib](https://github.com/GoogleContainerTools/jib), you'd probably need:
 
 ```
@@ -492,11 +510,13 @@ Then, you only need to enable overriding in `Ktor` application config, relying o
 include "config/application-override.conf"
 ```
 
-For [Spring Boot](https://spring.io/projects/spring-boot) application, you'd probably need:
+### Spring Boot and Dockerfile
+
+For [Spring Boot](https://spring.io/projects/spring-boot) application, you could use:
 
 ```
 {{- $applicationConfigurationOverride := "application-override.properties" -}} # or application-override.yaml
-{{- $configurationPath := "/opt/service/config" -}}
+{{- $configurationPath := "/opt/service/config" -}} # as configured in your Dockerfile or base Docker image
 ```
 
 Then, add this to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent):
@@ -504,19 +524,6 @@ Then, add this to application startup command line (eg: `Dockerfile`, `bootstrap
 ```
 java -jar service.jar ... \
      --spring.config.additional-location=config/application-override.properties # or application-override.yaml
-```
-
-Finally, you can prepare env-specific application configuration overrides, under same working-dir folder (eg: `deployment`):
-
-```
-deployment/
-└── config/
-    ├──dev/
-    │  └── application-override.conf
-    ├──qa/
-    │  └── application-override.conf
-    └──prd/
-       └── application-override.conf
 ```
 
 <a name='contributing'></a>
