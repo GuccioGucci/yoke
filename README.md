@@ -415,9 +415,9 @@ Given task-definition is prepared at deploy-time, it could be used to apply over
 
 The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words
 
-* a dedicated *ephemeral* `application-config` container is defined, with the only purpose of creating a dedicated configuration file. Configuration file's content is read from a `$DATA` environment variable
+* a dedicated *ephemeral* `application-config` container is defined, with the only purpose of creating a dedicated configuration file. Configuration file's content is read from a `DATA` environment variable
 * `application` container depends on `application-config` container to be COMPLETE (so it can then terminate, once done). This is to ensure configuration file would already be prepared, at application startup
-* `$DATA` environment variable into `application-config` container definition is then valued with original file content, encoded to base64 (that should preserve any special char and newlines)
+* `DATA` environment variable into `application-config` container definition is then valued with original file content, encoded to base64 (that should preserve any special char and newlines)
 
 Here's a draft `task-definition.json.tmpl`:
 
