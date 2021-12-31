@@ -34,7 +34,7 @@ parameters:
     -d|--debug              debug mode, verbose (default: $DEBUG)
     -c|--cluster value      ecs cluster (eg: cls01)
     -s|--service value      ecs service (eg: hello-world-dev)
-    -t|--tag value          docker image tag (eg: 1ab2c3-12)
+    -t|--tag value          Docker image tag (eg: 1ab2c3-12)
     -w|--working-dir value  where to search for resources (default: $WORKING_DIR)
     -f|--values value       values file (eg: values-dev.yaml)
     --prune value           only keep given task definitions (eg: 5)

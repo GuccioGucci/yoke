@@ -39,7 +39,7 @@ In [GuccioGucci](https://github.com/GuccioGucci/) we've been using ECS for a lon
 
 When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` cli first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every ECS environment (eg: `dev`, `qa` and `prd`).
 
-We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue togheter few open-source tools. Next section will explain how.
+We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue together few open-source tools. Next section will explain how.
 
 <a name='how-it-works'></a>
 ## How it works
@@ -55,7 +55,7 @@ So, `yoke` it's mainly composing an `ecs-deploy` command-line, and additionally 
 
 It was initially inspired by past experience with [Helm](https://helm.sh/), which is the Kubernetes (k8s) package manager (in few words, the tool to discover and install k8s applications -- *charts* in Helm jargon).
 
-Then the anology was: `helm` (the ship's wheel) is for `k8s` (again, whit a seven spokes wheel icon) what `yoke` (the control wheel for airplanes) is for `ECS` (the "cloud")!
+Then the analogy was: `helm` (the ship's wheel) is for `k8s` (again, whit a seven spokes wheel icon) what `yoke` (the control wheel for airplanes) is for `ECS` (the "cloud")!
 
 Anyway, if you don't get it, sounds like "joke".
 
@@ -64,7 +64,7 @@ Anyway, if you don't get it, sounds like "joke".
 <a name='installation'></a>
 # Installation
 
-Given it's a bash script, it should be supported in most Unix-like OS (Linux, MacOS). Even if potentially possible, no support is granted on Windows at the moment, mainly due to the lack of a Windows artifact of gucci 1.4.x (while it's available from version 1.5.x). Future support for Windows could be planned.
+Given it's a bash script, it should be supported in most Unix-like OS (Linux, MacOS). Even if potentially possible, no support is granted on Windows at the moment, mainly due to the lack of a Windows artefact of gucci 1.4.x (while it's available from version 1.5.x). Future support for Windows could be planned.
 
 These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
 
@@ -110,7 +110,7 @@ parameters:
     -d|--debug              debug mode, verbose (default: false)
     -c|--cluster value      ecs cluster (eg: cls01)
     -s|--service value      ecs service (eg: hello-world-dev)
-    -t|--tag value          docker image tag (eg: 8a5f3a7-88)
+    -t|--tag value          Docker image tag (eg: 8a5f3a7-88)
     -w|--working-dir value  where to search for resources (default: deployment)
     -f|--values value       values file (eg: values-dev.yaml)
     --prune value           only keep given task definitions (eg: 5)
@@ -129,7 +129,7 @@ Update an existing task definition, with a given image tag (short and long versi
 ./yoke update --cluster cls01 --service hello-world-dev --tag bb255ec-93
 ```
 
-This will grab the *current* task definition (for given `cls01` cluster and `hello-world-dev` service), update main container definition to use the given image tag (`bb255ec-93`), create a new revistion for the task definition, and finally force a new deployment. Once done, newly created task definition will be the *current* one.
+This will grab the *current* task definition (for given `cls01` cluster and `hello-world-dev` service), update main container definition to use the given image tag (`bb255ec-93`), create a new revision for the task definition, and finally force a new deployment. Once done, newly created task definition will be the *current* one.
 
 <a name='install'></a>
 ## Install
@@ -142,7 +142,7 @@ Install local task definition, with image tag (short and long versions):
 
 This will prepare a local task definition, starting from a template (expected to be `task-definition.json.tmpl`), apply the proper template substitutions (using given `values-dev.yaml` file as source), create a new revision for the task definition (starting from the local one, just created), and finally force a new deployment. Once done, newly created task definition will be the *current* one.
 
-Both task definition template (`task-definition.json.tmpl`) and values file (`values-dev.yaml` in the exaple) are expected to be found in a working directory (default to `deployment`, set to `test/samples/hello-world/deployment` in the example). Relying on the default, it would be:
+Both task definition template (`task-definition.json.tmpl`) and values file (`values-dev.yaml` in the example) are expected to be found in a working directory (default to `deployment`, set to `test/samples/hello-world/deployment` in the example). Relying on the default, it would be:
 ```
 deployment/
 ├── task-definition.json.tmpl
@@ -176,7 +176,7 @@ For the template (`task-definition.json.tmpl`) you can use some supported functi
 <a name='provisioning-terraform'></a>
 # Provisioning: Terraform
 
-You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope. Here's an [interesing discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches. We'll try to recap here, with examples.
+You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope. Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches. We'll try to recap here, with examples.
 
 <a name='mixed-managed-and-live'></a>
 ## Mixed: managed and live (migrating to Update mode)
@@ -203,7 +203,7 @@ resource "aws_ecs_service" "esv" {
 <a name='afterwards-live-only'></a>
 ## Afterwards: live only (migrating to Install mode)
 
-Another approach, going even furher, is getting rid of `resource` for *managed* task definition, and only relying on `data` for *live* task definition, using it to configure the service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
+Another approach, going even further, is getting rid of `resource` for *managed* task definition, and only relying on `data` for *live* task definition, using it to configure the service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
 
 Here's an example:
 
@@ -268,7 +268,7 @@ You can then prepare soe `bogus` task definitions, just for this reason, in any 
 * `bogus-8090`
 * ...
 
-They are expected to reply with a proper `200 OK` on any endpoint, so you could configure the proper health-check as it would be for the application. For details, see [bogus docker images](docker/bogus).
+They are expected to reply with a proper `200 OK` on any endpoint, so you could configure the proper health-check as it would be for the application. For details, see [bogus Docker images](Docker/bogus).
 
 Please, note that in order to migrate from bogus to application task definition, you have to keep the same container **name**, otherwise the the load balancer would fail to re-configure. For example, use `application` as a name for this.
 
@@ -295,11 +295,11 @@ This section contains resources and guidelines in adopting the process. Please, 
 <a name='deployment'></a>
 ### Deployment
 
-A deployment template is provided in [templates/deployment](templates/deployment). Copy & paste it in your application suorces, for example on root folder.
+A deployment template is provided in [templates/deployment](templates/deployment). Copy & paste it in your application sources, for example on root folder.
 
 Sample values files should be ready to be used, while you should edit [`task-definition.json.tmpl`](templates/deployment/task-definition.json.tmpl):
 
-* replace `${APPLICATION}` with your application name. This is also expected to be the docker repository image name
+* replace `${APPLICATION}` with your application name. This is also expected to be the Docker repository image name
 * replace `${CONTAINER_PORT}` with load-balanced HTTP port for your application, as in your provisioning configuration (eg: Terraform)
 * replace `${SERVICE}` with your service name, in order match `${SERVICE}-{{ .environment.name }}` with your provisioning configuration (eg: Terraform)
 
@@ -310,19 +310,19 @@ While integrating with [Jenkins](https://www.jenkins.io/), one possible approach
 
 ![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipeliens, Jenkins: main")
 
-The main pipeline would build application version for a given commit (on target `branch`), while the deployment pipeline would be executed multiple times, for individual `environments`, accordingly to given branch (eg: limiting branches other than `main`/`master`/`trunk` to dev, proposing `main`/`master`/`trunk` branch to all available envs).
+The main pipeline would build application version for a given commit (on target `branch`), while the deployment pipeline would be executed multiple times, for individual `environments`, accordingly to given branch (eg: limiting branches other than `main`/`master`/`trunk` to dev, proposing `main`/`master`/`trunk` branch to all available environments).
 
 ![Pipelines, Jenkins: deploy](docs/pipelines-jenkins-deploy.png "Pipeliens, Jenkins: deploy")
 
 For doing so, sample templates are provided in [templates/pipeline](templates/pipeline):
 
 * [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline
-  * set `APPLICATION` to your application name. This is also expected to be the docker repository image name
+  * set `APPLICATION` to your application name. This is also expected to be the Docker repository image name
   * create a Jenkins job using this `Jenkinsfile` as the pipeline
 * [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
   * set `APPLICATION` to your application name (as in previous step)
   * set `SERVICE` to your service name, in order match `${params.ENVIRONMENT}-${SERVICE}` with your Terraform configuration
-  * customize any `prd`-specific tasks that you want to perform (eg: configuring AWS profiles and/or promoting images from nonprod to prod docker registries)
+  * customize any `prd`-specific tasks that you want to perform (eg: configuring AWS profiles and/or promoting images from nonprod to prod Docker registries)
   * create a Jenkins job using this `Jenkinsfile.deploy` as the pipeline, named `${APPLICATION}_deploy`
 
 Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `master` branch, in order to keep control of yoke version, since it lacks any proper distribution channel at the moment (nexus, yum, etc.). To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.
@@ -330,7 +330,7 @@ Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of
 <a name='application-configuration-override'></a>
 ## Application configuration override
 
-Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of enviroment variables, defined in every value file, we can leverage on language or framework specific tecniques for injecting complete application configuration file, for a given environemnt, at run-time (you'd probably leave few environment variables anyway, eg: those used by Dockerfile or other resources).
+Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of environment variables, defined in every value file, we can leverage on language or framework specific techniques for injecting complete application configuration file, for a given environment, at run-time (you'd probably leave few environment variables anyway, eg: those used by Dockerfile or other resources).
 
 The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words
 
@@ -342,7 +342,7 @@ Here's a draft `task-definition.json.tmpl`:
 
 ```
 {{/*
-  $configurationPath and $applicationConfigurationOverride are set to match docker configuration (eg: Jib, Dockerfile or other tooling for preparing docker images)
+  $configurationPath and $applicationConfigurationOverride are set to match Docker configuration (eg: Jib, Dockerfile or other tooling for preparing Docker images)
   please keep them in synch, would they be migrated.
 */}}
 {{- $applicationConfigurationOverride := "..." -}} # eg: application-override.yaml
@@ -459,6 +459,8 @@ These are the libs we're using:
 * https://github.com/ztombol/bats-docs
   * https://github.com/ztombol/bats-support
   * https://github.com/ztombol/bats-assert
+
+Additionally, in [GuccioGucci](https://github.com/GuccioGucci/) we take care of ensuring end-to-end build and deployment is still working, with few sample applications, on our AWS ECS clusters (and then using `yoke` in our daily deployments).
 
 <a name='contributions'></a>
 ## Contributions
