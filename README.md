@@ -189,8 +189,10 @@ In addition to that, we prepared some useful helper scripts (already available i
 
 ### aws_account_id
 
-`aws_account_id`: get current AWS account id. Example:
+Get current AWS account id.
 
+* `aws_account_id`
+* Example:
 ```
 "executionRoleArn": "arn:aws:iam::{{ shell "aws_account_id" }}:role/hello-world-{{ .environment.name }}"
 ```
