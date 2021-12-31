@@ -29,7 +29,7 @@ command -v "git" > /dev/null 2>&1 || fail "Please, install git"
 }
 
 [[ -d $CURRENT_DIR/gucci ]] || {
-    GUCCI_VERSION="1.4.0"
+    GUCCI_VERSION="1.5.2"
     OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
     if [[ $OS_LABEL =~ "_nt" ]]; then
         GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-windows-amd64.exe"
