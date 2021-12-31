@@ -153,7 +153,7 @@ deployment/
 └── values-prd.yaml
 ```
 
-Expected task-definition.json.tmpl content is a JSON file, with a taskDefinition root node matching the [aws ecs register-task-definition](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/register-task-definition.html) JSON syntax. Here's a minimal template, see [Deployment](#deployment) Templates section for a complete example:
+Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinition` root node matching the [aws ecs register-task-definition](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/register-task-definition.html) JSON syntax. Here's a minimal template, see [Deployment](#deployment) Templates section for a complete example:
 
 ```
 {
@@ -183,23 +183,71 @@ Expected task-definition.json.tmpl content is a JSON file, with a taskDefinition
 <a name='helpers'></a>
 ## Helpers
 
-For the template (`task-definition.json.tmpl`) you can use some supported functions (see [here](https://github.com/noqcks/gucci#templating) for the full list). In addition to that, we prepared some useful helper scripts, you can use with the `shell` function. Here they are (available in [helpers](bin/helpers), usage examples in [helpers.bats](test/helpers.bats)):
+While preparing template content, you can use much of Go templating functions: for example, declaring variables, `if` statements, boolean functions and so on. Also, Sprig functions are supported. Please, see [here](https://github.com/noqcks/gucci#templating) for the full list of supported functions and options.
 
-* `aws_account_id`: get current AWS account id. Example:
+In addition to that, we prepared some useful helper scripts (already available into `PATH`), that you can use with the `shell` function. Here's a brief recap (see [helpers](bin/helpers) for details, and [helpers.bats](test/helpers.bats) for usage examples):
+
+### aws_account_id
+
+`aws_account_id`: get current AWS account id. Example:
+
 ```
 "executionRoleArn": "arn:aws:iam::{{ shell "aws_account_id" }}:role/hello-world-{{ .environment.name }}"
 ```
 
-* `aws_iam_role $NAME`: get IAM role by name, then extract ARN. Example (this is equivalent to the previous one):
+### aws_iam_role
+
+Get IAM role by name, then extract ARN.
+
+* Usage: `aws_iam_role $NAME`
+* Example (this is equivalent to the previous one):
 ```
 "executionRoleArn": "{{ shell "aws_iam_role hello-world-" .environment.name }}"
 ```
 
-* `aws_efs_ap $NAME $ATTRIBUTE`: get EFS access point by `Name` tag, then extract requested attribute. Tag usage is to overcome no clear ID on those resources, to be uniquely identified. Example:
+### aws_efs_ap
+
+Get EFS access point by `Name` tag, then extract requested attribute. `Name` tag usage is required to overcome no clear ID on those resources, to be uniquely identified.
+
+* Usage: `aws_efs_ap $NAME $ATTRIBUTE`
+* Example:
 ```
 "fileSystemId": "{{ shell "aws_efs_ap hello-world-" .environment.name "-efs fileSystemId" }}"
 ...
 "accessPointId": "{{ shell "aws_efs_ap hello-world-" .environment.name "-efs accessPointId" }}"
+```
+
+### aws_lb_target_group
+
+Get LB target group by name, then extract ARN.
+
+* Usage: `aws_lb_target_group $NAME`
+* Example:
+```
+"targetGroupArn": "{{ shell "aws_lb_target_group hello-world-" .environment.name "-tg" }}"
+```
+
+### aws_security_group
+
+Get security group by name, then extract ARN.
+
+* Usage: `aws_security_group $NAME`
+* Example:
+```
+"securityGroups": [ "{{ shell "aws_security_group hello-world-" .environment.name "-sg" }}" ]
+```
+
+### aws_subnet
+
+Get subnet by name, then extract ARN.
+
+* Usage: `aws_subnet $NAME`
+* Example:
+```
+"subnets": [
+  "{{ shell "aws_subnet nonprod-az1" }}",
+  "{{ shell "aws_subnet nonprod-az2" }}"
+]
 ```
 
 <a name='extra'></a>
