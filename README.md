@@ -66,7 +66,7 @@ Anyway, if you don't get it, sounds like "joke".
 <a name='installation'></a>
 # Installation
 
-Given it's a bash script, it should be supported in most Unix-like OS (Linux, MacOS). Even if potentially possible, no support is granted on Windows at the moment, mainly due to the lack of a Windows artefact of gucci 1.4.x (while it's available from version 1.5.x). Future support for Windows could be planned.
+Given it's a bash script, it should be supported in most Unix-like OS (Linux, MacOS). No support is granted on Windows at the moment, even if you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar. Anyway downloaded binaries are OS specific (eg: gucci is available for Windows from version 1.5.x).
 
 These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
 
@@ -83,11 +83,11 @@ $ git clone https://github.com/GuccioGucci/yoke.git
 $ cd yoke
 $ ./yoke --version
 
-Updating ecs-deploy
-Updating gucci
-Updating bats
-Updating bats-assert
-Updating bats-support
+Updating ecs-deploy (GuccioGucci/ecs-deploy)
+Updating gucci (gucci-v1.5.2-darwin-amd64)
+Updating bats (sstephenson/bats)
+Updating bats-assert (ztombol/bats-assert)
+Updating bats-support (ztombol/bats-support)
 (templating) gucci: gucci version 1.4.0
 (deployment) ecs-deploy: 3.10.2
 ```
