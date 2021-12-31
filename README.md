@@ -88,7 +88,7 @@ Updating gucci (gucci-v1.5.2-darwin-amd64)
 Updating bats (sstephenson/bats)
 Updating bats-assert (ztombol/bats-assert)
 Updating bats-support (ztombol/bats-support)
-(templating) gucci: gucci version 1.4.0
+(templating) gucci: gucci version 1.5.1
 (deployment) ecs-deploy: 3.10.2
 ```
 
