@@ -35,9 +35,9 @@
 <a name='motivation'></a>
 # Motivation
 
-In [GuccioGucci](https://github.com/GuccioGucci/) we've been using ECS for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` cli](https://aws.amazon.com/cli/) for performing application deployment.
+In [GuccioGucci](https://github.com/GuccioGucci/) we've been using `ECS` for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` cli](https://aws.amazon.com/cli/) for performing application deployment. We also relied on `FARGATE` launch type, wich ensure `ECS` is managing resources with no additional operations required.
 
-When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` cli first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every ECS environment (eg: `dev`, `qa` and `prd`).
+When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` cli first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every `ECS` environment (eg: `dev`, `qa` and `prd`).
 
 We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue together few open-source tools. Next section will explain how.
 
@@ -45,7 +45,7 @@ We then started looking for something supporting our scenario, and found it was 
 ## How it works
 
 Frankly speaking, it's just a wrapper around other tools (actually, [enriched forks](#contributing)):
-* [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy): simple script for deploying to AWS ECS. Itself, it's a wrapper around `aws` and `jq`
+* [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy): simple script for deploying to AWS `ECS`. Itself, it's a wrapper around `aws` and `jq`
 * [noqcks/gucci](https://github.com/noqcks/gucci): standalone [Go template engine](https://golang.org/pkg/text/templates/). (Isn't it funny that it is named `gucci`? Really!)
 
 So, `yoke` it's mainly composing an `ecs-deploy` command-line, and additionally preparing a proper actual task-definition file, from given template and "values" YAML files (holding per-environment data).
@@ -55,7 +55,7 @@ Currently, we mainly promote using `yoke` with services provisioned as `ECS` [de
 <a name='origin'></a>
 ## Origin
 
-It was initially inspired by past experience with [Helm](https://helm.sh/), which is the Kubernetes (k8s) package manager (in few words, the tool to discover and install k8s applications -- *charts* in Helm jargon).
+It was initially inspired by past experience with [Helm](https://helm.sh/), which is the [Kubernetes](https://kubernetes.io/) (k8s) package manager (in few words, the tool to discover and install k8s applications -- *charts* in Helm jargon).
 
 Then the analogy was: `helm` (the ship's wheel) is for `k8s` (again, whit a seven spokes wheel icon) what `yoke` (the control wheel for airplanes) is for `ECS` (the "cloud")!
 
@@ -153,6 +153,33 @@ deployment/
 └── values-prd.yaml
 ```
 
+Expected task-definition.json.tmpl content is a JSON file, with a taskDefinition root node matching the [aws ecs register-task-definition](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/register-task-definition.html) JSON syntax. Here's a minimal template, see [Deployment](#deployment) Templates section for a complete example:
+
+```
+{
+  "taskDefinition": {
+    "family": "...",
+    "executionRoleArn": "...",
+    "taskRoleArn": "...",
+    "placementConstraints": [ ],
+    "requiresCompatibilities": [ "FARGATE" ],
+    "networkMode": "...",
+    "cpu": "...",
+    "memory": "...",
+    "volumes": [ ],
+    "containerDefinitions": [
+      {
+        "name": "application",
+        "image": "...",
+        "portMappings": [ { "containerPort": ... } ],
+        "environment": [ ],
+        "secrets": [ ]
+      }
+    ]
+  }
+}
+```
+
 <a name='helpers'></a>
 ## Helpers
 
@@ -183,12 +210,14 @@ This section contains resources and guidelines in adopting the process. Please, 
 <a name='provisioning-terraform'></a>
 ## Provisioning: Terraform
 
-You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope. Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches. We'll try to recap here, with examples.
+You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope (since tesk-definition in `ECS` are managed resources, with individual revisions). Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches.
+
+We'll recap them here, with examples, using the following as reference scenario: a shared `module.tf`, with common definitions, and per-environment `$stage/main.tf` files (eg: `dev/main.tf`, `qa/main.tf` and `prd/main.tf`).
 
 <a name='mixed-managed-and-live'></a>
 ### Mixed: managed and live (migrating to Update mode)
 
-One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the ECS environment. Then, on task definition `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
+One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the `ECS` environment. Then, on task definition `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
 
 Here's an example:
 
@@ -269,7 +298,7 @@ module "main" {
 }
 ```
 
-You can then prepare soe `bogus` task definitions, just for this reason, in any target environment (eg: **nonprod**, **prod**). They would be named after the HTTP port they expose, in order to configure the proper one, accordingly to current application behaviour:
+You can then prepare some `bogus` task definitions, just for this reason, in any target environment (eg: **nonprod**, **prod**). They would be named after the HTTP port they expose, in order to configure the proper one, accordingly to current application behaviour:
 
 * `bogus-8080`
 * `bogus-8090`
@@ -310,18 +339,18 @@ Sample values files should be ready to be used, while you should edit [`task-def
 
 While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is using one main pipeline for orchestrating build, test and deployment on all environments (`dev`, `qa` and `prd`), while delegating deployment to a dedicated pipeline.
 
-![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipeliens, Jenkins: main")
+![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipelines, Jenkins: main")
 
 The main pipeline would build application version for a given commit (on target `branch`), while the deployment pipeline would be executed multiple times, for individual `environments`, accordingly to given branch (eg: limiting branches other than `main`/`master`/`trunk` to dev, proposing `main`/`master`/`trunk` branch to all available environments).
 
-![Pipelines, Jenkins: deploy](docs/pipelines-jenkins-deploy.png "Pipeliens, Jenkins: deploy")
+![Pipelines, Jenkins: deploy](docs/pipelines-jenkins-deploy.png "Pipelines, Jenkins: deploy")
 
 For doing so, sample templates are provided in [templates/pipeline](templates/pipeline):
 
 * [`Jenkinsfile`](templates/pipeline/Jenkinsfile) is the main pipeline
   * set `APPLICATION` to your application name. This is also expected to be the Docker repository image name
   * create a Jenkins job using this `Jenkinsfile` as the pipeline
-* [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on ECS
+* [`Jenkinsfile.deploy`](templates/pipeline/Jenkinsfile.deploy) is the deployment pipeline, interacting with yoke in order to deploy on `ECS`
   * set `APPLICATION` to your application name (as in previous step)
   * set `SERVICE` to your service name, in order match `${params.ENVIRONMENT}-${SERVICE}` with your Terraform configuration
   * customize any `prd`-specific tasks that you want to perform (eg: configuring AWS profiles and/or promoting images from nonprod to prod Docker registries)
@@ -332,7 +361,7 @@ Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of
 <a name='application-configuration-override'></a>
 ## Application configuration override
 
-Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of environment variables, defined in every value file, we can leverage on language or framework specific techniques for injecting complete application configuration file, for a given environment, at run-time (you'd probably leave few environment variables anyway, eg: those used by Dockerfile or other resources).
+Given task-definition is prepared at deploy-time, it could be used to apply override application configurations, with external resources. In other words, instead of relying on a bunch of environment variables, defined in every value file, we can leverage on language or framework specific techniques for injecting complete application configuration file, for a given environment, at run-time (you'd probably leave few environment variables anyway, eg: those used by `Dockerfile` or other resources).
 
 The overall approach is documented [here](https://kichik.com/2020/09/10/mounting-configuration-files-in-fargate/), and it's easily adapted from CloudFormation. In few words
 
@@ -462,7 +491,7 @@ These are the libs we're using:
   * https://github.com/ztombol/bats-support
   * https://github.com/ztombol/bats-assert
 
-Additionally, in [GuccioGucci](https://github.com/GuccioGucci/) we take care of ensuring end-to-end build and deployment is still working, with few sample applications, on our AWS ECS clusters (and then using `yoke` in our daily deployments).
+Additionally, in [GuccioGucci](https://github.com/GuccioGucci/) we take care of ensuring end-to-end build and deployment is still working, with few sample applications, on our AWS `ECS` clusters (and then using `yoke` in our daily deployments).
 
 <a name='contributions'></a>
 ## Contributions
