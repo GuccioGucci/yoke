@@ -554,11 +554,11 @@ Additionally, in [GuccioGucci](https://github.com/GuccioGucci/) we take care of 
 
 Here's a list of contributions we did to involved open-source projects:
 
-* [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy)
+* [silinternational/ecs-deploy](https://github.com/silinternational/ecs-deploy) (forked to [GuccioGucci/ecs-deploy](https://github.com/GuccioGucci/ecs-deploy))
   * confirmed a bug on task-definition file not working, [here](https://github.com/silinternational/ecs-deploy/pull/215)
   * PR to migrate `--tag-only` to apply on main container definition only (being the first one), [here](https://github.com/silinternational/ecs-deploy/pull/227)
   * PR to support canary releases on `EXTERNAL` deployments, [here](https://github.com/silinternational/ecs-deploy/pull/231)
-* [noqcks/gucci](https://github.com/noqcks/gucci)
+* [noqcks/gucci](https://github.com/noqcks/gucci) (forked to [GuccioGucci/gucci](https://github.com/GuccioGucci/gucci))
   * PR on enriching shell function to support multiple arguments, [here](https://github.com/noqcks/gucci/pull/30)
 
 Note that while waiting for some PR to be merged, we're using forks.
