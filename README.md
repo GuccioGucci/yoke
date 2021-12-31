@@ -9,11 +9,11 @@
   * [Update](#update)
   * [Install](#install)
   * [Helpers](#helpers)
-* [Provisioning: Terraform](#provisioning-terraform)
-  * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live)
-  * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only)
-  * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus)
 * [Extra](#extra)
+  * [Provisioning: Terraform](#provisioning-terraform)
+    * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live)
+    * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only)
+    * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus)
   * [Templates](#templates)
     * [Deployment](#deployment)
     * [Pipelines: Jenkins](#pipelines-jenkins)
@@ -173,13 +173,18 @@ For the template (`task-definition.json.tmpl`) you can use some supported functi
 "accessPointId": "{{ shell "aws_efs_ap hello-world-" .environment.name "-efs accessPointId" }}"
 ```
 
+<a name='extra'></a>
+# Extra
+
+This section contains resources and guidelines in adopting the process. Please, consider this additional contribution as being very specific to what we've been using in [GuccioGucci](https://github.com/GuccioGucci/), anyway we hope it's common enough to be useful to you as well.
+
 <a name='provisioning-terraform'></a>
-# Provisioning: Terraform
+## Provisioning: Terraform
 
 You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope. Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches. We'll try to recap here, with examples.
 
 <a name='mixed-managed-and-live'></a>
-## Mixed: managed and live (migrating to Update mode)
+### Mixed: managed and live (migrating to Update mode)
 
 One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the ECS environment. Then, on task definition `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
 
@@ -201,7 +206,7 @@ resource "aws_ecs_service" "esv" {
 ```
 
 <a name='afterwards-live-only'></a>
-## Afterwards: live only (migrating to Install mode)
+### Afterwards: live only (migrating to Install mode)
 
 Another approach, going even further, is getting rid of `resource` for *managed* task definition, and only relying on `data` for *live* task definition, using it to configure the service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
 
@@ -219,7 +224,7 @@ resource "aws_ecs_service" "esv" {
 ```
 
 <a name='bootstrap-live-only-with-bogus'></a>
-## Bootstrap: live only, with bogus (creating from scratch)
+### Bootstrap: live only, with bogus (creating from scratch)
 
 Even better, we could always rely on existing task definitions, but using some default "off-the-shelf" ones the very first time (while creating), and then stick to previous solution, afterwards. This can be achieved using a variable on command-line (e.g. `bootstrap`), being `false` by default and set `true` on first execution.
 
@@ -283,11 +288,6 @@ resource "aws_ecs_service" "esv" {
 ```
 
 As reference, here's a [description of the approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
-
-<a name='extra'></a>
-# Extra
-
-This section contains resources and guidelines in adopting the process. Please, consider this additional contribution as being very specific to what we've been using in [GuccioGucci](https://github.com/GuccioGucci/), anyway we hope it's common enough to be useful to you as well.
 
 <a name='templates'></a>
 ## Templates
