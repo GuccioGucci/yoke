@@ -309,9 +309,14 @@ resource "aws_ecs_service" "esv" {
 <a name='bootstrap-live-only-with-bogus'></a>
 ### Bootstrap: live only, with bogus (creating from scratch)
 
-Even better, we could always rely on existing task definitions, but using some default "off-the-shelf" ones the very first time (while creating), and then stick to previous solution, afterwards. This can be achieved using a variable on command-line (e.g. `bootstrap`), being `false` by default and set `true` on first execution.
+Even better, we could always rely on *already existing* task definitions, but using some default "off-the-shelf" ones the very first time (on creation), then following previous solution, afterwards. This was inspired by [this approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
 
-Here's an example:
+In order to do so, we need to:
+
+* distinguish *first* and *following* Terraform `apply` executions
+* prepare "off-the-shelf" task definitions (referred to as `bogus`)
+
+First goal can be achieved using a variable on command-line (e.g. `bootstrap`), being `false` by default and set `true` on first execution. Here's an example:
 
 ```
 # first time
@@ -321,7 +326,7 @@ terraform apply -var bootstrap=true
 terraform apply
 ```
 
-So the only change, in respect to previous example, is to pick the proper task definition, accordingly to bootstrap.
+So the only change, in respect to previous example, is to pick the proper task definition, accordingly to `bootstrap`.
 
 * `module.tf`
 ```
@@ -350,7 +355,7 @@ module "main" {
 }
 ```
 
-In order to solve this "chicken and eggs" problem (having a task definition already prepared *before* the very first application deploy), we prepared a [bogus Docker image](Docker/bogus), with a minimal Nginx website, always replying with a `200 OK` response on any endpoint. This is ideal for emulating a proper health-check, as it would be for the real application.
+For achieving second goal, and solving this "chicken and eggs" problem (having a task definition already prepared *before* the very first application deploy), we prepared a [bogus Docker image](Docker/bogus), with a minimal Nginx website, always replying with a `200 OK` response on any endpoint. This is ideal for emulating a proper health-check, as it would be for the real application.
 
 This Docker image is expected to be built and pushed to your reference Docker registry (`ECR` or private one), and then referenced in dedicated `bogus` task definitions. Suggested approach is provisioning one task definition for every exposed HTTP port, eg: `bogus-80`, `bogus-8080`, `bogus-8090` and the like. Here's a sample Terraform snippet for doing so:
 
@@ -407,8 +412,6 @@ resource "aws_ecs_service" "esv" {
   }
 }
 ```
-
-As reference, here's a [description of the approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
 
 <a name='templates'></a>
 ## Templates
