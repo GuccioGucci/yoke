@@ -191,7 +191,7 @@ In addition to that, we prepared some useful helper scripts (already available i
 
 ### aws_account_id
 
-Get current AWS account id.
+Get current Account id.
 
 * Usage: `aws_account_id`
 * Example:
@@ -201,7 +201,7 @@ Get current AWS account id.
 
 ### aws_iam_role
 
-Get IAM role by name, then extract ARN.
+Get [IAM](https://aws.amazon.com/iam/) Role by name, then extract ARN.
 
 * Usage: `aws_iam_role $NAME`
 * Example (this is equivalent to the previous one):
@@ -211,7 +211,7 @@ Get IAM role by name, then extract ARN.
 
 ### aws_efs_ap
 
-Get EFS access point by `Name` tag, then extract requested attribute. `Name` tag usage is required to overcome no clear ID on those resources, to be uniquely identified.
+Get [EFS](https://aws.amazon.com/efs/) Access Point by `Name` tag, then extract requested attribute. `Name` tag usage is required since there is no clear id on those resources. So, to be uniquely identified, please add this tag to desired access points, in your provisioning configuration (eg: Terraform module).
 
 * Usage: `aws_efs_ap $NAME $ATTRIBUTE`
 * Example:
@@ -223,7 +223,7 @@ Get EFS access point by `Name` tag, then extract requested attribute. `Name` tag
 
 ### aws_lb_target_group
 
-Get LB target group by name, then extract ARN.
+Get Load Balancer Target Group by name, then extract ARN.
 
 * Usage: `aws_lb_target_group $NAME`
 * Example:
@@ -233,7 +233,7 @@ Get LB target group by name, then extract ARN.
 
 ### aws_security_group
 
-Get security group by name, then extract ARN.
+Get Security Group by name, then extract ARN.
 
 * Usage: `aws_security_group $NAME`
 * Example:
@@ -243,7 +243,7 @@ Get security group by name, then extract ARN.
 
 ### aws_subnet
 
-Get subnet by name, then extract ARN.
+Get Subnet by name, then extract ARN.
 
 * Usage: `aws_subnet $NAME`
 * Example:
