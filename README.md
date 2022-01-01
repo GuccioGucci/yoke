@@ -97,7 +97,7 @@ Updating bats-support (ztombol/bats-support)
 <a name='usage'></a>
 # Usage
 
-In order to use it, please ensure you have a proper AWS setup. For example, ensuring `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_DEFAULT_REGION` (or alternatively `AWS_SHARED_CREDENTIALS_FILE` only) environment variables are set.
+In order to use it, please ensure you have a proper AWS setup, ensuring `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables are set, or alternatively `AWS_SHARED_CREDENTIALS_FILE` only. Please, remember also to configure default region, by choosing "Default region name" value with `aws configure`, or setting `AWS_DEFAULT_REGION` environment variable.
 
 Usage help:
 
