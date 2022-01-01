@@ -335,7 +335,7 @@ variable "bootstrap" {}
 locals {
   ...
   container_port = 8090
-  task_definition_family = var.bootstrap ? "bogus-${local.container_port}" : "${var.stage}-${local.svc_name}"
+  task_definition_family = var.bootstrap ? "bogus-${local.container_port}" : "${local.svc_name}-${var.stage}"
 }
 
 data "aws_ecs_task_definition" "current_td" {
