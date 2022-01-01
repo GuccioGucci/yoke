@@ -350,15 +350,53 @@ module "main" {
 }
 ```
 
-You can then prepare some `bogus` task definitions, just for this reason, in any target environment (eg: **nonprod**, **prod**). They would be named after the HTTP port they expose, in order to configure the proper one, accordingly to current application behaviour:
+In order to solve this "chicken and eggs" problem (having a task definition already prepared *before* the very first application deploy), we prepared a [bogus Docker image](Docker/bogus), with a minimal Nginx website, always replying with a `200 OK` response on any endpoint. This is ideal for emulating a proper health-check, as it would be for the real application.
 
-* `bogus-8080`
-* `bogus-8090`
-* ...
+This Docker image is expected to be built and pushed to your reference Docker registry (`ECR` or private one), and then referenced in dedicated `bogus` task definitions. Suggested approach is provisioning one task definition for every exposed HTTP port, eg: `bogus-80`, `bogus-8080`, `bogus-8090` and the like. Here's a sample Terraform snippet for doing so:
 
-They are expected to reply with a proper `200 OK` on any endpoint, so you could configure the proper health-check as it would be for the application. For details, see [bogus Docker images](Docker/bogus).
+```
+variable "container_ports" {
+  type        = list(string)
+  default     = ["80", "8080", "8090" ... ]
+}
 
-Please, note that in order to migrate from bogus to application task definition, you have to keep the same container **name**, otherwise the the load balancer would fail to re-configure. For example, use `application` as a name for this.
+resource "aws_ecs_task_definition" "td" {
+  count = length(var.container_ports)
+  family = "bogus-${var.container_ports[count.index]}"
+  container_definitions = <<EOF
+[
+    {
+      "name": "application",
+      "image": "$DOCKER_REGISTRY$/bogus:latest",
+      "environment": [
+        { 
+          "name": "NGINX_PORT",
+          "value": "${var.container_ports[count.index]}"
+        }
+      ],
+      "portMappings": [
+        {
+            "containerPort": ${var.container_ports[count.index]}
+        }
+      ],
+      "cpu" : 0,
+      "volumesFrom": [ ],
+      "mountPoints": [ ],
+      "essential": true
+    }
+  ]
+EOF
+  memory = ...
+  cpu = ...
+  execution_role_arn = ...
+  network_mode = ...
+  requires_compatibilities = [
+    "FARGATE",
+  ]
+}
+```
+
+Please, note that in order to migrate from *bogus* to *application* task definition, you have to keep the same container **name**, otherwise the the load balancer would fail to re-configure (`application` in the above example). Ensure you're using the same in `ECS` service definition:
 
 ```
 resource "aws_ecs_service" "esv" {
