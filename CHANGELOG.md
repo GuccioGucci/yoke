@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## 2.1 (Current)
+## Current
 
 * minimal support for Windows
 
@@ -80,5 +80,6 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * distribution as binary packages
 * rollback, by default or optionally
 * canary release: more complex scenario
+* helpers from working-dir
 * deploy scheduled tasks
 * support for secrets

@@ -66,8 +66,6 @@ Anyway, if you don't get it, sounds like "joke".
 <a name='installation'></a>
 # Installation
 
-Given it's a bash script, it should be supported in most Unix-like OS (Linux, MacOS). No support is granted on Windows at the moment, even if you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar. Anyway downloaded binaries are OS specific (eg: gucci is available for Windows from version 1.5.x).
-
 These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
 
 * [aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) cli (version 2)
@@ -76,7 +74,11 @@ These are the dependencies required to be installed, part of them are from `ecs-
 * [curl](http://curl.haxx.se/)
 * [git](https://git-scm.com/)
 
-Additional dependencies (for both application and tests) expected to be available in the `PATH` will be automatically installed on first execution. Since at the moment the tool is available as source code only (but planned to be distributed with source and/or binary releases), here's how to install it:
+Additional dependencies (for both application and tests) expected to be available in the `PATH` will be automatically installed on first execution.
+
+Given it's a `bash` script, it should be supported in most Unix-like OS. Most of development is done on MacOs, while automatic tests are run on Linux (Ubuntu and CentOS). On Windows, you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar (we succesfully tested on Windows 10 with `Git bash`, `aws` and `jq` - no extra `coreutils` and `curl` required). Anyway downloaded binaries are OS specific (eg: `gucci` is available for Windows starting from version `1.5.x`, 64-bit only at the moment).
+
+Since at the moment the tool is available as source code only (but planned to be distributed with source and/or binary releases), here's how to install it:
 
 ```
 $ git clone https://github.com/GuccioGucci/yoke.git
@@ -406,7 +408,7 @@ For doing so, sample templates are provided in [templates/pipeline](templates/pi
   * customize any `prd`-specific tasks that you want to perform (eg: configuring AWS profiles and/or promoting images from nonprod to prod Docker registries)
   * create a Jenkins job using this `Jenkinsfile.deploy` as the pipeline, named `${APPLICATION}_deploy`
 
-Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `master` branch, in order to keep control of yoke version, since it lacks any proper distribution channel at the moment (nexus, yum, etc.). To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.
+Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `main` branch, in order to keep control of `yoke` version. To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.
 
 <a name='application-configuration-override'></a>
 ## Application configuration override
