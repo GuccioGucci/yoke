@@ -391,7 +391,7 @@ While integrating with [Jenkins](https://www.jenkins.io/), one possible approach
 
 ![Pipelines, Jenkins: main](docs/pipelines-jenkins-main.png "Pipelines, Jenkins: main")
 
-The **main** pipeline would build application version for a given commit (on `BRANCH` parameter), while the **deploy** pipeline would be executed multiple times, deploying the very same Docker image (`TAG` parameter) on individual environments (`ENVIRONMENT` parameter). Deployment on each environment will be asked for confirmation (with `input` step), on `master` branch only (please, change it to match your *trunk* branch naming).
+The **main** pipeline would build application version for a given commit (`BRANCH` parameter), while the **deploy** pipeline would be executed multiple times, deploying the very same Docker image (`TAG` parameter) on individual environments (`ENVIRONMENT` parameter). Deployment on each environment other than `dev` will be asked for confirmation (with `input` step), on `master` branch only (please, change it to match your *trunk* branch naming).
 
 ![Pipelines, Jenkins: deploy](docs/pipelines-jenkins-deploy.png "Pipelines, Jenkins: deploy")
 
