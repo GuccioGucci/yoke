@@ -14,7 +14,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 ## 1.6
 
-* updated dependecies: ecs-deploy to 3.10.2 (fork)
+* updated dependencies: ecs-deploy to 3.10.2 (fork)
 * canary releases: 25% canary + stable rollout
 * canary releases: task-set from file
 * canary releases: custom confirm script
@@ -26,14 +26,14 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * helpers: aws iam role, as a more compact alternative to aws account id for roles
 * install: validation, avoid deploying failing task-definition
 * dry-run mode, to avoid any deployment execution (helping testing and troubleshooting)
-* updated dependecies: ecs-deploy to 3.10.1 (fork)
+* updated dependencies: ecs-deploy to 3.10.1 (fork)
 * multi-container mode, applying image tag to main container only (first one)
-* updated dependecies: gucci to 1.4.0 (merged from fork)
+* updated dependencies: gucci to 1.4.0 (merged from fork)
 
 ## 1.4
 
-* updated dependecies: gucci to 1.3.1 (fork)
-* helpers: support for shell with mutiple arguments (eg: for dynamic EFS access point names)
+* updated dependencies: gucci to 1.3.1 (fork)
+* helpers: support for shell with multiple arguments (eg: for dynamic EFS access point names)
 
 ## 1.3
 
@@ -43,7 +43,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 ## 1.2
 
 * added templates: deployment, pipelines
-* updated dependecies: ecs-deploy to 3.10.0, gucci to 1.3.0
+* updated dependencies: ecs-deploy to 3.10.0, gucci to 1.3.0
 
 ## 1.1
 
