@@ -187,7 +187,13 @@ Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinit
 
 While preparing template content, you can use much of Go templating functions: for example, declaring variables, `if` statements, boolean functions and so on. Also, Sprig functions are supported. Please, see [here](https://github.com/noqcks/gucci#templating) for the full list of supported functions and options.
 
-In addition to that, we prepared some useful helper scripts (already available into `PATH`), that you can use with the `shell` function. Here's a brief recap (see [helpers](bin/helpers) for details, and [helpers.bats](test/helpers.bats) for usage examples):
+In addition to that, we prepared some useful helper scripts (already available into `PATH`), that you can use with the `shell` function. Here's a brief recap (see [helpers](bin/helpers) for details, and [helpers.bats](test/helpers.bats) for usage examples). Please note, custom helpers are supported, loaded from `bin` folder under current working-dir, eg:
+
+```
+deployment/
+└── bin/
+    └── my_custom_helper
+```
 
 ### aws_account_id
 
