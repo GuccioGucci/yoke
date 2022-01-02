@@ -66,6 +66,11 @@ function do_initialize() {
     PATH="$CURRENT_DIR/bin/helpers:$PATH"
     realpath $( deployment_PATH ) > /dev/null 2>&1 && PATH="$( realpath $( deployment_PATH ) ):$PATH"
 
+    [[ "$DEBUG" != "false" ]] && {
+        log "PATH: $PATH";
+        log "dry-run: $DRY_RUN"
+    }
+
     # mandatory command
     [[ -z "$COMMAND" ]] && { echo "no command provided" ; show_usage ; exit 1; }
     [[ "$COMMAND" != "update" && "$COMMAND" != "install" ]] && { echo "unsupported command" ; show_usage ; exit 1; }
@@ -106,11 +111,7 @@ function init_task_definition() {
       command_line="-f $VALUES"
   fi
   
-  [[ "$DEBUG" != "false" ]] && {
-      log "[task definition] PATH: $PATH";
-      log "[task definition] template on: $command_line $original_confirmation";
-  }
-  
+  [[ "$DEBUG" != "false" ]] && log "[task definition] template on: $command_line $original_task_definition"
   template_on $command_line $original_task_definition > $TASK_DEFINITION || {
       log "cannot prepare task-definition";
       exit 1;
@@ -130,7 +131,8 @@ function init_task_set() {
     if [[ ! -z "$VALUES" ]]; then
         command_line="-f $VALUES"
     fi
-  
+    
+    [[ "$DEBUG" != "false" ]] && log "[task set] template on: $command_line $original_task_set"
     template_on $command_line $original_task_set > $TASK_SET || {
         log "cannot prepare task-set";
         exit 1;
@@ -140,7 +142,7 @@ function init_task_set() {
 
 function init_confirmation() {
   local command_line=""
-  CONFIRMATION="$( realpath $( deployment_PATH )/${CONFIRMATION} )"
+  realpath $( deployment_PATH )/${CONFIRMATION} > /dev/null 2>&1 && CONFIRMATION="$( realpath $( deployment_PATH )/${CONFIRMATION} )"
   
   if [[ -f $CONFIRMATION ]]; then
     log "confirmation: $CONFIRMATION"
@@ -151,7 +153,8 @@ function init_confirmation() {
     if [[ ! -z "$VALUES" ]]; then
         command_line="-f $VALUES"
     fi
-  
+    
+    [[ "$DEBUG" != "false" ]] && log "[confirmation] template on: $command_line $original_confirmation"
     template_on $command_line $original_confirmation > $CONFIRMATION || {
         log "cannot prepare confirmation";
         exit 1;
@@ -174,13 +177,9 @@ function do_deploy() {
     [[ "$COMMAND" == "install" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( on_install_flags ) --timeout $TIMEOUT"
     [[ ! -z "$PRUNE_TASK_DEFINITIONS" ]] && command_line="$command_line --max-definitions $PRUNE_TASK_DEFINITIONS"
 
-    [[ "$DEBUG" != "false" ]] && {
-        command_line="$command_line --verbose";
-        log "PATH: $PATH";
-        log "dry-run: $DRY_RUN"
-        log "ecs-deploy command line: $command_line";
-    }
-    
+    [[ "$DEBUG" != "false" ]] && command_line="$command_line --verbose"
+    [[ "$DEBUG" != "false" ]] && log "[deploy] ecs-deploy command line: $command_line"
+
     [[ "$DRY_RUN" != "false" ]] && exit 0
     ecs-deploy $command_line
 }
