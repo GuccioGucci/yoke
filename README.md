@@ -1,3 +1,7 @@
+# yoke
+
+![ci](https://github.com/GuccioGucci/yoke/actions/workflows/ci.yml/badge.svg)
+
 # Table of contents
 
 * [About](#about)
