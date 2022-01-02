@@ -16,7 +16,7 @@ TIMEOUT="300"
 DRY_RUN="false"
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-PATH="$PATH:$CURRENT_DIR/lib/ecs-deploy:$CURRENT_DIR/lib/gucci:$CURRENT_DIR/bin/helpers"
+PATH="$PATH:$CURRENT_DIR/lib/ecs-deploy:$CURRENT_DIR/lib/gucci"
 
 # functions
 
@@ -61,7 +61,11 @@ function deployment_PATH() {
     echo "${WORKING_DIR}/bin"
 }
 
-function do_initialize() {
+function do_initialize() {    
+    # enrich PATH with shared and deployment binaries
+    PATH="$CURRENT_DIR/bin/helpers:$PATH"
+    realpath $( deployment_PATH ) > /dev/null 2>&1 && PATH="$( realpath $( deployment_PATH ) ):$PATH"
+
     # mandatory command
     [[ -z "$COMMAND" ]] && { echo "no command provided" ; show_usage ; exit 1; }
     [[ "$COMMAND" != "update" && "$COMMAND" != "install" ]] && { echo "unsupported command" ; show_usage ; exit 1; }
@@ -101,6 +105,11 @@ function init_task_definition() {
   if [[ ! -z "$VALUES" ]]; then
       command_line="-f $VALUES"
   fi
+  
+  [[ "$DEBUG" != "false" ]] && {
+      log "[task definition] PATH: $PATH";
+      log "[task definition] template on: $command_line $original_confirmation";
+  }
   
   template_on $command_line $original_task_definition > $TASK_DEFINITION || {
       log "cannot prepare task-definition";

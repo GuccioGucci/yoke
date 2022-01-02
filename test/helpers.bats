@@ -25,6 +25,23 @@ teardown() {
     assert_equal "$service_name" "hello-world-dev"
 }
 
+@test 'helpers with arguments, from current deployment PATH' {
+    run ./yoke install -c any -s any -t 12345 -w test/deployments/task_definition_template_from_current_deployment -f values-dev.yaml --debug
+    assert_equal $status 0 || fail "${lines[*]}"
+    
+    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
+
+    local container_port="$( cat $task_definition | jq -r ".taskDefinition.containerDefinitions[0].portMappings[0].containerPort" )"
+    assert_equal "$container_port" "8080"
+
+    local family="$( cat $task_definition | jq -r ".taskDefinition.family" )"
+    assert_equal "$family" "hello-world-dev"
+    
+    local service_name="$( cat $task_definition | jq -r ".taskDefinition.containerDefinitions[0].environment[0].value" )"
+    assert_equal "$service_name" "hello-world-dev"
+}
+
+
 @test 'aws account id - success' {
     run ./bin/helpers/aws_account_id
     assert_equal $status 0

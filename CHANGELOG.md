@@ -5,6 +5,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 ## Current
 
 * minimal support for Windows
+* helpers from working-dir
 
 ## 2.0
 
@@ -80,6 +81,5 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * distribution as binary packages
 * rollback, by default or optionally
 * canary release: more complex scenario
-* helpers from working-dir
 * deploy scheduled tasks
 * support for secrets
