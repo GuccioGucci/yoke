@@ -57,6 +57,10 @@ function template_on() {
   ( cd $( realpath ${WORKING_DIR} ) ; gucci $* )
 }
 
+function deployment_PATH() {
+    echo "${WORKING_DIR}/bin"
+}
+
 function do_initialize() {
     # mandatory command
     [[ -z "$COMMAND" ]] && { echo "no command provided" ; show_usage ; exit 1; }
@@ -127,7 +131,7 @@ function init_task_set() {
 
 function init_confirmation() {
   local command_line=""
-  CONFIRMATION="$( realpath ${WORKING_DIR}/${CONFIRMATION} )"
+  CONFIRMATION="$( realpath $( deployment_PATH )/${CONFIRMATION} )"
   
   if [[ -f $CONFIRMATION ]]; then
     log "confirmation: $CONFIRMATION"

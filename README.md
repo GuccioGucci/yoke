@@ -37,7 +37,7 @@
 
 In [GuccioGucci](https://github.com/GuccioGucci/) we've been using `ECS` for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` cli](https://aws.amazon.com/cli/) for performing application deployment. We also relied on `FARGATE` launch type, wich ensure `ECS` is managing resources with no additional operations required.
 
-When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` cli first, then enriching task-definition in `Terraform` modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every `ECS` environment (eg: `dev`, `qa` and `prd`).
+When we tried applying Continuous Delivery, it was not so easy to automatically evolve application code to use new configuration values (eg: injected as environment variables), since this typically required to prepare parameters with `aws` cli first, then enriching task-definition in Terraform modules and applying those changes. Two manual steps, before the new application version could be deployed. And this process had to be replicated in every `ECS` environment (eg: `dev`, `qa` and `prd`).
 
 We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue together few open-source tools. Next section will explain how.
 
@@ -313,7 +313,7 @@ Even better, we could always rely on *already existing* task definitions, but us
 
 In order to do so, we need to:
 
-* distinguish *first* and *following* Terraform `apply` executions
+* distinguish *first* and *following* `terraform apply` executions
 * prepare "off-the-shelf" task definitions (referred to as `bogus`)
 
 First goal can be achieved using a variable on command-line (e.g. `bootstrap`), being `false` by default and set `true` on first execution. Here's an example:
