@@ -1,0 +1,58 @@
+{
+  "taskDefinition": {
+    "family": "hello-world-x-{{ .environment.name }}",
+    "executionRoleArn": "{{ shell "aws_iam_role hello-world-x-" .environment.name }}",
+    "taskRoleArn": "{{ shell "aws_iam_role hello-world-x-" .environment.name }}",
+    "placementConstraints": [ ],
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "cpu": "512",
+    "memory": "1024",
+    "volumes": [
+      {
+        "efsVolumeConfiguration": {
+          "fileSystemId": "{{ shell "aws_efs_ap hello-world-x-" .environment.name "-efs fileSystemId" }}",
+          "authorizationConfig": {
+            "iam": "ENABLED",
+            "accessPointId": "{{ shell "aws_efs_ap hello-world-x-" .environment.name "-efs accessPointId" }}"
+          },
+          "transitEncryption": "ENABLED",
+          "rootDirectory": "/"
+        },
+        "name": "shared"
+      }
+    ],
+    "containerDefinitions": [
+      {
+        "name": "application",
+        "image": "registry.docker.my/hello-world:latest",
+        "repositoryCredentials": {
+          "credentialsParameter": "registry.docker.my/readonly"
+        },
+        "portMappings": [
+          {
+            "containerPort": 8080
+          }
+        ],
+        "environment": [ ],
+        "secrets": [ ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "hello-world-x-{{ .environment.name }}",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "ecs"
+          }
+        },
+        "mountPoints": [
+          {
+            "containerPath": "/data",
+            "sourceVolume": "shared"
+          }
+        ]
+      }
+    ]
+  }
+}

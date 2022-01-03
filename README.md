@@ -329,17 +329,17 @@ Expected `task-set.json.tmpl` content is a JSON file, with a root node matching 
 Here's a sample execution:
 
 ```
- (1) [2021-01-05 16:38:00] values: test/samples/hello-world/deployment/values-dev.yaml
- (2) [2021-01-05 16:38:00] confirmation: test/samples/hello-world/deployment/bin/confirm.sh.tmpl
+ (1) [2021-01-05 16:38:00] values: test/samples/hello-world-x/deployment/values-dev.yaml
+ (2) [2021-01-05 16:38:00] confirmation: test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl
  (3) [2021-01-05 16:38:00] (current) confirmation: /tmp/confirm.sh.7947
- (4) [2021-01-05 16:38:00] task-definition: test/samples/hello-world/deployment/task-definition.json.tmpl
+ (4) [2021-01-05 16:38:00] task-definition: test/samples/hello-world-x/deployment/task-definition.json.tmpl
  (5) [2021-01-05 16:38:00] (current) task-definition: /tmp/task-definition.json.12699
- (6) [2021-01-05 16:38:02] task-set: test/samples/hello-world/deployment/task-set.json.tmpl
+ (6) [2021-01-05 16:38:02] task-set: test/samples/hello-world-x/deployment/task-set.json.tmpl
  (7) [2021-01-05 16:38:02] (current) task-set: /tmp/task-set.json.25561
  (8) Deployment controller: EXTERNAL
  (9) Using image name: bb255ec-93
-(10) Current task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:11
-(11) New task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:12
+(10) Current task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-x-dev:11
+(11) New task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-x-dev:12
 (12) Creating new canary deployment of the service
 (13) Current deployments
 (14) {"externalId":"stable-20210501-172006","status":"ACTIVE","scale":"100%","desired":4,"pending":0,"running":4}
@@ -373,7 +373,7 @@ At the moment, **canary release** strategy is the following:
 * delete existing deployment (`27`)
 * delete new canary deployment (`28`)
 
-Additionally, a custom confirmation strategy can be prepared, by defining a `confirm.sh.tmpl` script, expected to `exit 0` while ready to proceed, and to be found in `bin` folder, under current working-dir:
+Additionally, a custom confirmation strategy can be prepared, by defining a `confirm.sh.tmpl` script (see [confirm.sh.tmpl](test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl) as an example). It's expected to `exit 0` while ready to proceed, and to be found in `bin` folder, under current working-dir:
 
 ```
 deployment/

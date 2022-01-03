@@ -1,0 +1,27 @@
+{
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "subnets": [
+                "{{ shell "aws_subnet az1" }}"
+            ],
+            "securityGroups": [
+                "{{ shell "aws_security_group hello-world-x-" .environment.name }}"
+            ],
+            "assignPublicIp": "DISABLED"
+        }
+    },
+    "loadBalancers": [
+        {
+            "targetGroupArn": "{{ shell "aws_lb_target_group hello-world-x-" .environment.name "-ext" }}",
+            "containerName": "application",
+            "containerPort": 8080
+        }
+    ],
+    "serviceRegistries": [ ],
+    "launchType": "FARGATE",
+    "platformVersion": "LATEST",
+    "scale": {
+        "value": 100,
+        "unit": "PERCENT"
+    }
+}
