@@ -375,11 +375,11 @@ At the moment, **canary release** strategy is the following:
 
 Additionally, a custom confirmation strategy can be prepared, by defining a `confirm.sh.tmpl` script, expected to `exit 0` while ready to proceed, and to be found in `bin` folder, under current working-dir:
 
-‘‘‘
+```
 deployment/
 └── bin
     └── confirm.sh.tmpl
-’’’
+```
 
 <a name='extra'></a>
 # Extra
