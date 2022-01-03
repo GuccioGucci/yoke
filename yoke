@@ -80,12 +80,14 @@ function do_initialize() {
     [[ -z "$SERVICE" ]] && { echo "no service provided" ; show_usage ; exit 1; }
     [[ -z "$IMAGE_TAG" ]] && { echo "no image provided" ; show_usage ; exit 1; }
     
+    # shared initialization
+    init_values
+    init_confirmation
+    
     # install-specific initialization
     if [[ "$COMMAND" == "install" ]]; then
-      init_values      
       init_task_definition
       init_task_set
-      init_confirmation
     fi
 }
 
@@ -164,17 +166,22 @@ function init_confirmation() {
   fi
 }
 
-function on_install_flags() {
+function flags_install() {
   local flags="--task-definition-file $TASK_DEFINITION"
   [[ -f $TASK_SET ]] && flags="$flags --task-set-file $TASK_SET"
-  [[ -f $CONFIRMATION ]] && flags="$flags --canary-confirmation $CONFIRMATION" || flags="$flags --canary-confirmation wait_timeout"
   echo "$flags"
+}
+
+function flags_confirmation() {
+    flags=""
+    [[ -f $CONFIRMATION ]] && flags="$flags --canary-confirmation $CONFIRMATION" || flags="$flags --canary-confirmation wait_timeout"
+    echo "$flags"
 }
 
 function do_deploy() {
     local command_line=""
-    [[ "$COMMAND" == "update" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image --timeout $TIMEOUT"
-    [[ "$COMMAND" == "install" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( on_install_flags ) --timeout $TIMEOUT"
+    [[ "$COMMAND" == "update" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( flags_confirmation ) --timeout $TIMEOUT"
+    [[ "$COMMAND" == "install" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( flags_install ) $( flags_confirmation ) --timeout $TIMEOUT"
     [[ ! -z "$PRUNE_TASK_DEFINITIONS" ]] && command_line="$command_line --max-definitions $PRUNE_TASK_DEFINITIONS"
 
     [[ "$DEBUG" != "false" ]] && command_line="$command_line --verbose"

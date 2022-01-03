@@ -89,6 +89,26 @@ last_execution_output() {
     assert_equal "$securityGroup" "sg-abcdefghil1234567"
 }
 
+@test 'update - task set, default confirmation values' {
+    run ./yoke update -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_only
+
+    local commands="$( cat $YOKE_FAKES_LOGGING )"
+    assert_equal $status 0 || fail "$commands"
+    
+    local expected='--canary-confirmation wait_timeout'
+    [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
+}
+
+@test 'update - task set, custom confirmation' {
+    run ./yoke update -c any -s any -t bb255ec-93 -w test/deployments/task_set_with_confirmation
+
+    local commands="$( cat $YOKE_FAKES_LOGGING )"
+    assert_equal $status 0 || fail "$commands"
+    
+    local expected='--canary-confirmation /tmp/confirm.sh.\w*'
+    [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
+}
+
 @test 'install - task set, default confirmation values' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_only
 

@@ -6,6 +6,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 * minimal support for Windows
 * helpers from working-dir
+* canary releases: update, supporting confirmation (default or custom)
 
 ## 2.0
 
