@@ -13,6 +13,7 @@
   * [Update](#update)
   * [Install](#install)
   * [Helpers](#helpers)
+  * [Deployment Controllers](#deployment-controllers)
 * [Extra](#extra)
   * [Provisioning: Terraform](#provisioning-terraform)
     * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live)
@@ -53,8 +54,6 @@ Frankly speaking, it's just a wrapper around other tools (actually, [enriched fo
 * [noqcks/gucci](https://github.com/noqcks/gucci): standalone [Go template engine](https://golang.org/pkg/text/templates/). (Isn't it funny that it is named `gucci`? Really!)
 
 So, `yoke` it's mainly composing an `ecs-deploy` command-line, and additionally preparing a proper actual task-definition file, from given template and "values" YAML files (holding per-environment data).
-
-Currently, we mainly promote using `yoke` with services provisioned as `ECS` [deployment controller](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentController.html), which is the default one. Experimental support for `EXTERNAL` deployment controller is in progress, in order to support [canary releases](https://martinfowler.com/bliki/CanaryRelease.html). Please, see [contributions](#contributions) section for details.
 
 <a name='origin'></a>
 ## Origin
@@ -150,7 +149,7 @@ Install local task definition, with image tag (short and long versions):
 
 This will prepare a local task definition, starting from a template (expected to be `task-definition.json.tmpl`), apply the proper template substitutions (using given `values-dev.yaml` file as source), create a new revision for the task definition (starting from the local one, just created), and finally force a new deployment. Once done, newly created task definition will be the *current* one.
 
-Both task definition template (`task-definition.json.tmpl`) and values file (`values-dev.yaml` in the example) are expected to be found in a working directory (default to `deployment`, set to `test/samples/hello-world/deployment` in the example). Relying on the default, it would be:
+Both task definition template (`task-definition.json.tmpl`) and values file (`values-dev.yaml` in the example) are expected to be found in the working directory (default to `deployment`, set to `test/samples/hello-world/deployment` in the example). Relying on the default, it would be:
 ```
 deployment/
 ├── task-definition.json.tmpl
@@ -269,6 +268,118 @@ Get Subnet by name, then extract ARN.
   "{{ shell "aws_subnet nonprod-az2" }}"
 ]
 ```
+
+<a name='deployment-controllers'></a>
+## Deployment Controllers
+
+Currently, we mainly promote using `yoke` with services provisioned as `ECS` [deployment controller](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentController.html), which is the default one. Both **update** and **install** modes would then rely on ECS for managing the deployments lifecycle. Here's a sample execution:
+
+```
+ ./yoke install -c cls01 -s hello-world-dev -t bb255ec-93 -w test/samples/hello-world/deployment -f values-dev.yaml
+ 
+ (1) [2021-01-05 16:34:33] values: test/samples/hello-world/deployment/values-dev.yaml
+ (2) [2021-01-05 16:34:33] task-definition: test/samples/hello-world/deployment/task-definition.json.tmpl
+ (3) [2021-01-05 16:34:33] (current) task-definition: /tmp/task-definition.json.17213
+ (4) Deployment controller: ECS
+ (5) Using image name: bb255ec-93
+ (6) Current task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:10
+ (7) New task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:11
+ (8) .......
+ (9) Service updated successfully, new task definition running.
+(10) Waiting 300s for service deployment to complete...
+(11) ..............................................
+(12) Service deployment successful.
+```
+
+By default, it will:
+
+* create new fully-sized deployment (`7`-`9`)
+* wait for new deployment to be steady (`10`-`12`)
+* dispose previous deployment (as a non-blocking command, after `yoke` has completed)
+
+Experimental support for `EXTERNAL` deployment controller is in progress, supporting [canary releases](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, managed *deployments*). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](#contributions) section for details and [deployment.bats](test/deployment.bats) for sample usages).
+
+For **install** mode only, in addition to `task-definition.json.tmpl`, you're expected to provide a `task-set.json.tmpl` file as well, again expected to be found in the working directory, eg:
+
+```
+deployment/
+├── task-definition.json.tmpl
+├── task-set.json.tmpl
+├── values-dev.yaml
+├── values-qa.yaml
+└── values-prd.yaml
+```
+
+Expected `task-set.json.tmpl` content is a JSON file, with a root node matching [aws ecs update-task-set request](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/update-task-set.html) JSON syntax. Here's an example:
+
+```
+{
+  "networkConfiguration": { ... },
+  "loadBalancers": [ { ... } ],
+  "serviceRegistries": [ ],
+  "launchType": "FARGATE",
+  "platformVersion": "LATEST",
+  "scale": {
+    "value": 100,
+    "unit": "PERCENT"
+  }
+}
+```
+
+Here's a sample execution:
+
+```
+ (1) [2021-01-05 16:38:00] values: test/samples/hello-world/deployment/values-dev.yaml
+ (2) [2021-01-05 16:38:00] confirmation: test/samples/hello-world/deployment/bin/confirm.sh.tmpl
+ (3) [2021-01-05 16:38:00] (current) confirmation: /tmp/confirm.sh.7947
+ (4) [2021-01-05 16:38:00] task-definition: test/samples/hello-world/deployment/task-definition.json.tmpl
+ (5) [2021-01-05 16:38:00] (current) task-definition: /tmp/task-definition.json.12699
+ (6) [2021-01-05 16:38:02] task-set: test/samples/hello-world/deployment/task-set.json.tmpl
+ (7) [2021-01-05 16:38:02] (current) task-set: /tmp/task-set.json.25561
+ (8) Deployment controller: EXTERNAL
+ (9) Using image name: bb255ec-93
+(10) Current task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:11
+(11) New task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:12
+(12) Creating new canary deployment of the service
+(13) Current deployments
+(14) {"externalId":"stable-20210501-172006","status":"ACTIVE","scale":"100%","desired":4,"pending":0,"running":4}
+(15) {"externalId":"canary-20210501-163811","status":"ACTIVE","scale":"25%","desired":0,"pending":0,"running":0}
+(16) Waiting 300s for service deployment to complete...
+(17) .................
+(18) Service deployment successful.
+(19) 
+(20) Waiting 10s...
+(21) ..........
+(22) Creating new stable deployment of the service
+(23) Waiting 300s for service deployment to complete...
+(24) ............
+(25) Service deployment successful.
+(26) 
+(27) Deleting previous (stable) deployment of the service
+(28) Deleting canary deployment of the service
+(29) Current deployments
+(30) {"externalId":"stable-20210501-163909","status":"ACTIVE","scale":"100%","desired":4,"pending":0,"running":4}
+(31) {"externalId":"stable-20210501-172006","status":"DRAINING","scale":"0%","desired":4,"pending":0,"running":4}
+(32) {"externalId":"canary-20210501-163811","status":"DRAINING","scale":"0%","desired":1,"pending":0,"running":1}
+```
+
+At the moment, **canary release** strategy is the following:
+
+* create new *canary* deployment, scaled to 25% of desired size (`11`-`15`)
+* wait for new canary deployment to be steady (`16`-`18`)
+* apply **confirmation strategy**, by default `wait_timeout` (`20`-`21`)
+* create new *stable* deployment, scaled to 100% of desired size (`22`)
+* wait for new stable deployment to be steady (`23`-`25`)
+* delete existing deployment (`27`)
+* delete new canary deployment (`28`)
+
+Additionally, a custom confirmation strategy can be prepared, by defining a `confirm.sh.tmpl` script, expected to `exit 0` while ready to proceed, and to be found in `bin` folder, under current working-dir:
+
+‘‘‘
+deployment/
+└── bin
+    └── confirm.sh.tmpl
+’’’
 
 <a name='extra'></a>
 # Extra
