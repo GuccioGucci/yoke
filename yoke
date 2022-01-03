@@ -87,8 +87,6 @@ function do_initialize() {
       init_task_set
       init_confirmation
     fi
-
-    [[ "$DEBUG" != "false" ]] && log "task-definition: $( cat $TASK_DEFINITION )"
 }
 
 function init_values() {
@@ -105,7 +103,9 @@ function init_task_definition() {
   
   original_task_definition=$TASK_DEFINITION
   TASK_DEFINITION="/tmp/task-definition.json.$RANDOM"
+
   log "(current) task-definition: $TASK_DEFINITION"
+  [[ "$DEBUG" != "false" ]] && log "task-definition: $( cat $TASK_DEFINITION )"
   
   if [[ ! -z "$VALUES" ]]; then
       command_line="-f $VALUES"
