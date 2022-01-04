@@ -2,8 +2,6 @@
 
 ![ci](https://github.com/GuccioGucci/yoke/actions/workflows/ci.yml/badge.svg)
 
-# Table of contents
-
 * [About](#about)
   * [Motivation](#motivation)
   * [How it works](#how-it-works)
@@ -14,21 +12,24 @@
   * [Install](#install)
   * [Helpers](#helpers)
   * [Deployment Controllers](#deployment-controllers)
+    * [ECS: Rolling Update](#ecs-rolling-update)
+    * [EXTERNAL: Canary Release](#external-canary-release)
 * [Extra](#extra)
   * [Provisioning: Terraform](#provisioning-terraform)
-    * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live)
-    * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only)
-    * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus)
+    * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live-migrating-to-update-mode)
+    * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only-migrating-to-install-mode)
+    * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus-creating-from-scratch)
   * [Templates](#templates)
     * [Deployment](#deployment)
     * [Pipelines: Jenkins](#pipelines-jenkins)
   * [Application configuration override](#application-configuration-override)
+    * [Ktor and Jib](#ktor-and-jib)
+    * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
 * [Contributing](#contributing)
   * [Tests](#tests)
   * [Contributions](#contributions)
 * [License](#license)
 
-<a name='about'></a>
 # About
 
 `yoke` is a simple tool for deploying services on [Amazon Elastic Container Service](https://aws.amazon.com/ecs/) (AWS ECS). Its approach tries supporting [Continuous Delivery](https://continuousdelivery.com/), decoupling resources **provisioning** from application **deployment**, ensuring you can:
@@ -37,7 +38,6 @@
 * **build once, deploy everywhere**, decoupling build and deploy processes, given we correlate application version and deployment descriptors
 * **keep application and deployment descriptors close together**, ensuring they stay in synch
 
-<a name='motivation'></a>
 # Motivation
 
 In [GuccioGucci](https://github.com/GuccioGucci/) we've been using `ECS` for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` cli](https://aws.amazon.com/cli/) for performing application deployment. We also relied on `FARGATE` launch type, wich ensure `ECS` is managing resources with no additional operations required.
@@ -46,7 +46,6 @@ When we tried applying Continuous Delivery, it was not so easy to automatically 
 
 We then started looking for something supporting our scenario, and found it was quite common. Even if no single tooling existed matching our context, it was easy to glue together few open-source tools. Next section will explain how.
 
-<a name='how-it-works'></a>
 ## How it works
 
 Frankly speaking, it's just a wrapper around other tools (actually, [enriched forks](#contributing)):
@@ -55,7 +54,6 @@ Frankly speaking, it's just a wrapper around other tools (actually, [enriched fo
 
 So, `yoke` it's mainly composing an `ecs-deploy` command-line, and additionally preparing a proper actual task-definition file, from given template and "values" YAML files (holding per-environment data).
 
-<a name='origin'></a>
 ## Origin
 
 It was initially inspired by past experience with [Helm](https://helm.sh/), which is the [Kubernetes](https://kubernetes.io/) (k8s) package manager (in few words, the tool to discover and install k8s applications -- *charts* in Helm jargon).
@@ -66,7 +64,6 @@ Anyway, if you don't get it, sounds like "joke".
 
 ![flight yoke system](docs/flight-yoke-system.jpg "Flight yoke system")
 
-<a name='installation'></a>
 # Installation
 
 These are the dependencies required to be installed, part of them are from `ecs-deploy` [required dependencies](https://github.com/silinternational/ecs-deploy#installation):
@@ -97,7 +94,6 @@ Updating bats-support (ztombol/bats-support)
 (deployment) ecs-deploy: 3.10.2
 ```
 
-<a name='usage'></a>
 # Usage
 
 In order to use it, please ensure you have a proper AWS setup, ensuring `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables are set, or alternatively `AWS_SHARED_CREDENTIALS_FILE` only. Please, remember also to configure default region, by choosing "Default region name" value with `aws configure`, or setting `AWS_DEFAULT_REGION` environment variable.
@@ -127,7 +123,6 @@ parameters:
 
 `yoke` supports two different modes: **update** mode and **install** mode. Given your context (migrating an existing application, or developing a new application) you can choose the one that fits you best. Please, see next sections for details, and [Provisioning: Terraform](#provisioning-terraform) section to understand the impact on resource provisioning.
 
-<a name='update'></a>
 ## Update
 
 Update an existing task definition, with a given image tag (short and long versions):
@@ -138,7 +133,6 @@ Update an existing task definition, with a given image tag (short and long versi
 
 This will grab the *current* task definition (for given `cls01` cluster and `hello-world-dev` service), update main container definition to use the given image tag (`bb255ec-93`), create a new revision for the task definition, and finally force a new deployment. Once done, newly created task definition will be the *current* one.
 
-<a name='install'></a>
 ## Install
 
 Install local task definition, with image tag (short and long versions):
@@ -185,7 +179,6 @@ Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinit
 }
 ```
 
-<a name='helpers'></a>
 ## Helpers
 
 While preparing template content, you can use much of Go templating functions: for example, declaring variables, `if` statements, boolean functions and so on. Also, Sprig functions are supported. Please, see [here](https://github.com/noqcks/gucci#templating) for the full list of supported functions and options.
@@ -269,10 +262,18 @@ Get Subnet by name, then extract ARN.
 ]
 ```
 
-<a name='deployment-controllers'></a>
 ## Deployment Controllers
 
-Currently, we mainly promote using `yoke` with services provisioned as `ECS` [deployment controller](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentController.html), which is the default one. Both **update** and **install** modes would then rely on ECS for managing the deployments lifecycle. Here's a sample execution:
+AWS ECS services can be configured to be provisioned with specific [deployment controller](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentController.html). By default, it would be `ECS` (fully managed deployments). Alternatively, you can configure `CODE_DEPLOY` (unsupported, as it implies using AWS CodeDeploy) and `EXTERNAL` (for delegating third-party component, actually `yoke` itself).
+
+### ECS: Rolling Update
+
+Currently, we mainly promote using `yoke` with services provisioned as `ECS`. Both **update** and **install** modes would then rely on ECS for managing the deployments lifecycle. It would result in rolling update, described as:
+
+> replacing the current running version of the container with the latest version. The number of containers Amazon ECS adds or removes from the service during a rolling update is controlled by adjusting the minimum and maximum number of healthy tasks allowed during a service deployment, as specified in the DeploymentConfiguration.
+
+
+Here's a sample execution:
 
 ```
  ./yoke install -c cls01 -s hello-world-dev -t bb255ec-93 -w test/samples/hello-world/deployment -f values-dev.yaml
@@ -295,9 +296,12 @@ By default, it will:
 
 * create new fully-sized deployment (`7`-`9`)
 * wait for new deployment to be steady (`10`-`12`)
-* dispose previous deployment (as a non-blocking command, after `yoke` has completed)
 
-Experimental support for `EXTERNAL` deployment controller is in progress, supporting [canary releases](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, managed *deployments*). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](#contributions) section for details and [deployment.bats](test/deployment.bats) for sample usages).
+Once `yoke` execution is completed, ECS is still disposing previous deployment, which is no more load-balanced (and so, safely disposable).
+
+## EXTERNAL: Canary Release
+
+Experimental support for `EXTERNAL` deployment controller is in progress, supporting [Canary Release](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, managed *deployments*). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](#contributions) section for details and [deployment.bats](test/deployment.bats) for sample usages).
 
 For **install** mode only, in addition to `task-definition.json.tmpl`, you're expected to provide a `task-set.json.tmpl` file as well, again expected to be found in the working directory, eg:
 
@@ -305,9 +309,7 @@ For **install** mode only, in addition to `task-definition.json.tmpl`, you're ex
 deployment/
 ├── task-definition.json.tmpl
 ├── task-set.json.tmpl
-├── values-dev.yaml
-├── values-qa.yaml
-└── values-prd.yaml
+└── values-dev.yaml
 ```
 
 Expected `task-set.json.tmpl` content is a JSON file, with a `taskSet` root node matching [aws ecs update-task-set request](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/update-task-set.html) JSON syntax. Here's an example:
@@ -383,19 +385,16 @@ deployment/
     └── confirm.sh.tmpl
 ```
 
-<a name='extra'></a>
 # Extra
 
 This section contains resources and guidelines in adopting the process. Please, consider this additional contribution as being very specific to what we've been using in [GuccioGucci](https://github.com/GuccioGucci/), anyway we hope it's common enough to be useful to you as well.
 
-<a name='provisioning-terraform'></a>
 ## Provisioning: Terraform
 
 You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope (since tesk-definition in `ECS` are managed resources, with individual revisions). Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches.
 
 We'll recap them here, with examples, using the following as reference scenario: a shared `module.tf`, with common definitions, and per-environment `$stage/main.tf` files (eg: `dev/main.tf`, `qa/main.tf` and `prd/main.tf`).
 
-<a name='mixed-managed-and-live'></a>
 ### Mixed: managed and live (migrating to Update mode)
 
 One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the `ECS` environment. Then, on task definition `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
@@ -417,7 +416,6 @@ resource "aws_ecs_service" "esv" {
   ...
 ```
 
-<a name='afterwards-live-only'></a>
 ### Afterwards: live only (migrating to Install mode)
 
 Another approach, going even further, is getting rid of `resource` for *managed* task definition, and only relying on `data` for *live* task definition, using it to configure the service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
@@ -435,7 +433,6 @@ resource "aws_ecs_service" "esv" {
 }
 ```
 
-<a name='bootstrap-live-only-with-bogus'></a>
 ### Bootstrap: live only, with bogus (creating from scratch)
 
 Even better, we could always rely on *already existing* task definitions, but using some default "off-the-shelf" ones the very first time (on creation), then following previous solution, afterwards. This sounds like a ["chicken and egg" problem](https://en.wikipedia.org/wiki/Chicken_or_the_egg): having a task definition already prepared *before* the very first application deploy (which holds the actual task definition). For reference, this was inspired by [this approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
@@ -542,10 +539,8 @@ resource "aws_ecs_service" "esv" {
 }
 ```
 
-<a name='templates'></a>
 ## Templates
 
-<a name='deployment'></a>
 ### Deployment
 
 A deployment template is provided in [templates/deployment](templates/deployment). Copy & paste it in your application sources, for example on root folder.
@@ -556,7 +551,6 @@ Sample values files should be ready to be used, while you should edit [`task-def
 * replace `${CONTAINER_PORT}` with load-balanced HTTP port for your application, as in your provisioning configuration (eg: Terraform)
 * replace `${SERVICE}` with your service name, in order match `${SERVICE}-{{ .environment.name }}` with your provisioning configuration (eg: Terraform)
 
-<a name='pipelines-jenkins'></a>
 ### Pipelines: Jenkins
 
 While integrating with [Jenkins](https://www.jenkins.io/), one possible approach is using one **main** pipeline for orchestrating build, test and deployment on all environments (`dev`, `qa` and `prd`), while delegating deployment to a dedicated **deploy** pipeline.
@@ -580,7 +574,6 @@ For doing so, sample templates are provided in [templates/pipeline](templates/pi
 
 Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `main` branch, in order to keep control of `yoke` version. To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](CHANGELOG.md) for details about individual versions.
 
-<a name='application-configuration-override'></a>
 ## Application configuration override
 
 Given task-definition is prepared at deploy-time, it could be used to override application configurations, with external resources. For example, you can prepare environment-specific application configuration override files, under same working-dir folder (eg: `deployment/config`):
@@ -698,10 +691,8 @@ java -jar service.jar ... \
      --spring.config.additional-location=config/application-override.properties # or application-override.yaml
 ```
 
-<a name='contributing'></a>
 # Contributing
 
-<a name='tests'></a>
 ## Tests
 
 Yes, it's tested! We were able to cover basic command-line parsing, and even tested expected interaction with `ecs-deploy`, relying on a [fake version](test/fake/lib/ecs-deploy). So, no real AWS integration happening, test execution is safe!
@@ -721,7 +712,6 @@ These are the libs we're using:
 
 Additionally, in [GuccioGucci](https://github.com/GuccioGucci/) we take care of ensuring end-to-end build and deployment is still working, with few sample applications, on our AWS `ECS` clusters (and then using `yoke` in our daily deployments).
 
-<a name='contributions'></a>
 ## Contributions
 
 Here's a list of contributions we did to involved open-source projects:
@@ -735,7 +725,6 @@ Here's a list of contributions we did to involved open-source projects:
 
 Note that while waiting for some PR to be merged, we're using forks.
 
-<a name='license'></a>
 # License
 
 Copyright 2021 Gucci.
