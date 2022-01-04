@@ -268,9 +268,9 @@ AWS ECS services can be configured to be provisioned with specific [deployment c
 
 ### ECS: Rolling Update
 
-Currently, we mainly promote using `yoke` with services provisioned as `ECS`. Both **update** and **install** modes would then rely on ECS for managing the deployments lifecycle. It would result in rolling update, described as:
+Currently, we mainly promote using `yoke` with services provisioned as `ECS`. Both **update** and **install** modes would then rely on ECS for managing the deployments lifecycle. It would result in a [Rolling Update](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html), described as:
 
-> replacing the current running version of the container with the latest version. The number of containers Amazon ECS adds or removes from the service during a rolling update is controlled by adjusting the minimum and maximum number of healthy tasks allowed during a service deployment, as specified in the DeploymentConfiguration.
+> ... replacing the current running version of the container with the latest version. The number of containers Amazon ECS adds or removes from the service during a rolling update is controlled by adjusting the minimum and maximum number of healthy tasks allowed during a service deployment, as specified in the DeploymentConfiguration.
 
 
 Here's a sample execution:
@@ -301,9 +301,9 @@ Once `yoke` execution is completed, ECS is still disposing previous deployment, 
 
 ## EXTERNAL: Canary Release
 
-Experimental support for `EXTERNAL` deployment controller is in progress, supporting [Canary Release](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, managed *deployments*). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](#contributions) section for details and [deployment.bats](test/deployment.bats) for sample usages).
+Experimental support for `EXTERNAL` deployment controller is in progress, supporting [Canary Release](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, *managed* deployments). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](#contributions) section for details and [deployment.bats](test/deployment.bats) for sample usages).
 
-For **install** mode only, in addition to `task-definition.json.tmpl`, you're expected to provide a `task-set.json.tmpl` file as well, again expected to be found in the working directory, eg:
+For **install** mode only, in addition to `task-definition.json.tmpl`, you can provide a `task-set.json.tmpl` file as well, again expected to be found in the working directory, eg:
 
 ```
 deployment/
@@ -329,6 +329,8 @@ Expected `task-set.json.tmpl` content is a JSON file, with a `taskSet` root node
   }
 }
 ```
+
+Please, consider the impact on provisioning, once you configure `EXTERNAL` deployment controller, eg: removing resources from Terraform (see [Provisioning: Terraform](#provisioning-terraform) section).
 
 Here's a sample execution:
 
