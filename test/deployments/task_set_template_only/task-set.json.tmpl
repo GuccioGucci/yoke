@@ -1,17 +1,19 @@
 {
-    "networkConfiguration": {
-        "awsvpcConfiguration": {
-            "subnets": [ ],
-            "securityGroups": [ ],
-            "assignPublicIp": "DISABLED"
+    "taskSet": {
+        "networkConfiguration": {
+            "awsvpcConfiguration": {
+                "subnets": [ ],
+                "securityGroups": [ ],
+                "assignPublicIp": "DISABLED"
+            }
+        },
+        "loadBalancers": [ ],
+        "serviceRegistries": [ ],
+        "launchType": "FARGATE",
+        "platformVersion": "LATEST",
+        "scale": {
+            "value": 100,
+            "unit": "PERCENT"
         }
-    },
-    "loadBalancers": [ ],
-    "serviceRegistries": [ ],
-    "launchType": "FARGATE",
-    "platformVersion": "LATEST",
-    "scale": {
-        "value": 100,
-        "unit": "PERCENT"
     }
 }

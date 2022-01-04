@@ -85,7 +85,7 @@ last_execution_output() {
     assert_equal $status 0 || fail "$commands"
     
     local task_set="$( echo $commands | grep -o '/tmp/task-set\.json.\w*' )"
-    local securityGroup="$( cat $task_set | jq -cr '.networkConfiguration.awsvpcConfiguration.securityGroups[0]' )"
+    local securityGroup="$( cat $task_set | jq -cr '.taskSet.networkConfiguration.awsvpcConfiguration.securityGroups[0]' )"
     assert_equal "$securityGroup" "sg-abcdefghil1234567"
 }
 

@@ -310,18 +310,20 @@ deployment/
 └── values-prd.yaml
 ```
 
-Expected `task-set.json.tmpl` content is a JSON file, with a root node matching [aws ecs update-task-set request](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/update-task-set.html) JSON syntax. Here's an example:
+Expected `task-set.json.tmpl` content is a JSON file, with a `taskSet` root node matching [aws ecs update-task-set request](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/update-task-set.html) JSON syntax. Here's an example:
 
 ```
 {
-  "networkConfiguration": { ... },
-  "loadBalancers": [ { ... } ],
-  "serviceRegistries": [ ],
-  "launchType": "FARGATE",
-  "platformVersion": "LATEST",
-  "scale": {
-    "value": 100,
-    "unit": "PERCENT"
+  "taskSet": {
+    "networkConfiguration": { ... },
+    "loadBalancers": [ { ... } ],
+    "serviceRegistries": [ ],
+    "launchType": "FARGATE",
+    "platformVersion": "LATEST",
+    "scale": {
+      "value": 100,
+      "unit": "PERCENT"
+    }
   }
 }
 ```
