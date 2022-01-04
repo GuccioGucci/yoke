@@ -369,17 +369,17 @@ Here's a sample execution:
 (32) {"externalId":"canary-20210501-163811","status":"DRAINING","scale":"0%","desired":1,"pending":0,"running":1}
 ```
 
-At the moment, **canary release** strategy is the following:
+At the moment, **Canary Release** strategy is the following:
 
-* create new *canary* deployment, scaled to 25% of desired size (`11`-`15`)
-* wait for new canary deployment to be steady (`16`-`18`)
-* apply **confirmation strategy**, by default `wait_timeout` (`20`-`21`)
-* create new *stable* deployment, scaled to 100% of desired size (`22`)
-* wait for new stable deployment to be steady (`23`-`25`)
-* delete existing deployment (`27`)
-* delete new canary deployment (`28`)
+* create *new canary* deployment, scaled to 25% of desired size (`11`-`15`)
+* wait for *new canary* deployment to be steady (`16`-`18`)
+* apply confirmation strategy, custom or default to `wait_timeout` (`20`-`21`)
+* create *new stable* deployment, scaled to 100% of desired size (`22`)
+* wait for *new stable* deployment to be steady (`23`-`25`)
+* delete *existing stable* deployment (`27`)
+* delete *new canary* deployment (`28`)
 
-Additionally, a custom confirmation strategy can be prepared, by defining a `confirm.sh.tmpl` script (see [confirm.sh.tmpl](test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl) as an example). It's expected to `exit 0` while ready to proceed, and to be found in `bin` folder, under current working-dir:
+Custom **confirmation strategy** can be prepared, by defining a `confirm.sh.tmpl` script (see [confirm.sh.tmpl](test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl) as an example). It's expected to `exit 0` while ready to proceed, and to be found in `bin` folder, under current working-dir:
 
 ```
 deployment/
