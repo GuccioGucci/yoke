@@ -5,6 +5,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 ## Current
 
 * dependencies: migrated from lib/update to bin/install
+* dependencies: install exact version for ecs-deploy and gucci
 
 ## 2.1
 

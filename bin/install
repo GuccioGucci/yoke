@@ -20,19 +20,19 @@ mkdir -p $LIB_DIR/bin > /dev/null 2>&1
 
 # application tools
 
-ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
 ECS_DEPLOY_VERSION="3.10.3"
 [[ -d $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION ]] || {
-    echo "Installing ecs-deploy $ECS_DEPLOY_VERSION ($ECS_DEPLOY_REPO)"
+    ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
+    echo "Installing $ECS_DEPLOY_REPO (ecs-deploy-$ECS_DEPLOY_VERSION)"
     
     ( cd $LIB_DIR ; curl -s -L "https://github.com/$ECS_DEPLOY_REPO/archive/refs/tags/$ECS_DEPLOY_VERSION.tar.gz" | tar -xz )
-    [[ -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy/ecs-deploy"
+    [[ -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION"
     chmod +x $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy
     ln -s -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy $LIB_DIR/bin/ecs-deploy
 }
 
-[[ -d $LIB_DIR/gucci ]] || {
-    GUCCI_VERSION="1.5.2"
+GUCCI_VERSION="1.5.2"
+[[ -d $LIB_DIR/gucci-$GUCCI_VERSION ]] || {
     OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
     if [[ $OS_LABEL =~ "_nt" ]]; then
         GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-windows-amd64.exe"
@@ -40,12 +40,13 @@ ECS_DEPLOY_VERSION="3.10.3"
         GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-$OS_LABEL-amd64"
     fi
     
-    echo "Installing gucci ($GUCCI_ARTIFACT)"
+    echo "Installing gucci-$GUCCI_VERSION ($GUCCI_ARTIFACT)"
 
-    mkdir -p $LIB_DIR/gucci
-    curl "https://github.com/noqcks/gucci/releases/download/$GUCCI_VERSION/$GUCCI_ARTIFACT" -s -L -o $LIB_DIR/gucci/gucci
-    [[ -f $LIB_DIR/gucci/gucci ]] || fail "Could not update $LIB_DIR/gucci/gucci"
-    chmod +x $LIB_DIR/gucci/gucci
+    mkdir -p $LIB_DIR/gucci-$GUCCI_VERSION
+    ( cd $LIB_DIR/gucci-$GUCCI_VERSION ; curl "https://github.com/noqcks/gucci/releases/download/$GUCCI_VERSION/$GUCCI_ARTIFACT" -s -L -o $GUCCI_ARTIFACT )
+    [[ -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT ]] || fail "Could not update $LIB_DIR/gucci-$GUCCI_VERSION"
+    chmod +x $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT
+    ln -s -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT $LIB_DIR/bin/gucci
 }
 
 # test libraries
