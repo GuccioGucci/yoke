@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+LIB_DIR="${CURRENT_DIR}/../lib"
+
+function fail() {
+    local message="$*"
+    echo "$message" ; exit 1
+}
+
+# required dependencies
+
+command -v "aws" > /dev/null 2>&1 || fail "Please, install aws (version 2)"
+command -v "jq" > /dev/null 2>&1 || fail "Please, install jq"
+command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
+command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
+command -v "git" > /dev/null 2>&1 || fail "Please, install git"
+
+# application tools
+
+[[ -d $LIB_DIR/ecs-deploy ]] || {
+    ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
+    
+    echo "Installing ecs-deploy ($ECS_DEPLOY_REPO)"
+    
+    git clone --quiet --depth 1 "https://github.com/$ECS_DEPLOY_REPO.git" $LIB_DIR/ecs-deploy
+    [[ -f $LIB_DIR/ecs-deploy/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy/ecs-deploy"
+    chmod +x $LIB_DIR/ecs-deploy/ecs-deploy
+}
+
+[[ -d $LIB_DIR/gucci ]] || {
+    GUCCI_VERSION="1.5.2"
+    OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
+    if [[ $OS_LABEL =~ "_nt" ]]; then
+        GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-windows-amd64.exe"
+    else
+        GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-$OS_LABEL-amd64"
+    fi
+    
+    echo "Installing gucci ($GUCCI_ARTIFACT)"
+
+    mkdir -p $LIB_DIR/gucci
+    curl "https://github.com/noqcks/gucci/releases/download/$GUCCI_VERSION/$GUCCI_ARTIFACT" -s -L -o $LIB_DIR/gucci/gucci
+    [[ -f $LIB_DIR/gucci/gucci ]] || fail "Could not update $LIB_DIR/gucci/gucci"
+    chmod +x $LIB_DIR/gucci/gucci
+}
+
+# test libraries
+
+[[ -d $LIB_DIR/bats ]] || {
+    BATS_REPO="sstephenson/bats"
+    echo "Installing bats ($BATS_REPO)"
+    git clone --quiet --depth 1 "https://github.com/$BATS_REPO.git" $LIB_DIR/bats
+}
+
+[[ -d $LIB_DIR/bats-assert ]] || {
+    BATS_ASSERT_REPO="ztombol/bats-assert"
+    echo "Installing bats-assert ($BATS_ASSERT_REPO)"
+    git clone --quiet --depth 1 "https://github.com/$BATS_ASSERT_REPO.git" $LIB_DIR/bats-assert
+}
+
+[[ -d $LIB_DIR/bats-support ]] || {
+    BATS_SUPPORT_REPO="ztombol/bats-support"
+    echo "Installing bats-support ($BATS_SUPPORT_REPO)"
+    git clone --quiet --depth 1 "https://github.com/$BATS_SUPPORT_REPO.git" $LIB_DIR/bats-support
+}

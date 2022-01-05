@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## Current
+
+* dependencies: migrated from lib/update to bin/install
+
 ## 2.1
 
 * updated dependencies: gucci to 1.5.2

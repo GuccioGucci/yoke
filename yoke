@@ -193,7 +193,7 @@ function do_deploy() {
 
 # main
 
-$CURRENT_DIR/lib/update
+$CURRENT_DIR/bin/install
 
 [[ $# -eq 0 ]] && show_usage && exit 1
 while [[ $# -gt 0 ]]; do
