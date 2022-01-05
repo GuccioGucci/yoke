@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## Current
+## 2.1
 
 * updated dependencies: gucci to 1.5.2
 * minimal support for Windows
