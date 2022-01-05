@@ -59,22 +59,32 @@ function install_repo() {
     }
 }
 
-# required dependencies
-
-command -v "aws" > /dev/null 2>&1 || fail "Please, install aws (version 2)"
-command -v "jq" > /dev/null 2>&1 || fail "Please, install jq"
-command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
-command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
-command -v "git" > /dev/null 2>&1 || fail "Please, install git"
+SCOPE="--all"
+if [ $# -eq 1 ]; then
+    SCOPE="$1"
+fi
 
 # prepare bin folder
 mkdir -p $LIB_DIR/bin > /dev/null 2>&1
 
-# application tools
-install_ecs_deploy 3.10.3
-install_gucci 1.5.2
+[[ $SCOPE == "--all" || $SCOPE == "--app" ]] && {
+    # required dependencies
+    command -v "aws" > /dev/null 2>&1 || fail "Please, install aws (version 2)"
+    command -v "jq" > /dev/null 2>&1 || fail "Please, install jq"
+    command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
+    command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
+    
+    # application tools
+    install_ecs_deploy 3.10.3
+    install_gucci 1.5.2
+}
 
-# test libraries
-install_repo sstephenson/bats
-install_repo ztombol/bats-assert
-install_repo ztombol/bats-support
+[[ $SCOPE == "--all" || $SCOPE == "--test" ]] && {
+    # required dependencies
+    command -v "git" > /dev/null 2>&1 || fail "Please, install git"
+    
+    # test libraries
+    install_repo sstephenson/bats
+    install_repo ztombol/bats-assert
+    install_repo ztombol/bats-support
+}

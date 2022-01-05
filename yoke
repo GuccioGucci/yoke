@@ -193,7 +193,7 @@ function do_deploy() {
 
 # main
 
-$CURRENT_DIR/bin/install
+$CURRENT_DIR/bin/install --app
 
 [[ $# -eq 0 ]] && show_usage && exit 1
 while [[ $# -gt 0 ]]; do

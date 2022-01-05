@@ -78,7 +78,7 @@ These are the dependencies required to be installed, part of them are from `ecs-
 * [jq](https://github.com/stedolan/jq/wiki/Installation)
 * [coreutils](https://www.gnu.org/software/coreutils/)
 * [curl](http://curl.haxx.se/)
-* [git](https://git-scm.com/)
+* [git](https://git-scm.com/) (installing test libraries only)
 
 Additional dependencies (for both application and tests) expected to be available in the `PATH` will be automatically installed on first execution.
 
@@ -91,11 +91,8 @@ $ git clone https://github.com/GuccioGucci/yoke.git
 $ cd yoke
 $ ./yoke --version
 
-Updating ecs-deploy (GuccioGucci/ecs-deploy)
-Updating gucci (gucci-v1.5.2-darwin-amd64)
-Updating bats (sstephenson/bats)
-Updating bats-assert (ztombol/bats-assert)
-Updating bats-support (ztombol/bats-support)
+Installing GuccioGucci/ecs-deploy 3.10.3
+Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
 (templating) gucci: gucci version 1.5.1
 (deployment) ecs-deploy: 3.10.3
 ```
