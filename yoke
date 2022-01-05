@@ -16,7 +16,7 @@ TIMEOUT="300"
 DRY_RUN="false"
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-PATH="$PATH:$CURRENT_DIR/lib/ecs-deploy:$CURRENT_DIR/lib/gucci"
+PATH="$PATH:$CURRENT_DIR/lib/bin:$PATH:$CURRENT_DIR/lib/ecs-deploy:$CURRENT_DIR/lib/gucci"
 
 # functions
 

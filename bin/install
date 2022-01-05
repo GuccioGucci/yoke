@@ -16,16 +16,19 @@ command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
 command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
 command -v "git" > /dev/null 2>&1 || fail "Please, install git"
 
+mkdir -p $LIB_DIR/bin > /dev/null 2>&1 
+
 # application tools
 
-[[ -d $LIB_DIR/ecs-deploy ]] || {
-    ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
+ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
+ECS_DEPLOY_VERSION="3.10.3"
+[[ -d $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION ]] || {
+    echo "Installing ecs-deploy $ECS_DEPLOY_VERSION ($ECS_DEPLOY_REPO)"
     
-    echo "Installing ecs-deploy ($ECS_DEPLOY_REPO)"
-    
-    git clone --quiet --depth 1 "https://github.com/$ECS_DEPLOY_REPO.git" $LIB_DIR/ecs-deploy
-    [[ -f $LIB_DIR/ecs-deploy/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy/ecs-deploy"
-    chmod +x $LIB_DIR/ecs-deploy/ecs-deploy
+    ( cd $LIB_DIR ; curl -s -L "https://github.com/$ECS_DEPLOY_REPO/archive/refs/tags/$ECS_DEPLOY_VERSION.tar.gz" | tar -xz )
+    [[ -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy/ecs-deploy"
+    chmod +x $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy
+    ln -s -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy $LIB_DIR/bin/ecs-deploy
 }
 
 [[ -d $LIB_DIR/gucci ]] || {
