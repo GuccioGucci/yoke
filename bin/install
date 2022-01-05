@@ -8,6 +8,48 @@ function fail() {
     echo "$message" ; exit 1
 }
 
+function install_ecs_deploy() {
+    ECS_DEPLOY_VERSION="$1"
+    [[ -d $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION ]] || {
+        ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
+        echo "Installing $ECS_DEPLOY_REPO (ecs-deploy-$ECS_DEPLOY_VERSION)"
+    
+        ( cd $LIB_DIR ; curl -s -L "https://github.com/$ECS_DEPLOY_REPO/archive/refs/tags/$ECS_DEPLOY_VERSION.tar.gz" | tar -xz )
+        [[ -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION"
+        chmod +x $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy
+        ln -s -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy $LIB_DIR/bin/ecs-deploy
+    }
+}
+
+function install_gucci() {
+    GUCCI_VERSION="$1"
+    [[ -d $LIB_DIR/gucci-$GUCCI_VERSION ]] || {
+        OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
+        if [[ $OS_LABEL =~ "_nt" ]]; then
+            GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-windows-amd64.exe"
+        else
+            GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-$OS_LABEL-amd64"
+        fi
+    
+        echo "Installing gucci-$GUCCI_VERSION ($GUCCI_ARTIFACT)"
+
+        mkdir -p $LIB_DIR/gucci-$GUCCI_VERSION
+        ( cd $LIB_DIR/gucci-$GUCCI_VERSION ; curl "https://github.com/noqcks/gucci/releases/download/$GUCCI_VERSION/$GUCCI_ARTIFACT" -s -L -o $GUCCI_ARTIFACT )
+        [[ -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT ]] || fail "Could not update $LIB_DIR/gucci-$GUCCI_VERSION"
+        chmod +x $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT
+        ln -s -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT $LIB_DIR/bin/gucci
+    }
+}
+
+function install_repo() {
+    local repo="$1"
+    local name="$( echo $repo | cut -d "/" -f 2 )"
+    [[ -d $LIB_DIR/$name ]] || {
+        echo "Installing $name ($repo)"
+        git clone --quiet --depth 1 "https://github.com/$repo.git" $LIB_DIR/$name
+    }
+}
+
 # required dependencies
 
 command -v "aws" > /dev/null 2>&1 || fail "Please, install aws (version 2)"
@@ -16,55 +58,14 @@ command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
 command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
 command -v "git" > /dev/null 2>&1 || fail "Please, install git"
 
-mkdir -p $LIB_DIR/bin > /dev/null 2>&1 
+# prepare bin folder
+mkdir -p $LIB_DIR/bin > /dev/null 2>&1
 
 # application tools
-
-ECS_DEPLOY_VERSION="3.10.3"
-[[ -d $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION ]] || {
-    ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
-    echo "Installing $ECS_DEPLOY_REPO (ecs-deploy-$ECS_DEPLOY_VERSION)"
-    
-    ( cd $LIB_DIR ; curl -s -L "https://github.com/$ECS_DEPLOY_REPO/archive/refs/tags/$ECS_DEPLOY_VERSION.tar.gz" | tar -xz )
-    [[ -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION"
-    chmod +x $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy
-    ln -s -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy $LIB_DIR/bin/ecs-deploy
-}
-
-GUCCI_VERSION="1.5.2"
-[[ -d $LIB_DIR/gucci-$GUCCI_VERSION ]] || {
-    OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
-    if [[ $OS_LABEL =~ "_nt" ]]; then
-        GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-windows-amd64.exe"
-    else
-        GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-$OS_LABEL-amd64"
-    fi
-    
-    echo "Installing gucci-$GUCCI_VERSION ($GUCCI_ARTIFACT)"
-
-    mkdir -p $LIB_DIR/gucci-$GUCCI_VERSION
-    ( cd $LIB_DIR/gucci-$GUCCI_VERSION ; curl "https://github.com/noqcks/gucci/releases/download/$GUCCI_VERSION/$GUCCI_ARTIFACT" -s -L -o $GUCCI_ARTIFACT )
-    [[ -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT ]] || fail "Could not update $LIB_DIR/gucci-$GUCCI_VERSION"
-    chmod +x $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT
-    ln -s -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT $LIB_DIR/bin/gucci
-}
+install_ecs_deploy 3.10.3
+install_gucci 1.5.2
 
 # test libraries
-
-[[ -d $LIB_DIR/bats ]] || {
-    BATS_REPO="sstephenson/bats"
-    echo "Installing bats ($BATS_REPO)"
-    git clone --quiet --depth 1 "https://github.com/$BATS_REPO.git" $LIB_DIR/bats
-}
-
-[[ -d $LIB_DIR/bats-assert ]] || {
-    BATS_ASSERT_REPO="ztombol/bats-assert"
-    echo "Installing bats-assert ($BATS_ASSERT_REPO)"
-    git clone --quiet --depth 1 "https://github.com/$BATS_ASSERT_REPO.git" $LIB_DIR/bats-assert
-}
-
-[[ -d $LIB_DIR/bats-support ]] || {
-    BATS_SUPPORT_REPO="ztombol/bats-support"
-    echo "Installing bats-support ($BATS_SUPPORT_REPO)"
-    git clone --quiet --depth 1 "https://github.com/$BATS_SUPPORT_REPO.git" $LIB_DIR/bats-support
-}
+install_repo sstephenson/bats
+install_repo ztombol/bats-assert
+install_repo ztombol/bats-support
