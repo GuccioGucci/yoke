@@ -38,11 +38,13 @@
 * **build once, deploy everywhere**, decoupling build and deploy processes, given we correlate application version and deployment descriptors
 * **keep application and deployment descriptors close together**, ensuring they stay in synch
 
+Please, note that much of the context described here requires some basic knowledge of ECS concepts like *service* and *task-definition*.
+
 # Motivation
 
 In [GuccioGucci](https://github.com/GuccioGucci/) we've been using `ECS` for a long time, with a common setup: [Terraform](https://www.terraform.io/) for managing much of resource provisioning, and [`aws` cli](https://aws.amazon.com/cli/) for performing application deployment. We also relied on `FARGATE` launch type, wich ensure `ECS` is managing resources with no additional operations required.
 
-When we tried applying Continuous Delivery, we faced the main issue with ECS: task definitions are *managed* resources as well, so created, updated and deleted by interacting with ECS, which track individual revisions for every change. In other words, While deploying services, we have to reference individual task definition revision.
+When we tried applying Continuous Delivery, we faced the main issue with ECS: task definitions are *managed* resources as well, so created, updated and deleted by interacting with ECS, which track individual revisions for every change. In other words, to deploying a new application version on an ECS service, first we would have to update task definition, and then reference that task definition revision in deploying the service.
 
 One initial approach was keeping task definitions *stable*, while deploying *updated* application versions. This was achieved by using per-environment Docker image tags (eg: `application:dev`, `application:qa` and `application:prd`), and relying on **build** pipeline pushing new image version, and **deployment** pipeline tagging image accordingly to target environment. Then, it was just a matter of forcing a new deployment `(--force-new-deployment`) with [aws ecs update-service](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/update-service.html). But on the long run, even this approach was not enough.
 
