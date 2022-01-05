@@ -437,7 +437,9 @@ resource "aws_ecs_service" "esv" {
 
 ### Bootstrap: live only, with bogus (creating from scratch)
 
-Even better, we could always rely on *already existing* task definitions, but using some default "off-the-shelf" ones the very first time (on creation), then following previous solution, afterwards. This sounds like a ["chicken and egg" problem](https://en.wikipedia.org/wiki/Chicken_or_the_egg): having a task definition already prepared *before* the very first application deploy (which holds the actual task definition). For reference, this was inspired by [this approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
+Even better, we could always rely on *already existing* task definitions, with a little trick: using some default "off-the-shelf" ones the very first time (on creation), then following previous solution (*live* only), afterwards.
+
+This sounds like a ["chicken and egg" problem](https://en.wikipedia.org/wiki/Chicken_or_the_egg): having a task definition already prepared *before* the very first application deploy (which holds the actual task definition). For reference, this was inspired by [this approach](https://github.com/hashicorp/terraform-provider-aws/issues/632#issuecomment-472420686), from the previously shared discussion on the topic.
 
 In order to do so, we need to:
 
@@ -483,7 +485,7 @@ module "main" {
 }
 ```
 
-For achieving second goal, we prepared a [bogus Docker image](Docker/bogus), with a minimal Nginx website, always replying with a `200 OK` response on any endpoint. This is ideal for emulating a proper health-check, as it would be for the real application.
+For achieving second goal, we prepared a [bogus Docker image](docker/bogus), with a minimal [Nginx](https://www.nginx.com/) website, always replying with a `200 OK` response on any endpoint. This is ideal for emulating a proper health-check, as it would be for the real application.
 
 This Docker image is expected to be built and pushed to your reference Docker registry (`ECR` or private one), and then referenced in dedicated `bogus` task definitions. Suggested approach is provisioning one task definition for every exposed HTTP port, eg: `bogus-80`, `bogus-8080`, `bogus-8090` and the like. Here's a sample Terraform snippet for doing so:
 
