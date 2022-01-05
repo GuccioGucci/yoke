@@ -9,35 +9,44 @@ function fail() {
 }
 
 function install_ecs_deploy() {
-    ECS_DEPLOY_VERSION="$1"
-    [[ -d $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION ]] || {
-        ECS_DEPLOY_REPO="GuccioGucci/ecs-deploy"
-        echo "Installing $ECS_DEPLOY_REPO (ecs-deploy-$ECS_DEPLOY_VERSION)"
+    local version="$1"
+    local repo="GuccioGucci/ecs-deploy"
     
-        ( cd $LIB_DIR ; curl -s -L "https://github.com/$ECS_DEPLOY_REPO/archive/refs/tags/$ECS_DEPLOY_VERSION.tar.gz" | tar -xz )
-        [[ -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy ]] || fail "Could not update $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION"
-        chmod +x $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy
-        ln -s -f $LIB_DIR/ecs-deploy-$ECS_DEPLOY_VERSION/ecs-deploy $LIB_DIR/bin/ecs-deploy
+    local target=$LIB_DIR/ecs-deploy-$version
+    local artifact=$target/ecs-deploy
+
+    [[ -d $target ]] || {
+        echo "Installing $repo $version"
+    
+        ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$version.tar.gz" | tar -xz )
+        [[ -f $artifact ]] || fail "Could not install $artifact"
+        chmod +x $artifact
+        ln -s -f $artifact $LIB_DIR/bin/ecs-deploy
     }
 }
 
 function install_gucci() {
-    GUCCI_VERSION="$1"
-    [[ -d $LIB_DIR/gucci-$GUCCI_VERSION ]] || {
+    local version="$1"
+    local repo="noqcks/gucci"
+    
+    local target=$LIB_DIR/gucci-$version
+    local artifact=""
+    
+    [[ -d $target ]] || {
         OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
         if [[ $OS_LABEL =~ "_nt" ]]; then
-            GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-windows-amd64.exe"
+            artifact="gucci-v$version-windows-amd64.exe"
         else
-            GUCCI_ARTIFACT="gucci-v$GUCCI_VERSION-$OS_LABEL-amd64"
+            artifact="gucci-v$version-$OS_LABEL-amd64"
         fi
     
-        echo "Installing gucci-$GUCCI_VERSION ($GUCCI_ARTIFACT)"
+        echo "Installing $repo $version ($artifact)"
 
-        mkdir -p $LIB_DIR/gucci-$GUCCI_VERSION
-        ( cd $LIB_DIR/gucci-$GUCCI_VERSION ; curl "https://github.com/noqcks/gucci/releases/download/$GUCCI_VERSION/$GUCCI_ARTIFACT" -s -L -o $GUCCI_ARTIFACT )
-        [[ -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT ]] || fail "Could not update $LIB_DIR/gucci-$GUCCI_VERSION"
-        chmod +x $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT
-        ln -s -f $LIB_DIR/gucci-$GUCCI_VERSION/$GUCCI_ARTIFACT $LIB_DIR/bin/gucci
+        mkdir -p $target
+        ( cd $target ; curl "https://github.com/$repo/releases/download/$version/$artifact" -s -L -o $artifact )
+        [[ -f $target/$artifact ]] || fail "Could not update $target"
+        chmod +x $target/$artifact
+        ln -s -f $target/$artifact $LIB_DIR/bin/gucci
     }
 }
 
