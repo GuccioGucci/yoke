@@ -91,7 +91,7 @@ Updating bats (sstephenson/bats)
 Updating bats-assert (ztombol/bats-assert)
 Updating bats-support (ztombol/bats-support)
 (templating) gucci: gucci version 1.5.1
-(deployment) ecs-deploy: 3.10.2
+(deployment) ecs-deploy: 3.10.3
 ```
 
 # Usage
@@ -393,7 +393,7 @@ This section contains resources and guidelines in adopting the process. Please, 
 
 ## Provisioning: Terraform
 
-You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope (since tesk-definition in `ECS` are managed resources, with individual revisions). Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches.
+You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope (since task-definition in `ECS` are managed resources, with individual revisions). Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches.
 
 We'll recap them here, with examples, using the following as reference scenario: a shared `module.tf`, with common definitions, and per-environment `$stage/main.tf` files (eg: `dev/main.tf`, `qa/main.tf` and `prd/main.tf`).
 

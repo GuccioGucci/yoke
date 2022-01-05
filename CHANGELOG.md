@@ -4,9 +4,11 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 ## Current
 
+* updated dependencies: gucci to 1.5.2
 * minimal support for Windows
 * helpers from working-dir
 * canary releases: update, supporting confirmation (default or custom)
+* updated dependencies: ecs-deploy to 3.10.3 (fork)
 
 ## 2.0
 
