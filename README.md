@@ -402,7 +402,7 @@ We'll recap them here, with examples, using the following as reference scenario:
 
 ### Mixed: managed and live (migrating to Update mode)
 
-One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the `ECS` environment. Then, on task definition `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
+One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the `ECS` environment. Then, on service `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
 
 Here's an example:
 
