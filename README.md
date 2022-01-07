@@ -402,7 +402,7 @@ We'll recap them here, with examples, using the following as reference scenario:
 
 ### Mixed: managed and live (migrating to Update mode)
 
-One approach is to rely on both a `resource` for *managed* task definition, and also a `data` to get current *live* task definition in the `ECS` environment. Then, on service `resource`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
+One approach is to rely on both a `resource aws_ecs_task_definition` for *managed* task definition, and also a `data aws_ecs_task_definition` to get current *live* task definition in the `ECS` environment. Then, on `resource aws_ecs_service`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
 
 Here's an example:
 
@@ -423,7 +423,7 @@ resource "aws_ecs_service" "esv" {
 
 ### Afterwards: live only (migrating to Install mode)
 
-Another approach, going even further, is getting rid of `resource` for *managed* task definition, and only relying on `data` for *live* task definition, using it to configure the service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
+Another approach, going even further, is getting rid of `resource aws_ecs_task_definition` for *managed* task definition, and only relying on `data aws_ecs_task_definition` for *live* task definition, using it to configure 'aws_ecs_service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
 
 Here's an example:
 
@@ -534,7 +534,7 @@ EOF
 }
 ```
 
-Please, note that in order to migrate from *bogus* to *application* task definition, you have to keep the same container **name**, otherwise the the load balancer would fail to re-configure (`application` in the above example). Ensure you're using the same in `ECS` service definition:
+Please, note that in order to migrate from *bogus* to *application* task definition, you have to keep the same container **name** (in addition to container port and health-check path), otherwise the the load balancer would fail to re-configure (`application` in the above example). Ensure you're using the same in `ECS` service definition:
 
 ```
 resource "aws_ecs_service" "esv" {
