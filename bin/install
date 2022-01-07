@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-LIB_DIR="${CURRENT_DIR}/../lib"
+
+LIB_DIR=$( realpath $CURRENT_DIR/../lib )
+BIN_DIR=$LIB_DIR/bin
 
 function fail() {
     local message="$*"
@@ -12,41 +14,47 @@ function install_ecs_deploy() {
     local version="$1"
     local repo="GuccioGucci/ecs-deploy"
     
-    local target=$LIB_DIR/ecs-deploy-$version
-    local artifact=$target/ecs-deploy
+    local name="$( echo $repo | cut -d "/" -f 2 )"
+    local artifact="$version.tar.gz"
+        
+    local target=$LIB_DIR/$name-$version
+    local binary=$target/$name
 
     [[ -d $target ]] || {
         echo "Installing $repo $version"
     
-        ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$version.tar.gz" | tar -xz )
-        [[ -f $artifact ]] || fail "Could not install $artifact"
-        chmod +x $artifact
-        ln -s -f $artifact $LIB_DIR/bin/ecs-deploy
+        ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$artifact" | tar -xz )
+        [[ -f $binary ]] || fail "Could not install $name"
+
+        chmod +x $binary
+        ln -s -f $binary $BIN_DIR/$name
     }
 }
 
 function install_gucci() {
     local version="$1"
     local repo="noqcks/gucci"
-    
-    local target=$LIB_DIR/gucci-$version
-    local artifact=""
+
+    local name="$( echo $repo | cut -d "/" -f 2 )"
+    OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
+    if [[ $OS_LABEL =~ "_nt" ]]; then
+        local artifact="$name-v$version-windows-amd64.exe"
+    else
+        local artifact="$name-v$version-$OS_LABEL-amd64"
+    fi
+
+    local target=$LIB_DIR/$name-$version
+    local binary=$target/$artifact
     
     [[ -d $target ]] || {
-        OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
-        if [[ $OS_LABEL =~ "_nt" ]]; then
-            artifact="gucci-v$version-windows-amd64.exe"
-        else
-            artifact="gucci-v$version-$OS_LABEL-amd64"
-        fi
-    
         echo "Installing $repo $version ($artifact)"
 
         mkdir -p $target
         ( cd $target ; curl "https://github.com/$repo/releases/download/$version/$artifact" -s -L -o $artifact )
-        [[ -f $target/$artifact ]] || fail "Could not update $target"
-        chmod +x $target/$artifact
-        ln -s -f $target/$artifact $LIB_DIR/bin/gucci
+        [[ -f $target/$artifact ]] || fail "Could not update $name"
+
+        chmod +x $binary
+        ln -s -f $binary $BIN_DIR/$name
     }
 }
 
@@ -54,7 +62,7 @@ function install_repo() {
     local repo="$1"
     local name="$( echo $repo | cut -d "/" -f 2 )"
     [[ -d $LIB_DIR/$name ]] || {
-        echo "Installing $name ($repo)"
+        echo "Installing $repo"
         git clone --quiet --depth 1 "https://github.com/$repo.git" $LIB_DIR/$name
     }
 }
@@ -65,7 +73,7 @@ if [ $# -eq 1 ]; then
 fi
 
 # prepare bin folder
-mkdir -p $LIB_DIR/bin > /dev/null 2>&1
+mkdir -p $BIN_DIR > /dev/null 2>&1
 
 [[ $SCOPE == "--all" || $SCOPE == "--app" ]] && {
     # required dependencies
