@@ -1,25 +1,24 @@
 # Extra
 
-* [Extra](#extra)
-  * [Deployment Controllers](#deployment-controllers)
-    * [ECS: Rolling Update](#ecs-rolling-update)
-    * [EXTERNAL: Canary Release](#external-canary-release)
-  * [Provisioning: Terraform](#provisioning-terraform)
-    * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live-migrating-to-update-mode)
-    * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only-migrating-to-install-mode)
-    * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus-creating-from-scratch)
-  * [Templates](#templates)
-    * [Deployment](#deployment)
-    * [Pipelines: Jenkins](#pipelines-jenkins)
-  * [Application configuration override](#application-configuration-override)
-    * [Ktor and Jib](#ktor-and-jib)
-    * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
+* [Deployment Controllers](#deployment-controllers)
+  * [ECS: Rolling Update](#ecs-rolling-update)
+  * [EXTERNAL: Canary Release](#external-canary-release)
+* [Provisioning: Terraform](#provisioning-terraform)
+  * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live-migrating-to-update-mode)
+  * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only-migrating-to-install-mode)
+  * [Bootstrap: live only, with bogus (creating from scratch)](#bootstrap-live-only-with-bogus-creating-from-scratch)
+* [Templates](#templates)
+  * [Deployment](#deployment)
+  * [Pipelines: Jenkins](#pipelines-jenkins)
+* [Application configuration override](#application-configuration-override)
+  * [Ktor and Jib](#ktor-and-jib)
+  * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
 
-## Deployment Controllers
+# Deployment Controllers
 
 AWS ECS services can be configured to be provisioned with specific [deployment controller](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentController.html). By default, it would be `ECS` (fully managed deployments). Alternatively, you can configure `CODE_DEPLOY` (unsupported, as it implies using AWS CodeDeploy) and `EXTERNAL` (for delegating third-party component, actually `yoke` itself).
 
-### ECS: Rolling Update
+## ECS: Rolling Update
 
 Currently, we mainly promote using `yoke` with services provisioned as `ECS`. Both **update** and **install** modes would then rely on ECS for managing the deployments lifecycle. It would result in a [Rolling Update](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html), described as:
 
@@ -140,13 +139,13 @@ deployment/
     └── confirm.sh.tmpl
 ```
 
-## Provisioning: Terraform
+# Provisioning: Terraform
 
 You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope (since task-definition in `ECS` are managed resources, with individual revisions). Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches.
 
 We'll recap them here, with examples, using the following as reference scenario: a shared `module.tf`, with common definitions, and per-environment `$stage/main.tf` files (eg: `dev/main.tf`, `qa/main.tf` and `prd/main.tf`).
 
-### Mixed: managed and live (migrating to Update mode)
+## Mixed: managed and live (migrating to Update mode)
 
 One approach is to rely on both a `resource aws_ecs_task_definition` for *managed* task definition, and also a `data aws_ecs_task_definition` to get current *live* task definition in the `ECS` environment. Then, on `resource aws_ecs_service`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
 
@@ -167,7 +166,7 @@ resource "aws_ecs_service" "esv" {
   ...
 ```
 
-### Afterwards: live only (migrating to Install mode)
+## Afterwards: live only (migrating to Install mode)
 
 Another approach, going even further, is getting rid of `resource aws_ecs_task_definition` for *managed* task definition, and only relying on `data aws_ecs_task_definition` for *live* task definition, using it to configure 'aws_ecs_service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
 
@@ -184,7 +183,7 @@ resource "aws_ecs_service" "esv" {
 }
 ```
 
-### Bootstrap: live only, with bogus (creating from scratch)
+## Bootstrap: live only, with bogus (creating from scratch)
 
 Even better, we could always rely on *already existing* task definitions, with a little trick: using some default "off-the-shelf" ones the very first time (on creation), then following previous solution (*live* only), afterwards.
 
@@ -292,9 +291,9 @@ resource "aws_ecs_service" "esv" {
 }
 ```
 
-## Templates
+# Templates
 
-### Deployment
+## Deployment
 
 A deployment template is provided in [templates/deployment](/templates/deployment). Copy & paste it in your application sources, for example on root folder.
 
@@ -327,7 +326,7 @@ For doing so, sample templates are provided in [templates/pipeline](/templates/p
 
 Then, in `Jenkinsfile.deploy` please consider using in a specific tag instead of relying on `main` branch, in order to keep control of `yoke` version. To do so, please set `YOKE_VERSION` to any available tag. See [CHANGELOG](/CHANGELOG.md) for details about individual versions.
 
-## Application configuration override
+# Application configuration override
 
 Given task-definition is prepared at deploy-time, it could be used to override application configurations, with external resources. For example, you can prepare environment-specific application configuration override files, under same working-dir folder (eg: `deployment/config`):
 
@@ -414,7 +413,7 @@ Here's a draft `task-definition.json.tmpl`:
 }
 ```
 
-### Ktor and Jib
+## Ktor and Jib
 
 For example, with [Ktor](https://ktor.io/) and [Jib](https://github.com/GoogleContainerTools/jib), you'd probably need:
 
@@ -428,7 +427,7 @@ Then, you only need to enable overriding in `Ktor` application config, relying o
 include "config/application-override.conf"
 ```
 
-### Spring Boot and Dockerfile
+## Spring Boot and Dockerfile
 
 For [Spring Boot](https://spring.io/projects/spring-boot) application, you could use:
 
