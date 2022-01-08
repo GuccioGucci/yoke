@@ -154,7 +154,7 @@ We'll recap them here, with examples, using the following as reference scenario:
 
 ## Mixed: managed and live (migrating to Update mode)
 
-One approach is to rely on both a `resource aws_ecs_task_definition` for *managed* task definition, and also a `data aws_ecs_task_definition` to get current *live* task definition in the `ECS` environment. Then, on `resource aws_ecs_service`, you can pick the "latest" one, being either *managed* or *live* one (latest meaning being the biggest of them).
+One approach is to rely on both a [`aws_ecs_task_definition`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition) `resource` for *managed* task definition, and also a [`aws_ecs_task_definition`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ecs_task_definition) `data` to get current *live* task definition in the `ECS` environment. Then, on [`aws_ecs_service`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) `resource`, you can pick the "latest" `task_definition`, being either *managed* or *live* one ("latest" meaning being the *biggest* of them).
 
 Here's an example:
 
@@ -175,7 +175,7 @@ resource "aws_ecs_service" "esv" {
 
 ## Afterwards: live only (migrating to Install mode)
 
-Another approach, going even further, is getting rid of `resource aws_ecs_task_definition` for *managed* task definition, and only relying on `data aws_ecs_task_definition` for *live* task definition, using it to configure 'aws_ecs_service. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
+Another approach, going even further, is getting rid of `aws_ecs_task_definition` `resource` for *managed* task definition, and only relying on `aws_ecs_task_definition` `data` for *live* task definition, using it to configure `aws_ecs_service` `resource`. Of course, this can only be achieved once the task definition has already been created! So for example, that could be done to migrate an existing service, from a previously "all-managed" approach.
 
 Here's an example:
 
@@ -211,7 +211,7 @@ terraform apply -var bootstrap=true
 terraform apply
 ```
 
-So the only change, in respect to previous example, is to pick the proper task definition, accordingly to `bootstrap`.
+So the only change, in respect to previous example, is to pick the proper task definition family, accordingly to `bootstrap`.
 
 * `module.tf`
 ```
