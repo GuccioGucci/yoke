@@ -133,7 +133,7 @@ At the moment, **Canary Release** strategy is the following:
 
 Custom **confirmation strategy** can be prepared, by defining a `confirm.sh.tmpl` script (see [confirm.sh.tmpl](/test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl) as an example). Even if very basic at the moment, such provided script is intended to hold any custom logic to inspect *new canary* deployment status, and when a given confidence level is granted, confirming proceeding with *new stable* deployment.
 
-For example, it could check within a given period (next 5 minutes or so) for specific data:
+For example, it could check within a given period (eg: next 5 minutes or so) for specific data, such as:
 
 * application ERROR logs, with [aws logs tail](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/logs/tail.html) cli
 * system or application metrics, with [aws cloudwatch get-metric-statistics](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudwatch/get-metric-statistics.html) cli
