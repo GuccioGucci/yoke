@@ -90,7 +90,8 @@ $ git clone https://github.com/GuccioGucci/yoke.git
 $ cd yoke
 $ ./yoke --version
 
-Installing GuccioGucci/ecs-deploy 3.10.3
+Installing GuccioGucci/ecs-deploy 3.10.3 (ecs-deploy-3.10.3)
+Linking ecs-deploy-3.10.3/ecs-deploy
 Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
 (templating) gucci: gucci version 1.5.1
 (deployment) ecs-deploy: 3.10.3
