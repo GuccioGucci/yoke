@@ -1,5 +1,5 @@
-load '../lib/bats-support/load'
-load '../lib/bats-assert/load'
+load '../lib/bin/bats-support/load'
+load '../lib/bin/bats-assert/load'
 
 setup() {
     export PATH="$( realpath test/fake/platform ):$PATH"

@@ -10,24 +10,33 @@ function fail() {
     echo "$message" ; exit 1
 }
 
-function install_ecs_deploy() {
-    local version="$1"
-    local repo="GuccioGucci/ecs-deploy"
+function install_github_tag() {
+    local repo="$1"
+    local version="$2"
     
     local name="$( echo $repo | cut -d "/" -f 2 )"
     local artifact="$version.tar.gz"
         
-    local target=$LIB_DIR/$name-$version
-    local binary=$target/$name
+    local target=$name-$( echo $version | sed 's/v//g' ) # eg: 'v0.4.0' => '0.4.0'
+    [[ -d $LIB_DIR/$target ]] || {
+        echo "Installing $repo $version ($target)"
+        ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$artifact" -o $name-$artifact ; tar -xf $name-$artifact )
+        ( cd $LIB_DIR ; [[ -f $name-$artifact ]] && rm -rf $name-$artifact ) # remove downloaded artifact
 
-    [[ -d $target ]] || {
-        echo "Installing $repo $version"
-    
-        ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$artifact" | tar -xz )
-        [[ -f $binary ]] || fail "Could not install $name"
-
-        chmod +x $binary
-        ln -s -f $binary $BIN_DIR/$name
+        local binary=$LIB_DIR/$target/$name # in root folder
+        [[ -f $binary ]] || {
+            binary=$LIB_DIR/$target/bin/$name; # under bin folder
+            [[ -f $binary ]] || {
+                [[ -f $LIB_DIR/$target/load.bash ]] && binary=$LIB_DIR/$target; # root folder itself
+                [[ -d $binary ]] || binary=""; # mark as not found
+            }
+        }
+        
+        [[ -z "$binary" ]] || {
+            echo "Linking $( echo $binary | sed 's|'$LIB_DIR'/||g' )"
+            [[ -f $binary ]] && chmod +x $binary;
+            ln -s -f $binary $BIN_DIR/$name;
+        }
     }
 }
 
@@ -58,15 +67,6 @@ function install_gucci() {
     }
 }
 
-function install_repo() {
-    local repo="$1"
-    local name="$( echo $repo | cut -d "/" -f 2 )"
-    [[ -d $LIB_DIR/$name ]] || {
-        echo "Installing $repo"
-        git clone --quiet --depth 1 "https://github.com/$repo.git" $LIB_DIR/$name
-    }
-}
-
 SCOPE="--all"
 if [ $# -eq 1 ]; then
     SCOPE="$1"
@@ -83,16 +83,13 @@ mkdir -p $BIN_DIR > /dev/null 2>&1
     command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
     
     # application tools
-    install_ecs_deploy 3.10.3
+    install_github_tag GuccioGucci/ecs-deploy 3.10.3
     install_gucci 1.5.2
 }
 
 [[ $SCOPE == "--all" || $SCOPE == "--test" ]] && {
-    # required dependencies
-    command -v "git" > /dev/null 2>&1 || fail "Please, install git"
-    
     # test libraries
-    install_repo sstephenson/bats
-    install_repo ztombol/bats-assert
-    install_repo ztombol/bats-support
+    install_github_tag sstephenson/bats v0.4.0
+    install_github_tag ztombol/bats-assert v0.3.0
+    install_github_tag ztombol/bats-support v0.3.0
 }

@@ -78,7 +78,6 @@ These are the dependencies required to be installed, part of them are from `ecs-
 * [jq](https://github.com/stedolan/jq/wiki/Installation)
 * [coreutils](https://www.gnu.org/software/coreutils/)
 * [curl](http://curl.haxx.se/)
-* [git](https://git-scm.com/) (installing test libraries only)
 
 Additional dependencies (for both application and tests) expected to be available in the `PATH` will be automatically installed on first execution.
 
