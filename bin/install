@@ -10,6 +10,22 @@ function fail() {
     echo "$message" ; exit 1
 }
 
+function artifact_for() {
+    local name="$1"
+    local version="$2"
+    
+    local arch="amd64"
+    # detect OS
+    local os=$( uname -s | tr '[:upper:]' '[:lower:]' )
+    local extension=""
+    [[ $os =~ "_nt" ]] && {
+        os="windows";
+        extension=".exe"
+    }
+
+    echo "${name}-v${version}-${os}-${arch}${extension}"
+}
+
 function install_github_tag() {
     local repo="$1"
     local version="$2"
@@ -40,28 +56,24 @@ function install_github_tag() {
     }
 }
 
-function install_gucci() {
-    local version="$1"
-    local repo="noqcks/gucci"
+function install_github_release() {
+    local repo="$1"
+    local version="$2"
 
     local name="$( echo $repo | cut -d "/" -f 2 )"
-    OS_LABEL=$( uname -s | tr '[:upper:]' '[:lower:]' )
-    if [[ $OS_LABEL =~ "_nt" ]]; then
-        local artifact="$name-v$version-windows-amd64.exe"
-    else
-        local artifact="$name-v$version-$OS_LABEL-amd64"
-    fi
+    local artifact=$( artifact_for $name $version )
 
     local target=$LIB_DIR/$name-$version
-    local binary=$target/$artifact
-    
     [[ -d $target ]] || {
         echo "Installing $repo $version ($artifact)"
 
         mkdir -p $target
         ( cd $target ; curl "https://github.com/$repo/releases/download/$version/$artifact" -s -L -o $artifact )
-        [[ -f $target/$artifact ]] || fail "Could not update $name"
 
+        local binary=$target/$artifact
+        [[ -f $binary ]] || fail "Could not update $name"
+
+        echo "Linking $( echo $binary | sed 's|'$LIB_DIR'/||g' )"
         chmod +x $binary
         ln -s -f $binary $BIN_DIR/$name
     }
@@ -84,7 +96,7 @@ mkdir -p $BIN_DIR > /dev/null 2>&1
     
     # application tools
     install_github_tag GuccioGucci/ecs-deploy 3.10.3
-    install_gucci 1.5.2
+    install_github_release noqcks/gucci 1.5.2
 }
 
 [[ $SCOPE == "--all" || $SCOPE == "--test" ]] && {
