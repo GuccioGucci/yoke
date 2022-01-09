@@ -17,3 +17,6 @@ jobs:
 
       - name: Build & test
         run: ./build.sh
+
+      - name: Dist
+        run: ./dist.sh
