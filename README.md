@@ -74,9 +74,9 @@ Given it's a `bash` script, it should be supported in most Unix-like OS. Most of
 
 ## Binary distribution
 
-Starting from version 2.2, we provide a binary distribution, which actually is a self-extracting archive (thanks to [makeself](https://github.com/megastep/makeself)).  See makeself homepage to check compatibility with your OS. Please, pick desired `yoke` release from [Releases](https://github.com/GuccioGucci/yoke/releases) page.
+Starting from version `2.2`, we provide binary distributions, which actually are self-extracting archives (thanks to [makeself](https://github.com/megastep/makeself)).  See `makeself` homepage to check compatibility with your OS. 
 
-Here's how to install `yoke` from binary distribution:
+Please, pick desired `yoke` binary distribution from [Releases](https://github.com/GuccioGucci/yoke/releases) page. Here's how to install it:
 
 ```
 curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/yoke.bin -o yoke.bin
