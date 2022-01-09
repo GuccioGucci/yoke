@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-# force updating dependencies (test and app), to ensure stdout will be clean
-./bin/install --test && ./yoke --version
+# force updating dependencies (app, test and dist), to ensure stdout will be clean
+./bin/install --all && ./yoke --version
 ./lib/bin/bats test
