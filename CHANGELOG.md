@@ -2,13 +2,13 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## Current
+## 2.2
 
 * dependencies: migrated from lib/update to bin/install
 * dependencies: install exact version for ecs-deploy and gucci
 * dependencies: install `--all`, `--app` or `--test` only libraries
 * dependencies: downloaded, installed and linked
-* (WIP) distribution as binary packages: self-executable archive
+* distribution as binary packages: self-executable archive
 
 ## 2.1
 
