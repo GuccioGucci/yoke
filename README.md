@@ -1,6 +1,6 @@
 # yoke
 
-![ci](https://github.com/GuccioGucci/yoke/actions/workflows/ci.yml/badge.svg)
+![ci](https://github.com/GuccioGucci/yoke/actions/workflows/ci.yml/badge.svg) ![release](https://github.com/GuccioGucci/yoke/actions/workflows/release.yml/badge.svg)
 
 * [About](#about)
   * [Motivation](#motivation)
