@@ -7,6 +7,8 @@
   * [How it works](#how-it-works)
   * [Origin](#origin)
 * [Installation](#installation)
+  * [Binary distribution](#binary-distribution)
+  * [Sources](#sources)
 * [Usage](#usage)
   * [Update](#update)
   * [Install](#install)
@@ -70,7 +72,51 @@ Additional dependencies (for both application and tests) expected to be availabl
 
 Given it's a `bash` script, it should be supported in most Unix-like OS. Most of development is done on MacOs, while automatic tests are run on Linux (Ubuntu and CentOS). On Windows, you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar (we succesfully tested on Windows 10 with `Git bash`, `aws` and `jq` - no extra `coreutils` and `curl` required). Anyway downloaded binaries are OS specific (eg: `gucci` is available for Windows starting from version `1.5.x`, 64-bit only at the moment).
 
-Since at the moment the tool is available as source code only (but planned to be distributed with source and/or binary releases), here's how to install it:
+## Binary distribution
+
+Starting from version 2.2, we provide a binary distribution, which actually is a self-extracting archive (thanks to [makeself](https://github.com/megastep/makeself)).  See makeself homepage to check compatibility with your OS. Please, pick desired `yoke` release from [Releases](https://github.com/GuccioGucci/yoke/releases) page.
+
+Here's how to install `yoke` from binary distribution:
+
+```
+curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/yoke.bin -o yoke.bin
+chmod +x yoke.bin
+./yoke.bin
+
+Verifying archive integrity... MD5 checksums are OK. All good.
+Uncompressing yoke
+Installing GuccioGucci/ecs-deploy 3.10.3 (ecs-deploy-3.10.3)
+Linking ecs-deploy-3.10.3/ecs-deploy as ecs-deploy
+Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
+Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
+(templating) gucci: gucci version 1.5.1
+(deployment) ecs-deploy: 3.10.3
+```
+
+This will extract the distribution archive and run a self-check `--version` execution. Resources are extracted under `yoke` subfolder:
+
+```
+.
+├── yoke
+│   ├── LICENSE
+│   ├── bin
+│   ├── lib
+│   └── yoke
+└── yoke.bin
+```
+
+So, once installed, `yoke` can be executed from subfolder:
+
+```
+./yoke/yoke --version
+
+(templating) gucci: gucci version 1.5.1
+(deployment) ecs-deploy: 3.10.3
+```
+
+## Sources
+
+As an alternative, here's how to install `yoke` from sources:
 
 ```
 $ git clone https://github.com/GuccioGucci/yoke.git
