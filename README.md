@@ -16,7 +16,7 @@
 * [Extra](#extra)
 * [Contributing](#contributing)
   * [Tests](#tests)
-  * [Contributions](#contributions)
+  * [Contributions](/docs/EXTRA.md#contributions)
 * [License](#license)
 
 # About
@@ -158,7 +158,7 @@ parameters:
     --dry-run               dry-run mode, avoid any deployment (default: true)
 ```
 
-`yoke` supports two different modes: **update** mode and **install** mode. Given your context (migrating an existing application, or developing a new application) you can choose the one that fits you best. Please, see next sections for details, and [Provisioning: Terraform](#provisioning-terraform) section to understand the impact on resource provisioning.
+`yoke` supports two different modes: **update** mode and **install** mode. Given your context (migrating an existing application, or developing a new application) you can choose the one that fits you best. Please, see next sections for details, and [Provisioning: Terraform](/docs/EXTRA.md#provisioning-terraform) section to understand the impact on resource provisioning.
 
 ## Update
 
@@ -189,7 +189,7 @@ deployment/
 └── values-prd.yaml
 ```
 
-Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinition` root node matching the [aws ecs register-task-definition](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/register-task-definition.html) JSON syntax. Here's a minimal template, see [Deployment](#deployment) Templates section for a complete example:
+Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinition` root node matching the [aws ecs register-task-definition](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/register-task-definition.html) JSON syntax. Here's a minimal template, see [Deployment](/docs/EXTRA.md#deployment) Templates section for a complete example:
 
 ```
 {
