@@ -13,4 +13,10 @@ echo "Packaging distribution"
     --nox11 --noprogress --nowait --notemp --current \
     ./dist ./dist/yoke.bin "yoke" ./yoke/yoke --version
 
+echo "Cleaning distribution"
+rm -rf $DIST_DIR/yoke > /dev/null
+
+echo "Testing distribution"
+( cd $DIST_DIR ; ./yoke.bin ; ls -l * )
+
 echo "Done"
