@@ -11,12 +11,12 @@ cp -r yoke LICENSE bin $DIST_DIR/yoke
 echo "Packaging distribution"
 ./lib/bin/makeself.sh \
     --nox11 --noprogress --nowait --notemp --current \
-    ./dist ./dist/yoke.bin "yoke" ./yoke/yoke --version
+    ./dist ./dist/yoke.bin "yoke" ./yoke/yoke
 
 echo "Cleaning distribution"
 rm -rf $DIST_DIR/yoke > /dev/null
 
 echo "Testing distribution"
-( cd $DIST_DIR ; ./yoke.bin ; ls -l * )
+( cd $DIST_DIR ; ./yoke.bin -- --version )
 
 echo "Done"

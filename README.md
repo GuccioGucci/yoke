@@ -76,12 +76,12 @@ Given it's a `bash` script, it should be supported in most Unix-like OS. Most of
 
 Starting from version `2.2`, we provide binary distributions, which actually are self-extracting archives (thanks to [makeself](https://github.com/megastep/makeself)).  See `makeself` homepage to check compatibility with your OS. 
 
-Please, pick desired `yoke` binary distribution from [Releases](https://github.com/GuccioGucci/yoke/releases) page. Here's how to install it:
+Please, pick desired `yoke` binary distribution from [Releases](https://github.com/GuccioGucci/yoke/releases) page. Here's how to install it (this will extract the distribution archive and run a self-check `--version` execution):
 
 ```
 curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/yoke.bin -o yoke.bin
 chmod +x yoke.bin
-./yoke.bin
+./yoke.bin -- --version
 
 Verifying archive integrity... MD5 checksums are OK. All good.
 Uncompressing yoke
@@ -93,7 +93,7 @@ Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
 (deployment) ecs-deploy: 3.10.3
 ```
 
-This will extract the distribution archive and run a self-check `--version` execution. Resources are extracted under `yoke` subfolder:
+Please note that extra `--` before `--version`: that's required to instruct the self-extracting archive to pass arguments to `yoke` itself. Resources are extracted under `yoke` subfolder, and once extracted, `yoke` can be executed from subfolder.
 
 ```
 .
@@ -105,14 +105,14 @@ This will extract the distribution archive and run a self-check `--version` exec
 └── yoke.bin
 ```
 
-So, once installed, `yoke` can be executed from subfolder:
-
 ```
 ./yoke/yoke --version
 
 (templating) gucci: gucci version 1.5.1
 (deployment) ecs-deploy: 3.10.3
 ```
+
+Then, you can safely delete binary distribution file, or keep it as a wrapper, if you like it (it would always self-extract, before executing).
 
 ## Sources
 
