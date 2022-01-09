@@ -2,12 +2,15 @@
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-LIB_DIR=$( realpath $CURRENT_DIR/../lib )
-BIN_DIR=$LIB_DIR/bin
-
 function fail() {
     local message="$*"
     echo "$message" ; exit 1
+}
+
+function ensure() {
+    local name="$1"
+    local description="${2:-$name}"
+    command -v $name > /dev/null 2>&1 || fail "Please, install $description"
 }
 
 function artifact_for() {
@@ -26,6 +29,16 @@ function artifact_for() {
     echo "${name}-v${version}-${os}-${arch}${extension}"
 }
 
+function link_as() {
+    local name=$1
+    local binary=$2
+
+    echo "Linking $( echo $binary | sed 's|'$LIB_DIR'/||g' ) as $name"
+    [[ -f $binary ]] && chmod +x $binary;
+    ln -s -f $binary $BIN_DIR/$name;
+}
+
+
 function install_github_tag() {
     local repo="$1"
     local version="$2"
@@ -39,19 +52,24 @@ function install_github_tag() {
         ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$artifact" -o $name-$artifact ; tar -xf $name-$artifact )
         ( cd $LIB_DIR ; [[ -f $name-$artifact ]] && rm -rf $name-$artifact ) # remove downloaded artifact
 
-        local binary=$LIB_DIR/$target/$name # in root folder
-        [[ -f $binary ]] || {
-            binary=$LIB_DIR/$target/bin/$name; # under bin folder
-            [[ -f $binary ]] || {
-                [[ -f $LIB_DIR/$target/load.bash ]] && binary=$LIB_DIR/$target; # root folder itself
-                [[ -d $binary ]] || binary=""; # mark as not found
-            }
-        }
+    
+        # looking for binaries, multiple attempts
+        # - in root folder: no extension, .sh extension
+        # - under bin folder: no extension
+        # - root folder itself
+        local binary=""
+        [[ -z "$binary" ]] && { binary=$LIB_DIR/$target/$name ; [[ -r $binary ]] || binary=""; }
+        [[ -z "$binary" ]] && { binary=$LIB_DIR/$target/bin/$name ; [[ -r $binary ]] || binary=""; }
+        [[ -z "$binary" ]] && { [[ -f $LIB_DIR/$target/load.bash ]] && binary=$LIB_DIR/$target; [[ -r $binary ]] || binary=""; }
+        [[ -z "$binary" ]] && { binary=($LIB_DIR/$target/$name*.sh) ; [[ -r ${binary[0]} ]] || binary=""; }
         
+        # if found, link to $BIN_DIR
         [[ -z "$binary" ]] || {
-            echo "Linking $( echo $binary | sed 's|'$LIB_DIR'/||g' )"
-            [[ -f $binary ]] && chmod +x $binary;
-            ln -s -f $binary $BIN_DIR/$name;
+            if [[ "$(declare -p binary)" =~ "declare -a" ]]; then
+                for each in "${binary[@]}"; do link_as $( basename $each ) $each ; done
+            else
+                link_as $name $binary
+            fi
         }
     }
 }
@@ -84,16 +102,20 @@ if [ $# -eq 1 ]; then
     SCOPE="$1"
 fi
 
+# required dependencies
+ensure "aws" "aws (version 2)"
+ensure "jq"
+ensure "realpath" "coreutils"
+ensure "curl"
+
+# init context
+LIB_DIR=$( realpath $CURRENT_DIR/../lib )
+BIN_DIR=$LIB_DIR/bin
+
 # prepare bin folder
 mkdir -p $BIN_DIR > /dev/null 2>&1
 
 [[ $SCOPE == "--all" || $SCOPE == "--app" ]] && {
-    # required dependencies
-    command -v "aws" > /dev/null 2>&1 || fail "Please, install aws (version 2)"
-    command -v "jq" > /dev/null 2>&1 || fail "Please, install jq"
-    command -v "realpath" > /dev/null 2>&1 || fail "Please, install coreutils"
-    command -v "curl" > /dev/null 2>&1 || fail "Please, install curl"
-    
     # application tools
     install_github_tag GuccioGucci/ecs-deploy 3.10.3
     install_github_release noqcks/gucci 1.5.2
@@ -105,3 +127,11 @@ mkdir -p $BIN_DIR > /dev/null 2>&1
     install_github_tag ztombol/bats-assert v0.3.0
     install_github_tag ztombol/bats-support v0.3.0
 }
+
+[[ $SCOPE == "--all" || $SCOPE == "--dist" ]] && {
+    # dist libraries
+    install_github_tag megastep/makeself release-2.4.3 # last working on MacOS
+}
+
+# Done
+exit 0

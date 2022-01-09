@@ -8,6 +8,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * dependencies: install exact version for ecs-deploy and gucci
 * dependencies: install `--all`, `--app` or `--test` only libraries
 * dependencies: downloaded, installed and linked
+* (WIP) distribution as binary packages: self-executable archive
 
 ## 2.1
 
@@ -88,7 +89,6 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 # TODO
 
-* distribution as binary packages
 * rollback, by default or optionally
 * canary release: more complex scenario
 * deploy scheduled tasks
