@@ -7,7 +7,7 @@
   * [How it works](#how-it-works)
   * [Origin](#origin)
 * [Installation](#installation)
-  * [Binary distribution](#binary-distribution)
+  * [Binary distribution: Self-extracting archive](#binary-distribution-self-extracting archive)
   * [Sources](#sources)
 * [Usage](#usage)
   * [Update](#update)
@@ -72,7 +72,7 @@ Additional dependencies (for both application and tests) expected to be availabl
 
 Given it's a `bash` script, it should be supported in most Unix-like OS. Most of development is done on MacOs, while automatic tests are run on Linux (Ubuntu and CentOS). On Windows, you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar (we succesfully tested on Windows 10 with `Git bash`, `aws` and `jq` - no extra `coreutils` and `curl` required). Anyway downloaded binaries are OS specific (eg: `gucci` is available for Windows starting from version `1.5.x`, 64-bit only at the moment).
 
-## Binary distribution
+## Binary distribution: Self-extracting archive
 
 Starting from version `2.2`, we provide binary distributions, which actually are self-extracting archives (thanks to `makeself`).  See [makeself](https://github.com/megastep/makeself) to check compatibility with your OS.
 
