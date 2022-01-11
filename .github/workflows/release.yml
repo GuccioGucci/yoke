@@ -1,6 +1,7 @@
 name: release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "*"
@@ -18,4 +19,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/yoke.bin
+          files: |
+              dist/yoke.bin
+              dist/yoke.tar.gz
