@@ -7,6 +7,7 @@
   * [How it works](#how-it-works)
   * [Origin](#origin)
 * [Installation](#installation)
+  * [Install.sh](#install.sh)
   * [Binary distribution: Self-extracting archive](#binary-distribution-self-extracting archive)
   * [Sources](#sources)
 * [Usage](#usage)
@@ -72,9 +73,29 @@ Additional dependencies (for both application and tests) expected to be availabl
 
 Given it's a `bash` script, it should be supported in most Unix-like OS. Most of development is done on MacOs, while automatic tests are run on Linux (Ubuntu and CentOS). On Windows, you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar (we succesfully tested on Windows 10 with `Git bash`, `aws` and `jq` - no extra `coreutils` and `curl` required). Anyway downloaded binaries are OS specific (eg: `gucci` is available for Windows starting from version `1.5.x`, 64-bit only at the moment).
 
+## Install.sh
+
+Starting from version `2.2`, we added an `install.sh` script, eg:
+
+```
+curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/install.sh | bash
+```
+
+This will download and extract distribution archive, under yoke folder. You can the execute it with
+```
+./yoke/yoke --version
+
+Installing GuccioGucci/ecs-deploy 3.10.3 (ecs-deploy-3.10.3)
+Linking ecs-deploy-3.10.3/ecs-deploy as ecs-deploy
+Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
+Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
+(templating) gucci: gucci version 1.5.1
+(deployment) ecs-deploy: 3.10.3
+```
+
 ## Binary distribution: Self-extracting archive
 
-Starting from version `2.2`, we provide binary distributions, which actually are self-extracting archives (thanks to `makeself`).  See [makeself](https://github.com/megastep/makeself) to check compatibility with your OS.
+Starting from same version, we also provide a binary distributions, which actually are self-extracting archives (thanks to `makeself`).  See [makeself](https://github.com/megastep/makeself) to check compatibility with your OS.
 
 Please, pick desired `yoke` binary distribution from [Releases](https://github.com/GuccioGucci/yoke/releases) page. Here's how to install it (this will extract the distribution archive and run a self-check `--version` execution):
 
