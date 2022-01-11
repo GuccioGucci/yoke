@@ -13,6 +13,9 @@ echo "Preparing $DIST_DIR folder"
 rm -rf $DIST_DIR > /dev/null 2>&1 ; mkdir -p $DIST_DIR/yoke
 cp -r yoke LICENSE bin $DIST_DIR/yoke
 
+echo "Packaging distribution archive"
+( cd $DIST_DIR ; tar -czf yoke.tar.gz yoke )
+
 echo "Packaging distribution binary"
 $LIB_DIR/bin/makeself.sh \
     --quiet --nox11 --noprogress --nowait --notemp --current \

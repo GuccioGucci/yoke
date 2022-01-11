@@ -16,4 +16,8 @@ teardown() {
     
     assert_equal $status 0
     [[ -f $YOKE_DIST_DIR/yoke.bin ]] || fail "distribution binary expected to be created in $YOKE_DIST_DIR"
+
+    [[ -f $YOKE_DIST_DIR/yoke.tar.gz ]] || fail "distribution archive expected to be created in $YOKE_DIST_DIR"
+    local content=$( tar -tf $YOKE_DIST_DIR/yoke.tar.gz )
+    [[ $( echo $content | grep $( basename $YOKE_DIST_DIR ) | wc -l ) -eq 0 ]] || fail "distribution archive expected to be relative"
 }
