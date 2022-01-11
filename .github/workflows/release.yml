@@ -20,8 +20,8 @@ jobs:
         shell: bash
         run: |
             echo "#!/usr/bin/env bash" > dist/install.sh
-            echo "echo Downloading release ${{ github.ref }}" >> dist/install.sh
-            echo "curl -L https://github.com/GuccioGucci/yoke/releases/download/${{ github.ref }}/yoke.tar.gz | tar -xz" >> dist/install.sh
+            echo "echo Downloading release ${{ github.ref_name }}" >> dist/install.sh
+            echo "curl -L https://github.com/GuccioGucci/yoke/releases/download/${{ github.ref_name }}/yoke.tar.gz | tar -xz" >> dist/install.sh
             echo "echo Done" >> dist/install.sh
 
       - name: Release
