@@ -7,8 +7,8 @@
   * [How it works](#how-it-works)
   * [Origin](#origin)
 * [Installation](#installation)
-  * [Install.sh](#installsh)
-  * [Binary distribution: Self-extracting archive](#binary-distribution-self-extracting-archive)
+  * [Archive, install script](#archive-install-script)
+  * [Archive, self-extracting](#archive-self-extracting)
   * [Sources](#sources)
 * [Usage](#usage)
   * [Update](#update)
@@ -73,7 +73,7 @@ Additional dependencies (for both application and tests) expected to be availabl
 
 Given it's a `bash` script, it should be supported in most Unix-like OS. Most of development is done on MacOs, while automatic tests are run on Linux (Ubuntu and CentOS). On Windows, you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar (we succesfully tested on Windows 10 with `Git bash`, `aws` and `jq` - no extra `coreutils` and `curl` required). Anyway downloaded binaries are OS specific (eg: `gucci` is available for Windows starting from version `1.5.x`, 64-bit only at the moment).
 
-## Install.sh
+## Archive, install script
 
 Starting from version `2.2`, we added an `install.sh` script, eg:
 
@@ -81,7 +81,7 @@ Starting from version `2.2`, we added an `install.sh` script, eg:
 curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/install.sh | bash
 ```
 
-This will download and extract distribution archive, under yoke folder. You can the execute it with
+This will download and extract distribution archive, under `yoke` folder. You can the execute it with
 ```
 ./yoke/yoke --version
 
@@ -93,7 +93,7 @@ Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
 (deployment) ecs-deploy: 3.10.3
 ```
 
-## Binary distribution: Self-extracting archive
+## Archive, self-extracting
 
 Starting from same version, we also provide a binary distributions, which actually are self-extracting archives (thanks to `makeself`).  See [makeself](https://github.com/megastep/makeself) to check compatibility with your OS.
 
@@ -241,7 +241,7 @@ Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinit
 
 While preparing template content, you can use much of Go templating functions: for example, declaring variables, `if` statements, boolean functions and so on. Also, Sprig functions are supported. Please, see [here](https://github.com/noqcks/gucci#templating) for the full list of supported functions and options.
 
-In addition to that, we prepared some useful helper scripts (already available into `PATH`), that you can use with the `shell` function. Following sections will recap them (see [helpers](/bin/helpers) for details, and [helpers.bats](/test/helpers.bats) for usage examples).
+In addition to that, we prepared some useful helper scripts (already available into `PATH`), that you can use with the `shell` function. Following sections will recap them (see [helpers](/bin/helpers) for details, and [helpers.bats](/test/unit/helpers.bats) for usage examples).
 
 One last note, custom helpers are also supported. They're expected to be found in `bin` folder, under current working-dir. For example, you can define a custom `my_helper` script and run it from the task definition template:
 
