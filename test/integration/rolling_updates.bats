@@ -1,5 +1,5 @@
-load '../lib/bin/bats-support/load'
-load '../lib/bin/bats-assert/load'
+load '../../lib/bin/bats-support/load'
+load '../../lib/bin/bats-assert/load'
 
 setup() {
     export PATH="$( realpath test/fake/platform ):$PATH"
@@ -27,7 +27,7 @@ assert_lines_contains() {
   [[ "$matched" == "true" ]] || fail "$matched not found in: ${lines[@]}"
 }
 
-@test 'integration - hello-world install tag' {
+@test 'rolling updates - hello-world install tag' {
     run ./yoke install -c cls01 -s hello-world-dev -w test/samples/hello-world/deployment -f values-dev.yaml -t 6e973c2-116 --timeout 5
 
     local commands="$( cat $YOKE_FAKES_LOGGING )"

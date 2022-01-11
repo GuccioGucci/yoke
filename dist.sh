@@ -13,15 +13,9 @@ echo "Preparing $DIST_DIR folder"
 rm -rf $DIST_DIR > /dev/null 2>&1 ; mkdir -p $DIST_DIR/yoke
 cp -r yoke LICENSE bin $DIST_DIR/yoke
 
-echo "Packaging distribution"
+echo "Packaging distribution binary"
 $LIB_DIR/bin/makeself.sh \
     --quiet --nox11 --noprogress --nowait --notemp --current \
     $DIST_DIR $DIST_DIR/yoke.bin "yoke" ./yoke/yoke
-
-echo "Cleaning distribution"
-rm -rf $DIST_DIR/yoke > /dev/null
-
-echo "Testing distribution"
-( cd $DIST_DIR ; ./yoke.bin -- --version )
 
 echo "Done"
