@@ -7,7 +7,7 @@
   * [How it works](#how-it-works)
   * [Origin](#origin)
 * [Installation](#installation)
-  * [Install.sh](#install.sh)
+  * [Install.sh](#installsh)
   * [Binary distribution: Self-extracting archive](#binary-distribution-self-extracting-archive)
   * [Sources](#sources)
 * [Usage](#usage)
