@@ -459,9 +459,9 @@ For [ReactJS](https://reactjs.org/), few approaches have been proposed to achiev
 
 The overall idea is to:
 
-* provide shared *default* values (to be used in most of environments), eg: `config.js` in */public* folder
-* provide local *development* override values (to be used locally), eg: `config-override.js` in */public/env* folder
-* provide *per-environment* override values (to be used on deployment), eg: still `config-override.js`, but in yoke working directory (eg: */deployment* folder)
+* provide shared *default* values (to be used in most of environments), eg: `config.js` in `public` folder
+* provide local *development* override values (to be used locally), eg: `config-override.js` in `public/env` folder
+* provide *per-environment* override values (to be used on deployment), eg: still `config-override.js`, but in yoke working directory (eg: `deployment` folder)
 * prepare global configurations in `window.config` object, by merging default and override files
 
 So both *default* and *development* override config files will be packaged with the application bundle, and loaded by index.html, eg:
