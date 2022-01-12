@@ -240,6 +240,8 @@ Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinit
 }
 ```
 
+Please, while preparing per-environment `environment` values in `containerDefinitions` nodes, consider if those environment variables could be part of proper application configuration (specific to your programming language or framework). In that case, see [Application configuration override](/docs/EXTRA.md#application-configuration-override) section in [Extra](/docs/EXTRA.md).
+
 ## Helpers
 
 While preparing template content, you can use much of Go templating functions: for example, declaring variables, `if` statements, boolean functions and so on. Also, Sprig functions are supported. Please, see [here](https://github.com/noqcks/gucci#templating) for the full list of supported functions and options.
