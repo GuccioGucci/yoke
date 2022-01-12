@@ -451,3 +451,34 @@ java -jar service.jar ... \
 ```
 
 Please, note that on recent versions (such as `2.5.0`), there was a breaking change, so that resource set to that property is always expected to exist (while with older version such as `2.2.5.RELEASE`, it was allowed to set a non-existing resource).
+
+## ReactJS
+
+For [ReactJS](https://reactjs.org/), few approaches have been proposed to achieve "build once, deploy anywhere" goal. Leveraging on application configuration override, instead of individual environment variables, is probably the easiest of the solutions (see [here](https://www.cotyhamilton.com/build-once-deploy-anywhere-for-react-applications/) for reference).
+
+The overall idea is to:
+
+* provide shared *default* values (to be used in most of environments), eg: `config.js` in */public* folder
+* provide local *development* override values (to be used locally), eg: `config-override.js` in */public/env* folder
+* provide *per-environment* override values (to be used on deployment), eg: still `config-override.js`, but in yoke working directory (eg: */deployment* folder)
+* prepare global configurations in `window.config` object, by merging default and override files
+
+So both *default* and *development* override config files will be packaged with the application bundle, and loaded by index.html, eg:
+
+```
+  <body>
+    <script src="%PUBLIC_URL%/env/config-override.js"></script>
+    <script src="%PUBLIC_URL%/config.js"></script>
+    <script>
+      window.config = { ...config, ...config_override };
+    </script>
+    ...
+  </body>
+```
+
+Then, [Nginx](https://www.nginx.com/) configuration can then be overriden to this way:
+
+```
+{{- $applicationConfigurationOverride := "config-override.js" -}}
+{{- $configurationPath := "/usr/share/nginx/html/env" -}}
+```
