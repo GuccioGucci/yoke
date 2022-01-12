@@ -443,9 +443,11 @@ For [Spring Boot](https://spring.io/projects/spring-boot) application, you could
 {{- $configurationPath := "/opt/service/config" -}} # as configured in your Dockerfile or base Docker image
 ```
 
-Then, add this to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent):
+Then, you could use `spring.config.additional-location` property to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent), as documented [here](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config). So, adding this to application startup command line (eg: `Dockerfile`, `bootstrap.sh` or equivalent) would be enough:
 
 ```
 java -jar service.jar ... \
      --spring.config.additional-location=config/application-override.properties # or application-override.yaml
 ```
+
+Please, note that on recent versions (such as `2.5.0`), there was a breaking change, so that resource set to that property is always expected to exist (while with older version such as `2.2.5.RELEASE`, it was allowed to set a non-existing resource).
