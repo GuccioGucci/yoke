@@ -464,7 +464,7 @@ The overall idea is to:
 * provide *per-environment* override values (to be used on deployment), eg: still `config-override.js`, but in yoke working directory (eg: `deployment` folder)
 * prepare global configurations in `window.config` object, by merging default and override files
 
-So both *default* and *development* override config files will be packaged with the application bundle, and loaded by index.html, eg:
+So both *default* and *development* override config files will be packaged with the application bundle, and loaded by `index.html`, eg:
 
 ```
   <body>
