@@ -7,8 +7,8 @@
   * [How it works](#how-it-works)
   * [Origin](#origin)
 * [Installation](#installation)
-  * [Archive, install script](#archive-install-script)
-  * [Archive, self-extracting](#archive-self-extracting)
+  * [Archive: install script](#archive-install-script)
+  * [Archive: self-extracting](#archive-self-extracting)
   * [Sources](#sources)
 * [Usage](#usage)
   * [Update](#update)
@@ -73,15 +73,18 @@ Additional dependencies (for both application and tests) expected to be availabl
 
 Given it's a `bash` script, it should be supported in most Unix-like OS. Most of development is done on MacOs, while automatic tests are run on Linux (Ubuntu and CentOS). On Windows, you'd probably only need a bash prompt such as [Git bash](https://gitforwindows.org/), [Cygwin](https://www.cygwin.com/) or similar (we succesfully tested on Windows 10 with `Git bash`, `aws` and `jq` - no extra `coreutils` and `curl` required). Anyway downloaded binaries are OS specific (eg: `gucci` is available for Windows starting from version `1.5.x`, 64-bit only at the moment).
 
-## Archive, install script
+## Archive: install script
 
-Starting from version `2.2`, we added an `install.sh` script, eg:
+Starting from version `2.2`, we added an `install.sh` script. Please, pick desired `yoke` distribution from [Releases](https://github.com/GuccioGucci/yoke/releases) page.
+
+Here's how to install it (this will download and extract distribution archive, under `yoke` folder):
 
 ```
 curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/install.sh | bash
 ```
 
-This will download and extract distribution archive, under `yoke` folder. You can the execute it with
+You can then execute it with:
+
 ```
 ./yoke/yoke --version
 
@@ -93,11 +96,11 @@ Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
 (deployment) ecs-deploy: 3.10.3
 ```
 
-## Archive, self-extracting
+## Archive: self-extracting
 
 Starting from same version, we also provide a binary distributions, which actually are self-extracting archives (thanks to `makeself`).  See [makeself](https://github.com/megastep/makeself) to check compatibility with your OS.
 
-Please, pick desired `yoke` binary distribution from [Releases](https://github.com/GuccioGucci/yoke/releases) page. Here's how to install it (this will extract the distribution archive and run a self-check `--version` execution):
+Here's how to install it (this will extract the distribution archive and run a self-check `--version` execution):
 
 ```
 curl -L -s https://github.com/GuccioGucci/yoke/releases/download/2.2/yoke.bin -o yoke.bin
