@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 
 function to_response_file(){
-    local response_hash="$1"
+    local response_hash="$@"
 
      # simplify command line
-    [[ $response_hash =~ "{" ]] && response_hash=$( echo "$response_hash" | cut -d '{' -f 1 | head -n 1 )
+    [[ "$response_hash" =~ "{" ]] && response_hash=$( echo "$response_hash" | cut -d '{' -f 1 | head -n 1 )
     response_hash=$( echo "$response_hash" | sed 's|--output json||g' )
 
     # remove trailing and leading spaces
     response_hash=$( echo "$response_hash" | awk '{$1=$1};1' )
-    [[ $response_hash =~ "arn:" ]] && response_hash=$( echo "$response_hash" | sed -E 's~arn:aws:ecs:us-east-1:[0-9]+:([a-zA-Z0-9]|-)+\/~~g' ) #arn:aws:ecs:us-east-1:123456789012
+    [[ "$response_hash" =~ "arn:" ]] && response_hash=$( echo "$response_hash" | sed -E 's~arn:aws:ecs:us-east-1:[0-9]+:([a-zA-Z0-9]|-)+\/~~g' ) #arn:aws:ecs:us-east-1:123456789012
     
     response_hash=$( echo "$response_hash" | cut -d " " -f 1-5 )
     response_hash=$( echo "$response_hash" | sed 's| |_|g' )
     response_hash=$( echo "$response_hash" | sed 's|,|_|g' )
     response_hash=$( echo "$response_hash" | sed 's|:|_|g' )
-    echo ${BASH_SOURCE%/*}/fixture/*${response_hash}*.json
+    
+    local fakes="$( realpath "${BASH_SOURCE%/*}" )"
+    echo "$fakes/fixture/"*$response_hash*.json
 }
 
 function fake_log_in() {

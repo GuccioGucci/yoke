@@ -56,7 +56,7 @@ function log() {
 function template_on() {
     local target="$1" ; shift
     [[ "$DEBUG" != "false" ]] && log "[template] executing ($# params): gucci $@"
-    ( cd $( realpath "$WORKING_DIR" ) ; gucci "$@" > "$target" )
+    ( cd "$( realpath "$WORKING_DIR" )" ; gucci "$@" > "$target" )
 }
 
 function deployment_PATH() {
@@ -184,16 +184,16 @@ function flags_confirmation() {
 }
 
 function do_deploy() {
-    local command_line=""
-    [[ "$COMMAND" == "update" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( flags_confirmation ) --timeout $TIMEOUT"
-    [[ "$COMMAND" == "install" ]] && command_line="-c $CLUSTER -n $SERVICE --tag-only $IMAGE_TAG -i ignored-image $( flags_install ) $( flags_confirmation ) --timeout $TIMEOUT"
-    [[ ! -z "$PRUNE_TASK_DEFINITIONS" ]] && command_line="$command_line --max-definitions $PRUNE_TASK_DEFINITIONS"
+    local command_line=()
+    [[ "$COMMAND" == "update" ]] && command_line=("-c" "$CLUSTER" "-n" "$SERVICE" "--tag-only" "$IMAGE_TAG" "-i" "ignored-image" $( flags_confirmation ) "--timeout" "$TIMEOUT")
+    [[ "$COMMAND" == "install" ]] && command_line=("-c" "$CLUSTER" "-n" "$SERVICE" "--tag-only" "$IMAGE_TAG" "-i" "ignored-image" $( flags_install ) $( flags_confirmation ) "--timeout" "$TIMEOUT")
+    [[ ! -z "$PRUNE_TASK_DEFINITIONS" ]] && command_line+=("--max-definitions" "$PRUNE_TASK_DEFINITIONS")
 
-    [[ "$DEBUG" != "false" ]] && command_line="$command_line --verbose"
-    [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy $command_line"
+    [[ "$DEBUG" != "false" ]] && command_line+=("--verbose")
+    [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy ${command_line[@]}"
 
     [[ "$DRY_RUN" != "false" ]] && exit 0
-    ecs-deploy $command_line
+    ecs-deploy ${command_line[@]}
 }
 
 # main

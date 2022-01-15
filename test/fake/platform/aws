@@ -2,10 +2,10 @@
 
 source "${BASH_SOURCE%/*}/../common"
 
-fake_log_in "$( basename "$0" ) $*"
+fake_log_in "$( basename "$0" ) $@"
 
-response_file=$( to_response_file "$*" )
-[[ -f "$response_file" ]] || {
+response_file=$( to_response_file "$@" )
+[[ -f $response_file ]] || {
     fake_log_err "not found: $response_file"
     exit 254;
 }
