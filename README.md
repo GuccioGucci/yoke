@@ -88,12 +88,12 @@ You can then execute it with:
 ```
 ./yoke/yoke --version
 
-Installing GuccioGucci/ecs-deploy 3.10.3 (ecs-deploy-3.10.3)
-Linking ecs-deploy-3.10.3/ecs-deploy as ecs-deploy
+Installing GuccioGucci/ecs-deploy 3.10.4 (ecs-deploy-3.10.4)
+Linking ecs-deploy-3.10.4/ecs-deploy as ecs-deploy
 Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
 Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
 (templating) gucci: gucci version 1.5.1
-(deployment) ecs-deploy: 3.10.3
+(deployment) ecs-deploy: 3.10.4
 ```
 
 ## Archive: self-extracting
@@ -109,12 +109,12 @@ chmod +x yoke.bin
 
 Verifying archive integrity... MD5 checksums are OK. All good.
 Uncompressing yoke
-Installing GuccioGucci/ecs-deploy 3.10.3 (ecs-deploy-3.10.3)
-Linking ecs-deploy-3.10.3/ecs-deploy as ecs-deploy
+Installing GuccioGucci/ecs-deploy 3.10.4 (ecs-deploy-3.10.4)
+Linking ecs-deploy-3.10.4/ecs-deploy as ecs-deploy
 Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
 Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
 (templating) gucci: gucci version 1.5.1
-(deployment) ecs-deploy: 3.10.3
+(deployment) ecs-deploy: 3.10.4
 ```
 
 Please note that extra `--` before `--version`: that's required to instruct the self-extracting archive to pass arguments to `yoke` itself. Resources are extracted under `yoke` subfolder, and once extracted, `yoke` can be executed from subfolder.
@@ -133,7 +133,7 @@ Please note that extra `--` before `--version`: that's required to instruct the 
 ./yoke/yoke --version
 
 (templating) gucci: gucci version 1.5.1
-(deployment) ecs-deploy: 3.10.3
+(deployment) ecs-deploy: 3.10.4
 ```
 
 Then, you can safely delete binary distribution file, or keep it as a wrapper, if you like it (it would always self-extract, before executing).
@@ -147,12 +147,12 @@ $ git clone https://github.com/GuccioGucci/yoke.git
 $ cd yoke
 $ ./yoke --version
 
-Installing GuccioGucci/ecs-deploy 3.10.3 (ecs-deploy-3.10.3)
-Linking ecs-deploy-3.10.3/ecs-deploy
+Installing GuccioGucci/ecs-deploy 3.10.4 (ecs-deploy-3.10.4)
+Linking ecs-deploy-3.10.4/ecs-deploy
 Installing noqcks/gucci 1.5.2 (gucci-v1.5.2-darwin-amd64)
 Linking gucci-1.5.2/gucci-v1.5.2-darwin-amd64
 (templating) gucci: gucci version 1.5.1
-(deployment) ecs-deploy: 3.10.3
+(deployment) ecs-deploy: 3.10.4
 ```
 
 # Usage
