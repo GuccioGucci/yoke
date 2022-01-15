@@ -94,31 +94,31 @@ function do_initialize() {
 }
 
 function init_values() {
-  if [[ ! -z "$VALUES" ]]; then
-      VALUES="$( realpath ${WORKING_DIR}/$VALUES )"
-      log "values: $VALUES"
-  fi
+    if [[ ! -z "$VALUES" ]]; then
+        VALUES="$( realpath ${WORKING_DIR}/$VALUES )"
+        log "values: $VALUES"
+    fi
 }
 
 function init_task_definition() {
-  local command_line=""
-  TASK_DEFINITION="$( realpath ${WORKING_DIR}/${TASK_DEFINITION} )"
-  log "(template) task-definition: ${TASK_DEFINITION}"
-  [[ "$DEBUG" != "false" ]] && log "$( cat $TASK_DEFINITION )"
-    
-  original_task_definition=$TASK_DEFINITION
-  TASK_DEFINITION="/tmp/task-definition.json.$RANDOM"
-  log "(current) task-definition: $TASK_DEFINITION"
-  
-  if [[ ! -z "$VALUES" ]]; then
-      command_line="-f $VALUES"
-  fi
-  
-  [[ "$DEBUG" != "false" ]] && log "[task definition] template on $TASK_DEFINITION"
-  template_on $TASK_DEFINITION $command_line $original_task_definition || {
-      log "cannot prepare task-definition";
-      exit 1;
-  }
+    local command_line=""
+    TASK_DEFINITION="$( realpath ${WORKING_DIR}/${TASK_DEFINITION} )"
+    log "(template) task-definition: ${TASK_DEFINITION}"
+    [[ "$DEBUG" != "false" ]] && log "$( cat $TASK_DEFINITION )"
+
+    original_task_definition=$TASK_DEFINITION
+    TASK_DEFINITION="/tmp/task-definition.json.$RANDOM"
+    log "(current) task-definition: $TASK_DEFINITION"
+
+    if [[ ! -z "$VALUES" ]]; then
+        command_line="-f $VALUES"
+    fi
+
+    template_on $TASK_DEFINITION $command_line $original_task_definition || {
+        log "cannot prepare task-definition";
+        exit 1;
+    }
+    [[ "$DEBUG" != "false" ]] && log "$( cat $TASK_DEFINITION )"
 }
 
 function init_task_set() {
@@ -126,7 +126,9 @@ function init_task_set() {
   TASK_SET="$( realpath ${WORKING_DIR}/${TASK_SET} )"
   
   if [[ -f $TASK_SET ]]; then
-    log "task-set: $TASK_SET"
+    log "(template) task-set: $TASK_SET"
+    [[ "$DEBUG" != "false" ]] && log "$( cat $TASK_SET )"
+
     original_task_set=$TASK_SET
     TASK_SET="/tmp/task-set.json.$RANDOM"
     log "(current) task-set: $TASK_SET"
@@ -135,42 +137,44 @@ function init_task_set() {
         command_line="-f $VALUES"
     fi
     
-    [[ "$DEBUG" != "false" ]] && log "[task set] template on $TASK_SET"
     template_on $TASK_SET $command_line $original_task_set || {
         log "cannot prepare task-set";
         exit 1;
     }
+    [[ "$DEBUG" != "false" ]] && log "$( cat $TASK_SET )"
   fi
 }
 
 function init_confirmation() {
-  local command_line=""
-  realpath $( deployment_PATH )/${CONFIRMATION} > /dev/null 2>&1 && CONFIRMATION="$( realpath $( deployment_PATH )/${CONFIRMATION} )"
-  
-  if [[ -f $CONFIRMATION ]]; then
-    log "confirmation: $CONFIRMATION"
-    original_confirmation=$CONFIRMATION
-    CONFIRMATION="/tmp/confirm.sh.$RANDOM"
-    log "(current) confirmation: $CONFIRMATION"
-  
-    if [[ ! -z "$VALUES" ]]; then
-        command_line="-f $VALUES"
+    local command_line=""
+    realpath $( deployment_PATH )/${CONFIRMATION} > /dev/null 2>&1 && CONFIRMATION="$( realpath $( deployment_PATH )/${CONFIRMATION} )"
+
+    if [[ -f $CONFIRMATION ]]; then
+        log "(template) confirmation: $CONFIRMATION"
+        [[ "$DEBUG" != "false" ]] && log "$( cat $CONFIRMATION )"
+        
+        original_confirmation=$CONFIRMATION
+        CONFIRMATION="/tmp/confirm.sh.$RANDOM"
+        log "(current) confirmation: $CONFIRMATION"
+
+        if [[ ! -z "$VALUES" ]]; then
+            command_line="-f $VALUES"
+        fi
+
+        template_on $CONFIRMATION $command_line $original_confirmation || {
+            log "cannot prepare confirmation";
+            exit 1;
+        }
+        [[ "$DEBUG" != "false" ]] && log "$( cat $CONFIRMATION )"
+
+        chmod +x $CONFIRMATION
     fi
-    
-    [[ "$DEBUG" != "false" ]] && log "[confirmation] template on $CONFIRMATION"
-    template_on $CONFIRMATION $command_line $original_confirmation || {
-        log "cannot prepare confirmation";
-        exit 1;
-    }
-    
-    chmod +x $CONFIRMATION
-  fi
 }
 
 function flags_install() {
-  local flags="--task-definition-file $TASK_DEFINITION"
-  [[ -f $TASK_SET ]] && flags="$flags --task-set-file $TASK_SET"
-  echo "$flags"
+    local flags="--task-definition-file $TASK_DEFINITION"
+    [[ -f $TASK_SET ]] && flags="$flags --task-set-file $TASK_SET"
+    echo "$flags"
 }
 
 function flags_confirmation() {

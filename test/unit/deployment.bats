@@ -33,10 +33,9 @@ last_execution_output() {
 
 @test 'install - task definition, with image tag' {
     run ./yoke install -c cls01 -s hello-world-dev -t bb255ec-93 -w test/samples/hello-world/deployment -f values-dev.yaml
-
+    assert_equal $status 0 || fail "${lines[@]}"
+    
     local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
-
     local expected='ecs-deploy -c cls01 -n hello-world-dev --tag-only bb255ec-93 -i ignored-image --task-definition-file /tmp/task-definition\.json.\w*'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
