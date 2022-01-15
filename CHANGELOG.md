@@ -2,6 +2,11 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## 2.3
+
+* updated dependencies: ecs-deploy to 3.10.4 (fork)
+* support for path with spaces
+
 ## 2.2
 
 * dependencies: migrated from lib/update to bin/install
