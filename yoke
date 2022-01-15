@@ -56,11 +56,11 @@ function log() {
 function template_on() {
     local target=$1 ; shift
     [[ "$DEBUG" != "false" ]] && log "[template] executing: gucci $*"
-    ( cd $( realpath ${WORKING_DIR} ) ; gucci $* > $target )
+    ( cd $( realpath $WORKING_DIR ) ; gucci $* > $target )
 }
 
 function deployment_PATH() {
-    echo "${WORKING_DIR}/bin"
+    echo "$WORKING_DIR/bin"
 }
 
 function do_initialize() {    
@@ -95,15 +95,15 @@ function do_initialize() {
 
 function init_values() {
     if [[ ! -z "$VALUES" ]]; then
-        VALUES="$( realpath ${WORKING_DIR}/$VALUES )"
+        VALUES="$( realpath $WORKING_DIR/$VALUES )"
         log "values: $VALUES"
     fi
 }
 
 function init_task_definition() {
     local command_line=""
-    TASK_DEFINITION="$( realpath ${WORKING_DIR}/${TASK_DEFINITION} )"
-    log "(template) task-definition: ${TASK_DEFINITION}"
+    TASK_DEFINITION="$( realpath $WORKING_DIR/$TASK_DEFINITION )"
+    log "(template) task-definition: $TASK_DEFINITION"
     [[ "$DEBUG" != "false" ]] && log "$( cat $TASK_DEFINITION )"
 
     original_task_definition=$TASK_DEFINITION
@@ -123,7 +123,7 @@ function init_task_definition() {
 
 function init_task_set() {
   local command_line=""
-  TASK_SET="$( realpath ${WORKING_DIR}/${TASK_SET} )"
+  TASK_SET="$( realpath $WORKING_DIR/$TASK_SET )"
   
   if [[ -f $TASK_SET ]]; then
     log "(template) task-set: $TASK_SET"
@@ -147,7 +147,7 @@ function init_task_set() {
 
 function init_confirmation() {
     local command_line=""
-    realpath $( deployment_PATH )/${CONFIRMATION} > /dev/null 2>&1 && CONFIRMATION="$( realpath $( deployment_PATH )/${CONFIRMATION} )"
+    realpath $( deployment_PATH )/$CONFIRMATION > /dev/null 2>&1 && CONFIRMATION="$( realpath $( deployment_PATH )/$CONFIRMATION )"
 
     if [[ -f $CONFIRMATION ]]; then
         log "(template) confirmation: $CONFIRMATION"
