@@ -31,11 +31,11 @@ function artifact_for() {
 
 function link_as() {
     local name=$1
-    local binary=$2
+    local binary="$2"
 
-    echo "Linking $( echo $binary | sed 's|'$LIB_DIR'/||g' ) as $name"
-    [[ -f $binary ]] && chmod +x $binary;
-    ln -s -f $binary $BIN_DIR/$name;
+    echo "Linking $( echo "$binary" | sed 's|'"$LIB_DIR"'/||g' ) as $name"
+    [[ -f "$binary" ]] && chmod +x "$binary";
+    ln -s -f "$binary" "$BIN_DIR"/$name;
 }
 
 
@@ -46,11 +46,11 @@ function install_github_tag() {
     local name="$( echo $repo | cut -d "/" -f 2 )"
     local artifact="$version.tar.gz"
         
-    local target=$name-$( echo $version | sed 's/v//g' ) # eg: 'v0.4.0' => '0.4.0'
-    [[ -d $LIB_DIR/$target ]] || {
+    local target="$name-$( echo $version | sed 's/v//g' )" # eg: 'v0.4.0' => '0.4.0'
+    [[ -d "$LIB_DIR/$target" ]] || {
         echo "Installing $repo $version ($target)"
-        ( cd $LIB_DIR ; curl -s -L "https://github.com/$repo/archive/refs/tags/$artifact" -o $name-$artifact ; tar -xf $name-$artifact )
-        ( cd $LIB_DIR ; [[ -f $name-$artifact ]] && rm -rf $name-$artifact ) # remove downloaded artifact
+        ( cd "$LIB_DIR" ; curl -s -L "https://github.com/$repo/archive/refs/tags/$artifact" -o $name-$artifact ; tar -xf $name-$artifact )
+        ( cd "$LIB_DIR" ; [[ -f $name-$artifact ]] && rm -rf $name-$artifact ) # remove downloaded artifact
 
     
         # looking for binaries, multiple attempts
@@ -58,17 +58,17 @@ function install_github_tag() {
         # - under bin folder: no extension
         # - root folder itself
         local binary=""
-        [[ -z "$binary" ]] && { binary=$LIB_DIR/$target/$name ; [[ -r $binary ]] || binary=""; }
-        [[ -z "$binary" ]] && { binary=$LIB_DIR/$target/bin/$name ; [[ -r $binary ]] || binary=""; }
-        [[ -z "$binary" ]] && { [[ -f $LIB_DIR/$target/load.bash ]] && binary=$LIB_DIR/$target; [[ -r $binary ]] || binary=""; }
-        [[ -z "$binary" ]] && { binary=($LIB_DIR/$target/$name*.sh) ; [[ -r ${binary[0]} ]] || binary=""; }
+        [[ -z "$binary" ]] && { binary="$LIB_DIR/$target/$name" ; [[ -r "$binary" ]] || binary=""; }
+        [[ -z "$binary" ]] && { binary="$LIB_DIR/$target/bin/$name" ; [[ -r "$binary" ]] || binary=""; }
+        [[ -z "$binary" ]] && { [[ -f "$LIB_DIR/$target"/load.bash ]] && binary="$LIB_DIR/$target"; [[ -r "$binary" ]] || binary=""; }
+        [[ -z "$binary" ]] && { binary=("$LIB_DIR/$target"/$name*.sh) ; [[ -r "${binary[0]}" ]] || binary=""; }
         
         # if found, link to $BIN_DIR
         [[ -z "$binary" ]] || {
             if [[ "$(declare -p binary)" =~ "declare -a" ]]; then
-                for each in "${binary[@]}"; do link_as $( basename $each ) $each ; done
+                for each in "${binary[@]}"; do link_as $( basename "$each" ) "$each" ; done
             else
-                link_as $name $binary
+                link_as "$name" "$binary"
             fi
         }
     }
@@ -81,19 +81,19 @@ function install_github_release() {
     local name="$( echo $repo | cut -d "/" -f 2 )"
     local artifact=$( artifact_for $name $version )
 
-    local target=$LIB_DIR/$name-$version
-    [[ -d $target ]] || {
+    local target="$LIB_DIR/$name-$version"
+    [[ -d "$target" ]] || {
         echo "Installing $repo $version ($artifact)"
 
-        mkdir -p $target
-        ( cd $target ; curl "https://github.com/$repo/releases/download/$version/$artifact" -s -L -o $artifact )
+        mkdir -p "$target"
+        ( cd "$target" ; curl "https://github.com/$repo/releases/download/$version/$artifact" -s -L -o $artifact )
 
-        local binary=$target/$artifact
-        [[ -f $binary ]] || fail "Could not update $name"
+        local binary="$target/$artifact"
+        [[ -f "$binary" ]] || fail "Could not update $name"
 
-        echo "Linking $( echo $binary | sed 's|'$LIB_DIR'/||g' )"
-        chmod +x $binary
-        ln -s -f $binary $BIN_DIR/$name
+        echo "Linking $( echo "$binary" | sed 's|'"$LIB_DIR"'/||g' )"
+        chmod +x "$binary"
+        ln -s -f "$binary" "$BIN_DIR"/$name
     }
 }
 
@@ -109,11 +109,11 @@ ensure "realpath" "coreutils"
 ensure "curl"
 
 # init context
-LIB_DIR=$( realpath $CURRENT_DIR/../lib )
-BIN_DIR=$LIB_DIR/bin
+LIB_DIR=$( realpath "$CURRENT_DIR"/../lib )
+BIN_DIR="$LIB_DIR"/bin
 
 # prepare bin folder
-mkdir -p $BIN_DIR > /dev/null 2>&1
+mkdir -p "$BIN_DIR" > /dev/null 2>&1
 
 [[ $SCOPE == "--all" || $SCOPE == "--app" ]] && {
     # application tools

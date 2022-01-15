@@ -13,8 +13,9 @@ teardown() {
 
 @test 'helpers with arguments' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/task_definition_template_with_arguments -f values-dev.yaml
+    assert_equal $status 0 || fail "${lines[@]}"
+    
     local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
-
     local container_port="$( cat $task_definition | jq -r ".taskDefinition.containerDefinitions[0].portMappings[0].containerPort" )"
     assert_equal "$container_port" "8080"
 
@@ -27,10 +28,9 @@ teardown() {
 
 @test 'helpers with arguments, from current deployment PATH' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/task_definition_template_from_current_deployment -f values-dev.yaml --debug
-    assert_equal $status 0 || fail "${lines[*]}"
+    assert_equal $status 0 || fail "${lines[@]}"
     
     local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
-
     local container_port="$( cat $task_definition | jq -r ".taskDefinition.containerDefinitions[0].portMappings[0].containerPort" )"
     assert_equal "$container_port" "8080"
 
@@ -44,54 +44,62 @@ teardown() {
 
 @test 'aws account id - success' {
     run ./bin/helpers/aws_account_id
-    assert_equal $status 0
+
+    assert_equal $status 0 || fail "${lines[@]}"
     assert_equal "${lines[0]}" "123456789012"
 }
 
 @test 'aws account id - template' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/aws_account_id
-    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
-    
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"    
     local execution_role="$( cat $task_definition | jq -r ".taskDefinition.executionRoleArn" )"
     assert_equal "$execution_role" "arn:aws:iam::123456789012:role/helpers"
 }
 
 @test 'aws iam role - found' {
     run ./bin/helpers/aws_iam_role hello-world-dev
-    assert_equal $status 0
+
+    assert_equal $status 0 || fail "${lines[@]}"
     assert_equal "${lines[0]}" "arn:aws:iam::123456789012:role/hello-world-dev"
 }
 
 @test 'aws iam role - not found' {
     run ./bin/helpers/aws_iam_role not-found-role
-    assert_equal $status 1
+
+    assert_equal $status 1 || fail "${lines[@]}"
     assert_equal "${lines[0]}" "NOT-FOUND[not-found-role]"
 }
 
 @test 'aws iam role - template' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/aws_iam_role
+    assert_equal $status 0 || fail "${lines[@]}"
+
     local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
-    
     local execution_role="$( cat $task_definition | jq -r ".taskDefinition.executionRoleArn" )"
     assert_equal "$execution_role" "arn:aws:iam::123456789012:role/hello-world-dev"
 }
 
 @test 'aws efs ap - found' {
     run ./bin/helpers/aws_efs_ap hello-world-dev-efs fileSystemId
-    assert_equal $status 0
+
+    assert_equal $status 0 || fail "${lines[@]}"
     assert_equal "${lines[0]}" "fs-12345678"
 }
 
 @test 'aws efs ap - not found' {
     run ./bin/helpers/aws_efs_ap not-found-efs fileSystemId
-    assert_equal $status 1
+
+    assert_equal $status 1 || fail "${lines[@]}"
     assert_equal "${lines[0]}" "NOT-FOUND[not-found-efs,fileSystemId]"
 }
 
 @test 'aws efs ap - template' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/aws_efs_ap
-    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
-    
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"    
     local file_system_id="$( cat $task_definition | jq -r ".taskDefinition.volumes[0].efsVolumeConfiguration.fileSystemId" )"
     assert_equal "$file_system_id" "fs-12345678"
     

@@ -2,4 +2,4 @@
 
 source "${BASH_SOURCE%/*}/../common"
 
-fake_log_in "$( basename $0 ) $*"
+fake_log_in "$( basename "$0" ) $*"

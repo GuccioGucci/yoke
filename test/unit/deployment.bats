@@ -42,6 +42,7 @@ last_execution_output() {
 
 @test 'install - task definition, with values' {
     run ./yoke install -c any -s any -t any -w test/samples/hello-world/deployment -f values-dev.yaml
+    assert_equal $status 0 || fail "${lines[@]}"
     
     local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
     local family="$( cat $task_definition | jq | grep family | cut -d \" -f 4)"
@@ -50,17 +51,16 @@ last_execution_output() {
 
 @test 'install - task definition, without values' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_definition_template_only
+    assert_equal $status 0 || fail "${lines[@]}"
 
     local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
-    
     local expected='--tag-only bb255ec-93 -i ignored-image --task-definition-file /tmp/task-definition\.json.\w*'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
 
 @test 'install - task definition, on failure' {
     run ./yoke install -c any -s any -t any -w test/deployments/failing -d
-    assert_equal $status 1
+    assert_equal $status 1 || fail "${lines[@]}"
     
     local expected="cannot prepare task-definition"
     local output=$( last_execution_output )
@@ -69,20 +69,18 @@ last_execution_output() {
 
 @test 'install - task set, without values' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_only
-
-    local commands="$( cat $YOKE_FAKES_LOGGING )"
     assert_equal $status 0 || fail "$commands"
-    
+
+    local commands="$( cat $YOKE_FAKES_LOGGING )"    
     local expected='--task-definition-file .*task-definition\.json.* --task-set-file .*task-set\.json.*'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
 
 @test 'install - task set, with values' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_with_arguments -f values-dev.yaml
-
-    local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
+    assert_equal $status 0 || fail "${lines[@]}"
     
+    local commands="$( cat $YOKE_FAKES_LOGGING )"    
     local task_set="$( echo $commands | grep -o '/tmp/task-set\.json.\w*' )"
     local securityGroup="$( cat $task_set | jq -cr '.taskSet.networkConfiguration.awsvpcConfiguration.securityGroups[0]' )"
     assert_equal "$securityGroup" "sg-abcdefghil1234567"
@@ -90,40 +88,36 @@ last_execution_output() {
 
 @test 'update - task set, default confirmation values' {
     run ./yoke update -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_only
+    assert_equal $status 0 || fail "${lines[@]}"
 
     local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
-    
     local expected='--canary-confirmation wait_timeout'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
 
 @test 'update - task set, custom confirmation' {
     run ./yoke update -c any -s any -t bb255ec-93 -w test/deployments/task_set_with_confirmation
+    assert_equal $status 0 || fail "${lines[@]}"
 
     local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
-    
     local expected='--canary-confirmation /tmp/confirm.sh.\w*'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
 
 @test 'install - task set, default confirmation values' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_only
+    assert_equal $status 0 || fail "${lines[@]}"
 
     local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
-    
     local expected='--canary-confirmation wait_timeout'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
 
 @test 'install - task set, custom confirmation' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_set_with_confirmation
+    assert_equal $status 0 || fail "${lines[@]}"
 
     local commands="$( cat $YOKE_FAKES_LOGGING )"
-    assert_equal $status 0 || fail "$commands"
-    
     local expected='--canary-confirmation /tmp/confirm.sh.\w*'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
@@ -154,15 +148,16 @@ last_execution_output() {
 
 @test 'dry-run' {
     run ./yoke update -c any -s any -t any --dry-run
-    assert_equal $status 0
+    assert_equal $status 0 || fail "${lines[@]}"
     
     [[ ! -r "$YOKE_FAKES_LOGGING" ]] || fail "not expected to exist $YOKE_FAKES_LOGGING. content: \"$( cat $YOKE_FAKES_LOGGING )\""
 }
 
 @test 'shell running in working directory' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/shell_working_directory
-    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
+    assert_equal $status 0 || fail "${lines[@]}"
     
+    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
     local family="$( cat $task_definition | jq -r ".taskDefinition.family" )"
     assert_equal "$family" "Hello"
 }
