@@ -2,6 +2,11 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## Current
+
+* updated dependencies: ecs-deploy to 3.10.5 (fork)
+* (WIP) rollback, mode info: current task definition containers' image
+
 ## 2.3
 
 * updated dependencies: ecs-deploy to 3.10.4 (fork)
@@ -95,7 +100,6 @@ Versions before 2.0 were only available on internal repository, before open-sour
 # TODO
 
 * deployment lifecycle: post-deploy (eg. custom cache invalidation)
-* rollback, mode info: current task definition containers' image
 * rollback, by default or optionally
 * canary release: more complex scenario
 * deploy scheduled tasks
