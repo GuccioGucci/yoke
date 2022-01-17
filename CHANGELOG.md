@@ -94,6 +94,8 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 # TODO
 
+* deployment lifecycle: post-deploy (eg. custom cache invalidation)
+* rollback, mode info: current task definition containers' image
 * rollback, by default or optionally
 * canary release: more complex scenario
 * deploy scheduled tasks
