@@ -2,10 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## Current
+## 2.4
 
 * updated dependencies: ecs-deploy to 3.10.5 (fork)
-* (WIP) rollback, mode info: current task definition containers' image
+* rollback, mode info: current task definition containers' image
 
 ## 2.3
 
