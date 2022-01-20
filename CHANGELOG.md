@@ -2,6 +2,12 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## 2.5
+
+* updated dependencies: ecs-deploy to 3.10.6 (fork)
+* rollback, mode info: current task definition containers' image, more info
+* dry-run mode, delegating to ecs-deploy
+
 ## 2.4
 
 * updated dependencies: ecs-deploy to 3.10.5 (fork)

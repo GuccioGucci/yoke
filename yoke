@@ -188,11 +188,10 @@ function do_deploy() {
     [[ "$COMMAND" == "update" ]] && command_line=("-c" "$CLUSTER" "-n" "$SERVICE" "--tag-only" "$IMAGE_TAG" "-i" "ignored-image" $( flags_confirmation ) "--timeout" "$TIMEOUT")
     [[ "$COMMAND" == "install" ]] && command_line=("-c" "$CLUSTER" "-n" "$SERVICE" "--tag-only" "$IMAGE_TAG" "-i" "ignored-image" $( flags_install ) $( flags_confirmation ) "--timeout" "$TIMEOUT")
     [[ ! -z "$PRUNE_TASK_DEFINITIONS" ]] && command_line+=("--max-definitions" "$PRUNE_TASK_DEFINITIONS")
-
+    [[ "$DRY_RUN" != "false" ]] && command_line+=("--dry-run")
     [[ "$DEBUG" != "false" ]] && command_line+=("--verbose")
-    [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy ${command_line[@]}"
 
-    [[ "$DRY_RUN" != "false" ]] && exit 0
+    [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy ${command_line[@]}"
     ecs-deploy ${command_line[@]}
 }
 

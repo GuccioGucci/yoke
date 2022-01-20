@@ -150,7 +150,9 @@ last_execution_output() {
     run ./yoke update -c any -s any -t any --dry-run
     assert_equal $status 0 || fail "${lines[@]}"
     
-    [[ ! -r "$YOKE_FAKES_LOGGING" ]] || fail "not expected to exist $YOKE_FAKES_LOGGING. content: \"$( cat $YOKE_FAKES_LOGGING )\""
+    local expected='--dry-run'
+    local commands="$( cat $YOKE_FAKES_LOGGING )"
+    [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }
 
 @test 'shell running in working directory' {
