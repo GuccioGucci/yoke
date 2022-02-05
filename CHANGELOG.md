@@ -5,6 +5,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 ## Current
 
 * helpers: aws_cf_distribution
+* (WIP) deployment lifecycle: post-deploy (eg. custom cache invalidation)
 
 ## 2.5
 
@@ -109,7 +110,6 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 # TODO
 
-* deployment lifecycle: post-deploy (eg. custom cache invalidation)
 * rollback, by default or optionally
 * canary release: more complex scenario
 * deploy scheduled tasks

@@ -9,7 +9,6 @@ IMAGE_TAG=
 WORKING_DIR="deployment"
 TASK_DEFINITION="task-definition.json.tmpl"
 TASK_SET="task-set.json.tmpl"
-CONFIRMATION="confirm.sh.tmpl"
 DEBUG="false"
 PRUNE_TASK_DEFINITIONS=
 TIMEOUT="300"
@@ -84,7 +83,7 @@ function do_initialize() {
     
     # shared initialization
     init_values
-    init_confirmation
+    init_lifecycle CONFIRMATION confirm.sh
     
     # install-specific initialization
     if [[ "$COMMAND" == "install" ]]; then
@@ -145,29 +144,32 @@ function init_task_set() {
   fi
 }
 
-function init_confirmation() {
-    local command_line=()
-    realpath $( deployment_PATH )/$CONFIRMATION > /dev/null 2>&1 && CONFIRMATION="$( realpath $( deployment_PATH )/$CONFIRMATION )"
+function init_lifecycle() {
+    local name="$1"
+    local script="$2"
 
-    if [[ -f "$CONFIRMATION" ]]; then
-        log "(template) confirmation: $CONFIRMATION"
-        [[ "$DEBUG" != "false" ]] && log "$( cat "$CONFIRMATION" )"
+    local command_line=()
+    realpath $( deployment_PATH )/$( lifecycle_get $name ) > /dev/null 2>&1 && lifecycle_set "$name" "$( realpath $( deployment_PATH )/$( lifecycle_get $name ) )"
+
+    if [[ -f "$( lifecycle_get $name )" ]]; then
+        log "(template) $name: $( lifecycle_get $name )"
+        [[ "$DEBUG" != "false" ]] && log "$( cat "$( lifecycle_get $name )" )"
         
-        original_confirmation="$CONFIRMATION"
-        CONFIRMATION="/tmp/confirm.sh.$RANDOM"
-        log "(current) confirmation: $CONFIRMATION"
+        original_value="$( lifecycle_get $name )"
+        lifecycle_set "$name" "/tmp/$script.$RANDOM"
+        log "(current) $name: $( lifecycle_get $name )"
 
         if [[ ! -z "$VALUES" ]]; then
             command_line+=("-f" "$VALUES")
         fi
 
-        template_on "$CONFIRMATION" "${command_line[@]}" "$original_confirmation" || {
-            log "cannot prepare confirmation";
+        template_on "$( lifecycle_get $name )" "${command_line[@]}" "$original_value" || {
+            log "cannot prepare $name";
             exit 1;
         }
-        [[ "$DEBUG" != "false" ]] && log "$( cat "$CONFIRMATION" )"
+        [[ "$DEBUG" != "false" ]] && log "$( cat "$( lifecycle_get $name )" )"
 
-        chmod +x "$CONFIRMATION"
+        chmod +x "$( lifecycle_get $name )"
     fi
 }
 
@@ -179,7 +181,7 @@ function flags_install() {
 
 function flags_confirmation() {
     flags=""
-    [[ -f $CONFIRMATION ]] && flags="$flags --canary-confirmation $CONFIRMATION" || flags="$flags --canary-confirmation wait_timeout"
+    [[ -f $( lifecycle_get CONFIRMATION ) ]] && flags="$flags --canary-confirmation $( lifecycle_get CONFIRMATION )" || flags="$flags --canary-confirmation wait_timeout"
     echo "$flags"
 }
 
@@ -195,8 +197,23 @@ function do_deploy() {
     ecs-deploy ${command_line[@]}
 }
 
+function lifecycle_set() {
+    local key=$1
+    local value=$2
+    
+    local name="LIFECYCLE_$key"
+    eval "$name='$2'"
+}
+
+function lifecycle_get() {
+    local key=$1
+    local name=LIFECYCLE_$key
+    echo "${!name}"
+}
+
 # main
 
+lifecycle_set CONFIRMATION "confirm.sh.tmpl"
 "$CURRENT_DIR"/bin/install --app
 
 [[ $# -eq 0 ]] && show_usage && exit 1
