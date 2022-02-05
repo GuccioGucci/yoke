@@ -325,6 +325,14 @@ Get Subnet by name, then extract ARN.
 ]
 ```
 
+### aws_cf_distribution
+
+Get [CloudFront](https://aws.amazon.com/cloudfront/) distribution id, by `Comment`. `Comment` usage is required since there is id is automatically generated, and not controlled by configuration. So, to be uniquely identified, please add this comment to desired distribution, in your provisioning configuration (eg: Terraform module). Note that, we're not using `Tags` node here, since it would require two API calls (see [list-distributions](https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-distributions.html) and [list-tags-for-resource](https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-tags-for-resource.html)).
+
+
+* Usage: `aws_cf_distribution $VALUE`
+* Note: this is intended to be used as part of post-deploy actions
+
 # Extra
 
 We prepared some resources and guidelines in adopting the process, for example ready to use **templates** for deployment and build servers (such as [Jenkins](https://www.jenkins.io/)), or configuring **deployment controllers** (for Rolling Update and Canary Releases). Please, note that this additional contribution is partly very specific to what we've been using in [GuccioGucci](https://github.com/GuccioGucci/), anyway we hope it's common enough to be useful to you as well. See [EXTRA.md](/docs/EXTRA.md)

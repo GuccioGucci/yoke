@@ -8,4 +8,3 @@ NAME="$1"
 RESULT=$( aws elbv2 describe-target-groups --names $NAME )
 [[ $? -eq 0 ]] || fail "NOT-FOUND[$NAME]"
 echo $RESULT | jq -cr '.TargetGroups[0].TargetGroupArn'
-

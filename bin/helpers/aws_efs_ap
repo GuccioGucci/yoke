@@ -12,6 +12,7 @@ function upcase_first_char() {
     echo "$( echo ${value:0:1} | tr '[:lower:]' '[:upper:]' )${value:1}"
 }
 
-aws efs describe-access-points \
-    | jq -rce '.AccessPoints[] | select(.Tags[].Key == "Name" and .Tags[].Value == "'$NAME'") | .'$( upcase_first_char $ATTRIBUTE)''
+RESULT=$( aws efs describe-access-points \
+           | jq -rce '.AccessPoints[] | select(.Tags[].Key == "Name" and .Tags[].Value == "'$NAME'") | .'$( upcase_first_char $ATTRIBUTE)'' )
 [[ $? -eq 0 ]] || fail "NOT-FOUND[$NAME,$ATTRIBUTE]"
+echo $RESULT

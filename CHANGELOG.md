@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## Current
+
+* helpers: aws_cf_distribution
+
 ## 2.5
 
 * updated dependencies: ecs-deploy to 3.10.6 (fork)

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+function fail(){
+    echo "$*" ; exit 1
+}
+
+VALUE="$1"
+RESULT=$( aws cloudfront list-distributions | jq -e -r '.DistributionList.Items[] | select(.Comment | test ("'$VALUE'") ) | .Id' )
+[[ $? -eq 0 ]] || fail "NOT-FOUND[$VALUE]"
+echo $RESULT

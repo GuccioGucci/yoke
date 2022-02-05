@@ -8,4 +8,3 @@ NAME="$1"
 RESULT=$( aws ec2 describe-subnets --filter Name=tag:Name,Values=$NAME )
 [[ $? -eq 0 ]] || fail "NOT-FOUND[$NAME]"
 echo $RESULT | jq -cr '.Subnets[0].SubnetId'
-
