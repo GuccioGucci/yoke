@@ -7,8 +7,6 @@ SERVICE=
 VALUES=
 IMAGE_TAG=
 WORKING_DIR="deployment"
-TASK_DEFINITION="task-definition.json.tmpl"
-TASK_SET="task-set.json.tmpl"
 DEBUG="false"
 PRUNE_TASK_DEFINITIONS=
 TIMEOUT="300"
@@ -62,6 +60,68 @@ function deployment_PATH() {
     echo "$WORKING_DIR/bin"
 }
 
+function init_values() {
+    if [[ ! -z "$VALUES" ]]; then
+        VALUES="$( realpath $WORKING_DIR/$VALUES )"
+        log "values: $VALUES"
+    fi
+}
+
+function init_resource() {
+    local name="$1"
+    local folder="$2"
+
+    local script="$( echo $( resource_get $name ) | sed 's/.tmpl//g' )"
+    realpath "$folder/$( resource_get $name )" > /dev/null 2>&1 \
+        && resource_set "$( realpath $folder/$( resource_get $name ) )" "$name"
+
+    if [[ -f "$( resource_get $name )" ]]; then
+        log "(template) $name: $( resource_get $name )"
+        [[ "$DEBUG" != "false" ]] && log "$( cat "$( resource_get $name )" )"
+
+        local command_line=()
+        local original_value="$( resource_get $name )"
+
+        resource_set "/tmp/$script.$RANDOM" "$name"
+        log "(current) $name: $( resource_get $name )"
+
+        if [[ ! -z "$VALUES" ]]; then
+            command_line+=("-f" "$VALUES")
+        fi
+
+        template_on "$( resource_get $name )" "${command_line[@]}" "$original_value" || {
+            log "cannot prepare $name";
+            exit 1;
+        }
+        [[ "$DEBUG" != "false" ]] && log "$( cat "$( resource_get $name )" )"
+
+        chmod +x "$( resource_get $name )"
+    fi
+}
+
+function flags_install() {
+    local flags="--task-definition-file $TASK_DEFINITION"
+    [[ -f $TASK_SET ]] && flags="$flags --task-set-file $TASK_SET"
+    echo "$flags"
+}
+
+function flags_confirmation() {
+    [[ -f $( resource_get LIFECYCLE_CONFIRMATION ) ]] \
+        && echo "--canary-confirmation $( resource_get LIFECYCLE_CONFIRMATION )" \
+        || echo "--canary-confirmation wait_timeout"
+}
+
+function resource_set() {
+    local value=$1
+    local key=$2
+    eval "$key='$value'"   # 'declare -g' unsupported on bash < 4.2
+}
+
+function resource_get() {
+    local key=$1
+    echo "${!key}"
+}
+
 function do_initialize() {    
     # enrich PATH with shared and deployment binaries
     PATH="$CURRENT_DIR/bin/helpers:$PATH"
@@ -83,106 +143,13 @@ function do_initialize() {
     
     # shared initialization
     init_values
-    init_lifecycle CONFIRMATION confirm.sh
+    init_resource LIFECYCLE_CONFIRMATION "$( deployment_PATH )"
     
     # install-specific initialization
     if [[ "$COMMAND" == "install" ]]; then
-      init_task_definition
-      init_task_set
+      init_resource TASK_DEFINITION "$WORKING_DIR"
+      init_resource TASK_SET "$WORKING_DIR"
     fi
-}
-
-function init_values() {
-    if [[ ! -z "$VALUES" ]]; then
-        VALUES="$( realpath $WORKING_DIR/$VALUES )"
-        log "values: $VALUES"
-    fi
-}
-
-function init_task_definition() {
-    local command_line=()
-    TASK_DEFINITION="$( realpath $WORKING_DIR/$TASK_DEFINITION )"
-    log "(template) task-definition: $TASK_DEFINITION"
-    [[ "$DEBUG" != "false" ]] && log "$( cat "$TASK_DEFINITION" )"
-
-    original_task_definition="$TASK_DEFINITION"
-    TASK_DEFINITION="/tmp/task-definition.json.$RANDOM"
-    log "(current) task-definition: $TASK_DEFINITION"
-
-    if [[ ! -z "$VALUES" ]]; then
-        command_line+=("-f" "$VALUES")
-    fi
-
-    template_on "$TASK_DEFINITION" "${command_line[@]}" "$original_task_definition" || {
-        log "cannot prepare task-definition";
-        exit 1;
-    }
-    [[ "$DEBUG" != "false" ]] && log "$( cat "$TASK_DEFINITION" )"
-}
-
-function init_task_set() {
-  local command_line=()
-  TASK_SET="$( realpath "$WORKING_DIR/$TASK_SET" )"
-  
-  if [[ -f "$TASK_SET" ]]; then
-    log "(template) task-set: $TASK_SET"
-    [[ "$DEBUG" != "false" ]] && log "$( cat "$TASK_SET" )"
-
-    original_task_set="$TASK_SET"
-    TASK_SET="/tmp/task-set.json.$RANDOM"
-    log "(current) task-set: $TASK_SET"
-  
-    if [[ ! -z "$VALUES" ]]; then
-        command_line+=("-f" "$VALUES")
-    fi
-    
-    template_on "$TASK_SET" "${command_line[@]}" "$original_task_set" || {
-        log "cannot prepare task-set";
-        exit 1;
-    }
-    [[ "$DEBUG" != "false" ]] && log "$( cat "$TASK_SET" )"
-  fi
-}
-
-function init_lifecycle() {
-    local name="$1"
-    local script="$2"
-
-    local command_line=()
-    realpath $( deployment_PATH )/$( lifecycle_get $name ) > /dev/null 2>&1 && lifecycle_set "$name" "$( realpath $( deployment_PATH )/$( lifecycle_get $name ) )"
-
-    if [[ -f "$( lifecycle_get $name )" ]]; then
-        log "(template) $name: $( lifecycle_get $name )"
-        [[ "$DEBUG" != "false" ]] && log "$( cat "$( lifecycle_get $name )" )"
-        
-        original_value="$( lifecycle_get $name )"
-        lifecycle_set "$name" "/tmp/$script.$RANDOM"
-        log "(current) $name: $( lifecycle_get $name )"
-
-        if [[ ! -z "$VALUES" ]]; then
-            command_line+=("-f" "$VALUES")
-        fi
-
-        template_on "$( lifecycle_get $name )" "${command_line[@]}" "$original_value" || {
-            log "cannot prepare $name";
-            exit 1;
-        }
-        [[ "$DEBUG" != "false" ]] && log "$( cat "$( lifecycle_get $name )" )"
-
-        chmod +x "$( lifecycle_get $name )"
-    fi
-}
-
-function flags_install() {
-    local flags="--task-definition-file $TASK_DEFINITION"
-    [[ -f $TASK_SET ]] && flags="$flags --task-set-file $TASK_SET"
-    echo "$flags"
-}
-
-function flags_confirmation() {
-    flags=""
-    [[ -f $( lifecycle_get CONFIRMATION ) ]] && flags="$flags --canary-confirmation $( lifecycle_get CONFIRMATION )" || flags="$flags --canary-confirmation wait_timeout"
-    echo "$flags"
 }
 
 function do_deploy() {
@@ -197,80 +164,72 @@ function do_deploy() {
     ecs-deploy ${command_line[@]}
 }
 
-function lifecycle_set() {
-    local key=$1
-    local value=$2
-    
-    local name="LIFECYCLE_$key"
-    eval "$name='$2'"
-}
+# skip when sourcing the script
+if [ "$0" = "$BASH_SOURCE" ] ; then
 
-function lifecycle_get() {
-    local key=$1
-    local name=LIFECYCLE_$key
-    echo "${!name}"
-}
+    resource_set task-definition.json.tmpl TASK_DEFINITION
+    resource_set task-set.json.tmpl TASK_SET
+    resource_set confirm.sh.tmpl LIFECYCLE_CONFIRMATION
 
-# main
+    # main
+    "$CURRENT_DIR"/bin/install --app
 
-lifecycle_set CONFIRMATION "confirm.sh.tmpl"
-"$CURRENT_DIR"/bin/install --app
+    [[ $# -eq 0 ]] && show_usage && exit 1
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        case $key in
+            -w|--working-dir)
+            WORKING_DIR="$2"
+            shift 2
+            ;;
+            -c|--cluster)
+            CLUSTER="$2"
+            shift 2
+            ;;
+            -s|--service)
+            SERVICE="$2"
+            shift 2
+            ;;
+            -t|--tag)
+            IMAGE_TAG="$2"
+            shift 2
+            ;;
+            -f|--values)
+            VALUES="$2"
+            shift 2
+            ;;
+            --prune)
+            PRUNE_TASK_DEFINITIONS="$2"
+            shift 2
+            ;;
+            --timeout)
+            TIMEOUT="$2"
+            shift 2
+            ;;
+            -d|--debug)
+            DEBUG="true"
+            shift 1
+            ;;
+            --dry-run)
+            DRY_RUN="true"
+            shift 1
+            ;;
+            -v|--version)
+            show_version ; exit 0
+            ;;
+            -h|--help)
+            show_usage ; exit 0
+            ;;
+            -*|--*)
+            show_usage ; exit 1
+            ;;
+            *)
+            COMMAND="$1"
+            shift 1
+            ;;
+        esac
+    done
 
-[[ $# -eq 0 ]] && show_usage && exit 1
-while [[ $# -gt 0 ]]; do
-    key="$1"
-    case $key in
-        -w|--working-dir)
-        WORKING_DIR="$2"
-        shift 2
-        ;;
-        -c|--cluster)
-        CLUSTER="$2"
-        shift 2
-        ;;
-        -s|--service)
-        SERVICE="$2"
-        shift 2
-        ;;
-        -t|--tag)
-        IMAGE_TAG="$2"
-        shift 2
-        ;;
-        -f|--values)
-        VALUES="$2"
-        shift 2
-        ;;
-        --prune)
-        PRUNE_TASK_DEFINITIONS="$2"
-        shift 2
-        ;;
-        --timeout)
-        TIMEOUT="$2"
-        shift 2
-        ;;
-        -d|--debug)
-        DEBUG="true"
-        shift 1
-        ;;
-        --dry-run)
-        DRY_RUN="true"
-        shift 1
-        ;;
-        -v|--version)
-        show_version ; exit 0
-        ;;
-        -h|--help)
-        show_usage ; exit 0
-        ;;
-        -*|--*)
-        show_usage ; exit 1
-        ;;
-        *)
-        COMMAND="$1"
-        shift 1
-        ;;
-    esac
-done
-
-do_initialize
-do_deploy
+    do_initialize
+    do_deploy
+fi

@@ -62,7 +62,7 @@ last_execution_output() {
     run ./yoke install -c any -s any -t any -w test/deployments/failing -d
     assert_equal $status 1 || fail "${lines[@]}"
     
-    local expected="cannot prepare task-definition"
+    local expected="cannot prepare TASK_DEFINITION"
     local output=$( last_execution_output )
     [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
 }
