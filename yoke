@@ -144,6 +144,7 @@ function do_initialize() {
     # shared initialization
     init_values
     init_resource LIFECYCLE_CONFIRMATION "$( deployment_PATH )"
+    init_resource LIFECYCLE_POST "$( deployment_PATH )"
     
     # install-specific initialization
     if [[ "$COMMAND" == "install" ]]; then
@@ -162,6 +163,15 @@ function do_deploy() {
 
     [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy ${command_line[@]}"
     ecs-deploy ${command_line[@]}
+    
+    on_post_deploy
+}
+
+function on_post_deploy() {
+    [[ -f "$( resource_get LIFECYCLE_POST )" ]] \
+        && $( resource_get LIFECYCLE_POST ) \
+        || { [[ "$DEBUG" != "false" ]] && log "Skipping post-deploy"; }
+    return 0
 }
 
 # skip when sourcing the script
@@ -170,6 +180,7 @@ if [ "$0" = "$BASH_SOURCE" ] ; then
     resource_set task-definition.json.tmpl TASK_DEFINITION
     resource_set task-set.json.tmpl TASK_SET
     resource_set confirm.sh.tmpl LIFECYCLE_CONFIRMATION
+    resource_set post.sh.tmpl LIFECYCLE_POST
 
     # main
     "$CURRENT_DIR"/bin/install --app

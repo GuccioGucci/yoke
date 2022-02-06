@@ -163,3 +163,12 @@ last_execution_output() {
     local family="$( cat $task_definition | jq -r ".taskDefinition.family" )"
     assert_equal "$family" "Hello"
 }
+
+@test 'lifecycle - post-deploy' {
+    run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_post_deploy
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local expected='On post-deploy!'
+    local output=$( last_execution_output )
+    [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
+}

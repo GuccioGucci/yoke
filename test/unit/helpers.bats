@@ -43,7 +43,6 @@ teardown() {
     assert_equal "$service_name" "hello-world-dev"
 }
 
-
 @test 'aws account id - success' {
     run ./bin/helpers/aws_account_id
     local commands="$( cat $YOKE_FAKES_LOGGING )"
