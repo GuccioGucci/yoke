@@ -163,15 +163,22 @@ function do_deploy() {
 
     [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy ${command_line[@]}"
     ecs-deploy ${command_line[@]}
-    
-    on_post_deploy
 }
 
 function on_post_deploy() {
-    [[ -f "$( resource_get LIFECYCLE_POST )" ]] \
-        && $( resource_get LIFECYCLE_POST ) \
-        || { [[ "$DEBUG" != "false" ]] && log "Skipping post-deploy"; }
+    local action="$( resource_get LIFECYCLE_POST )"
+    if [[ -f "$action" ]]; then
+        [[ "$DEBUG" != "false" ]] && log "[post-deploy] executing $action";
+        execute $action
+    else
+        [[ "$DEBUG" != "false" ]] && log "[post-deploy] skipping, not set";
+    fi
     return 0
+}
+
+function execute() {
+    local command_line=$*
+    [[ "$DRY_RUN" != "false" ]] && log "dry-run, skipping $command_line" || $command_line
 }
 
 # skip when sourcing the script
@@ -243,4 +250,6 @@ if [ "$0" = "$BASH_SOURCE" ] ; then
 
     do_initialize
     do_deploy
+    
+    on_post_deploy
 fi
