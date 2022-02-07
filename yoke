@@ -106,8 +106,8 @@ function flags_install() {
 }
 
 function flags_confirmation() {
-    [[ -f $( variable_get LIFECYCLE_CONFIRMATION ) ]] \
-        && echo "--canary-confirmation $( variable_get LIFECYCLE_CONFIRMATION )" \
+    [[ -f "$LIFECYCLE_CONFIRMATION" ]] \
+        && echo "--canary-confirmation $LIFECYCLE_CONFIRMATION" \
         || echo "--canary-confirmation wait_timeout"
 }
 
@@ -168,7 +168,7 @@ function do_deploy() {
 }
 
 function on_post_deploy() {
-    local action="$( variable_get LIFECYCLE_POST )"
+    local action="$LIFECYCLE_POST"
     if [[ -f "$action" ]]; then
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] executing $action";
         ECS_CLUSTER=$CLUSTER ECS_SERVICE=$SERVICE \
