@@ -171,7 +171,9 @@ function on_post_deploy() {
     local action="$( variable_get LIFECYCLE_POST )"
     if [[ -f "$action" ]]; then
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] executing $action";
-        execute $action
+        ECS_CLUSTER=$CLUSTER ECS_SERVICE=$SERVICE \
+            YOKE_CUSTOM=$YOKE_CUSTOM \
+            execute $action
     else
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] skipping, not set";
     fi
