@@ -71,31 +71,31 @@ function init_resource() {
     local name="$1"
     local folder="$2"
 
-    local script="$( echo $( resource_get $name ) | sed 's/.tmpl//g' )"
-    realpath "$folder/$( resource_get $name )" > /dev/null 2>&1 \
-        && resource_set "$( realpath $folder/$( resource_get $name ) )" "$name"
+    local script="$( echo $( variable_get $name ) | sed 's/.tmpl//g' )"
+    realpath "$folder/$( variable_get $name )" > /dev/null 2>&1 \
+        && variable_set "$( realpath $folder/$( variable_get $name ) )" "$name"
 
-    if [[ -f "$( resource_get $name )" ]]; then
-        log "(template) $name: $( resource_get $name )"
-        [[ "$DEBUG" != "false" ]] && log "$( cat "$( resource_get $name )" )"
+    if [[ -f "$( variable_get $name )" ]]; then
+        log "(template) $name: $( variable_get $name )"
+        [[ "$DEBUG" != "false" ]] && log "$( cat "$( variable_get $name )" )"
 
         local command_line=()
-        local original_value="$( resource_get $name )"
+        local original_value="$( variable_get $name )"
 
-        resource_set "/tmp/$script.$RANDOM" "$name"
-        log "(current) $name: $( resource_get $name )"
+        variable_set "/tmp/$script.$RANDOM" "$name"
+        log "(current) $name: $( variable_get $name )"
 
         if [[ ! -z "$VALUES" ]]; then
             command_line+=("-f" "$VALUES")
         fi
 
-        template_on "$( resource_get $name )" "${command_line[@]}" "$original_value" || {
+        template_on "$( variable_get $name )" "${command_line[@]}" "$original_value" || {
             log "cannot prepare $name";
             exit 1;
         }
-        [[ "$DEBUG" != "false" ]] && log "$( cat "$( resource_get $name )" )"
+        [[ "$DEBUG" != "false" ]] && log "$( cat "$( variable_get $name )" )"
 
-        chmod +x "$( resource_get $name )"
+        chmod +x "$( variable_get $name )"
     fi
 }
 
@@ -106,18 +106,18 @@ function flags_install() {
 }
 
 function flags_confirmation() {
-    [[ -f $( resource_get LIFECYCLE_CONFIRMATION ) ]] \
-        && echo "--canary-confirmation $( resource_get LIFECYCLE_CONFIRMATION )" \
+    [[ -f $( variable_get LIFECYCLE_CONFIRMATION ) ]] \
+        && echo "--canary-confirmation $( variable_get LIFECYCLE_CONFIRMATION )" \
         || echo "--canary-confirmation wait_timeout"
 }
 
-function resource_set() {
+function variable_set() {
     local value=$1
     local key=$2
     eval "$key='$value'"   # 'declare -g' unsupported on bash < 4.2
 }
 
-function resource_get() {
+function variable_get() {
     local key=$1
     echo "${!key}"
 }
@@ -143,14 +143,16 @@ function do_initialize() {
     
     # shared initialization
     init_values
-    init_resource LIFECYCLE_CONFIRMATION "$( deployment_PATH )"
-    init_resource LIFECYCLE_POST "$( deployment_PATH )"
     
-    # install-specific initialization
+    # install-specific resources
     if [[ "$COMMAND" == "install" ]]; then
       init_resource TASK_DEFINITION "$WORKING_DIR"
       init_resource TASK_SET "$WORKING_DIR"
     fi
+    
+    # additional resources
+    init_resource LIFECYCLE_CONFIRMATION "$( deployment_PATH )"
+    init_resource LIFECYCLE_POST "$( deployment_PATH )"
 }
 
 function do_deploy() {
@@ -166,7 +168,7 @@ function do_deploy() {
 }
 
 function on_post_deploy() {
-    local action="$( resource_get LIFECYCLE_POST )"
+    local action="$( variable_get LIFECYCLE_POST )"
     if [[ -f "$action" ]]; then
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] executing $action";
         execute $action
@@ -184,10 +186,10 @@ function execute() {
 # skip when sourcing the script
 if [ "$0" = "$BASH_SOURCE" ] ; then
 
-    resource_set task-definition.json.tmpl TASK_DEFINITION
-    resource_set task-set.json.tmpl TASK_SET
-    resource_set confirm.sh.tmpl LIFECYCLE_CONFIRMATION
-    resource_set post.sh.tmpl LIFECYCLE_POST
+    variable_set task-definition.json.tmpl TASK_DEFINITION
+    variable_set task-set.json.tmpl TASK_SET
+    variable_set confirm.sh.tmpl LIFECYCLE_CONFIRMATION
+    variable_set post.sh.tmpl LIFECYCLE_POST
 
     # main
     "$CURRENT_DIR"/bin/install --app

@@ -10,18 +10,18 @@ teardown() {
     rm -rf "$YOKE_TMP"
 }
 
-@test 'resource, set' {
+@test 'variable, set' {
     source yoke
     
-    resource_set bar LIFECYCLE_FOO
+    variable_set bar LIFECYCLE_FOO
     [[ "$LIFECYCLE_FOO" == "bar" ]] || fail "expected: bar, actual: $LIFECYCLE_FOO"
 }
 
-@test 'resource, get' {
+@test 'variable, get' {
     source yoke
     
     LIFECYCLE_FOO="bar"
-    local actual=$(resource_get LIFECYCLE_FOO )
+    local actual=$(variable_get LIFECYCLE_FOO )
     [[ "$actual" == "bar" ]] || fail "expected: bar, actual: $actual"
 }
 
