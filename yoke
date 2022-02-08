@@ -130,7 +130,7 @@ function variable_get() {
 function on_post_deploy() {
     local action="$LIFECYCLE_POST"
     if [[ -f "$action" ]]; then
-        [[ "$DEBUG" != "false" ]] && log "[post-deploy] executing $action";
+        log "[post-deploy] executing $action";
         export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE
         execute $action
     else
