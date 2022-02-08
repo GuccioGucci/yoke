@@ -43,10 +43,3 @@ teardown() {
     result="$( on_post_deploy )"
     [[ $result =~ "Hello" ]] || fail "result: $result"
 }
-
-@test 'custom environment variables' {
-    source yoke    
-
-    result="$( YOKE_CUSTOM_ONE=one YOKE_CUSTOM_TWO=two custom_environment_variables | awk '{print}' ORS=' ' )"
-    [[ $result =~ "YOKE_CUSTOM_ONE=one YOKE_CUSTOM_TWO=two" ]] || fail "result: $result"
-}

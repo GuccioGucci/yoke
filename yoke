@@ -65,10 +65,6 @@ function execute() {
     [[ "$DRY_RUN" != "false" ]] && log "dry-run, skipping $command_line" || $command_line
 }
 
-function custom_environment_variables() {
-    env | grep YOKE | sort
-}
-
 function init_values() {
     if [[ ! -z "$VALUES" ]]; then
         VALUES="$( realpath $WORKING_DIR/$VALUES )"
@@ -136,7 +132,6 @@ function on_post_deploy() {
     if [[ -f "$action" ]]; then
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] executing $action";
         export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE
-        custom_environment_variables | xargs export
         execute $action
     else
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] skipping, not set";
