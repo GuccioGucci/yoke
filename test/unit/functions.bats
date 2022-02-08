@@ -21,7 +21,7 @@ teardown() {
     source yoke
     
     LIFECYCLE_FOO="bar"
-    local actual=$(variable_get LIFECYCLE_FOO )
+    local actual=$( variable_get LIFECYCLE_FOO )
     [[ "$actual" == "bar" ]] || fail "expected: bar, actual: $actual"
 }
 
@@ -42,4 +42,11 @@ teardown() {
 
     result="$( on_post_deploy )"
     [[ $result =~ "Hello" ]] || fail "result: $result"
+}
+
+@test 'custom environment variables' {
+    source yoke    
+
+    result="$( YOKE_CUSTOM_ONE=one YOKE_CUSTOM_TWO=two custom_environment_variables | awk '{print}' ORS=' ' )"
+    [[ $result =~ "YOKE_CUSTOM_ONE=one YOKE_CUSTOM_TWO=two" ]] || fail "result: $result"
 }

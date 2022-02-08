@@ -183,10 +183,10 @@ last_execution_output() {
 }
 
 @test 'lifecycle - post-deploy, with custom YOKE environment variables' {
-    YOKE_CUSTOM=foo run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_post_deploy
+    YOKE_MY_WEBSITE=my-website run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_post_deploy
     assert_equal $status 0 || fail "${lines[@]}"
 
-    local expected='CUSTOM: foo'
+    local expected='CUSTOM: my-website'
     local output=$( last_execution_output )
     [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
 }
