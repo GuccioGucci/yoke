@@ -3,6 +3,7 @@
 * [Deployment Controllers](#deployment-controllers)
   * [ECS: Rolling Update](#ecs-rolling-update)
   * [EXTERNAL: Canary Release](#external-canary-release)
+* [Lifecyle Hooks](#lifecyle-hooks)
 * [Provisioning: Terraform](#provisioning-terraform)
   * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live-migrating-to-update-mode)
   * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only-migrating-to-install-mode)
