@@ -147,6 +147,18 @@ deployment/
     └── confirm.sh.tmpl
 ```
 
+# Lifecyle Hooks
+
+Additional actions can be performed hooking into particular lifecycle events. Again, script templates are expected to be found in `bin` folder, under current working-dir. As for canary releases script template, you can use values from value file, if set in the command line.
+
+Currently the only supported hook is `post`, for post-deploy action:
+
+```
+deployment/
+└── bin
+    └── post.sh.tmpl
+```
+
 # Provisioning: Terraform
 
 You're probably guessing what's the impact on provisioning, once we move task-definition out of Terraform scope (since task-definition in `ECS` are managed resources, with individual revisions). Here's an [interesting discussion on the topic](https://github.com/hashicorp/terraform-provider-aws/issues/632), with alternative approaches.

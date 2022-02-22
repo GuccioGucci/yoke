@@ -7,7 +7,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * helpers: aws_cf_distribution
 * updated dependencies: gucci to 1.5.4 (fork)
 * templates, helpers: stdout as error detail, on failure
-* (WIP) deployment lifecycle: post-deploy (eg. custom cache invalidation)
+* deployment lifecycle: post-deploy (eg. custom cache invalidation)
 
 ## 2.5
 
