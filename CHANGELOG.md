@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## Current
+## 2.6
 
 * helpers: aws_cf_distribution
 * updated dependencies: gucci to 1.5.4 (fork)
