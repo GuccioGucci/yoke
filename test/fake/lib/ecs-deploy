@@ -3,3 +3,7 @@
 source "${BASH_SOURCE%/*}/../common"
 
 fake_log_in "$( basename "$0" ) $@"
+[[ ! -z "$YOKE_FAKES_ECSDEPLOY_EXIT" ]] && exit $YOKE_FAKES_ECSDEPLOY_EXIT
+
+# success
+exit 0

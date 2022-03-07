@@ -182,6 +182,11 @@ function do_deploy() {
 
     [[ "$DEBUG" != "false" ]] && log "[deploy] executing (${#command_line[@]} params): ecs-deploy ${command_line[@]}"
     ecs-deploy ${command_line[@]}
+
+    local ecs_deploy_result=$?
+    [[ $ecs_deploy_result -eq 0 ]] || {
+        echo "Could not deploy"; exit $ecs_deploy_result;
+    }
 }
 
 # skip when sourcing the script
@@ -253,6 +258,5 @@ if [ "$0" = "$BASH_SOURCE" ] ; then
 
     do_initialize
     do_deploy
-    
     on_post_deploy
 fi

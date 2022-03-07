@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## 2.7
+
+* deployment lifecycle: deploy, halt on error
+
 ## 2.6
 
 * helpers: aws_cf_distribution
