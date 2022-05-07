@@ -132,7 +132,12 @@ function on_post_deploy() {
     if [[ -f "$action" ]]; then
         log "[post-deploy] executing $action";
         export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE
+
         execute $action
+        local action_result=$?
+        [[ $action_result -eq 0 ]] || {
+            echo "[post-deploy] could not execute"; exit $action_result;
+        }
     else
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] skipping, not set";
     fi
@@ -185,7 +190,7 @@ function do_deploy() {
 
     local ecs_deploy_result=$?
     [[ $ecs_deploy_result -eq 0 ]] || {
-        echo "Could not deploy"; exit $ecs_deploy_result;
+        echo "could not deploy"; exit $ecs_deploy_result;
     }
 }
 

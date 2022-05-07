@@ -199,3 +199,8 @@ last_execution_output() {
     local output=$( last_execution_output )
     [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
 }
+
+@test 'lifecycle - post-deploy error, as overall failure' {
+    YOKE_FAKES_POST_DEPLOY_EXIT=99 run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_post_deploy
+    assert_equal $status 99 || fail "${lines[@]}"
+}

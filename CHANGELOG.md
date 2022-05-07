@@ -5,6 +5,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 ## WIP
 
 * updated dependencies: gucci to 1.5.5
+* post-deploy: fail deployment, on error
 
 ## 2.7
 
@@ -126,4 +127,3 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * support for secrets
 * helpers: cache invalidation, waiting for completion
 * deploy: task definition diff
-* post-deploy: fail deployment, on error
