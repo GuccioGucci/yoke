@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## WIP
+
+* updated dependencies: gucci to 1.5.5
+
 ## 2.7
 
 * deployment lifecycle: deploy, halt on error
@@ -120,3 +124,6 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * canary release: more complex scenario
 * deploy scheduled tasks
 * support for secrets
+* helpers: cache invalidation, waiting for completion
+* deploy: task definition diff
+* post-deploy: fail deployment, on error
