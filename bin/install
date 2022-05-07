@@ -117,7 +117,7 @@ mkdir -p "$BIN_DIR" > /dev/null 2>&1
 
 [[ $SCOPE == "--all" || $SCOPE == "--app" ]] && {
     # application tools
-    install_github_tag GuccioGucci/ecs-deploy 3.10.6
+    install_github_tag GuccioGucci/ecs-deploy 3.10.7
     install_github_release noqcks/gucci 1.5.5
 }
 

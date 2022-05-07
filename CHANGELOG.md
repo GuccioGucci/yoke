@@ -6,6 +6,8 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 * updated dependencies: gucci to 1.5.5
 * post-deploy: fail deployment, on error
+* updated dependencies: ecs-deploy to 3.10.7 (fork)
+* deploy: task definition diff
 
 ## 2.7
 
@@ -126,4 +128,3 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * deploy scheduled tasks
 * support for secrets
 * helpers: cache invalidation, waiting for completion
-* deploy: task definition diff
