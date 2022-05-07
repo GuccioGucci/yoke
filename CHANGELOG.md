@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## WIP
+## 2.8
 
 * updated dependencies: gucci to 1.5.5
 * post-deploy: fail deployment, on error
