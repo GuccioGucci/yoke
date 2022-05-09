@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## 2.9
+
+* updated dependencies: ecs-deploy to 3.10.0.8 (fork) => fixing tags history
+
 ## 2.8
 
 * updated dependencies: gucci to 1.5.5
