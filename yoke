@@ -47,15 +47,13 @@ function show_version() {
 }
 
 function log() {
-    echo -e "[$( date "+%Y-%m-%d %H:%M:%S" )] $*"
+    echo -e "[$( date "+%Y-%m-%d %H:%M:%S" )] $@"
 }
 
 function template_on() {
     local target="$1" ; shift
     [[ "$DEBUG" != "false" ]] && log "[template] executing ($# params): gucci $@"
-    ( cd "$( realpath "$WORKING_DIR" )" ; \
-        export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE ; export ECS_IMAGE_TAG=$IMAGE_TAG ; \
-        gucci "$@" > "$target" )
+    ( cd "$( realpath "$WORKING_DIR" )" ; execute_within_context gucci "$@" > "$target" )
 }
 
 function deployment_PATH() {
@@ -63,8 +61,12 @@ function deployment_PATH() {
 }
 
 function execute() {
-    local command_line=$*
-    [[ "$DRY_RUN" != "false" ]] && log "dry-run, skipping $command_line" || $command_line
+    local command_line="$@"
+    [[ "$DRY_RUN" != "false" ]] && log "dry-run, skipping $command_line" || execute_within_context "$command_line"
+}
+
+function execute_within_context() {
+    ECS_CLUSTER=$CLUSTER ECS_SERVICE=$SERVICE ECS_IMAGE_TAG=$IMAGE_TAG "$@"
 }
 
 function init_values() {
@@ -133,9 +135,8 @@ function on_post_deploy() {
     local action="$LIFECYCLE_POST"
     if [[ -f "$action" ]]; then
         log "[post-deploy] executing $action";
-        export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE ; export ECS_IMAGE_TAG=$IMAGE_TAG
-
         execute $action
+
         local action_result=$?
         [[ $action_result -eq 0 ]] || {
             echo "[post-deploy] could not execute"; exit $action_result;
