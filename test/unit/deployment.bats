@@ -202,7 +202,7 @@ last_execution_output() {
     run ./yoke install -c my-cluster -s my-service -t 12345 -w test/deployments/lifecycle_post_deploy
     assert_equal $status 0 || fail "${lines[@]}"
 
-    local expected='ECS: my-cluster,my-service'
+    local expected='ECS: my-cluster,my-service,12345'
     local output=$( last_execution_output )
     [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
 }

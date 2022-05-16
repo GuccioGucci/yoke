@@ -54,9 +54,7 @@ function template_on() {
     local target="$1" ; shift
     [[ "$DEBUG" != "false" ]] && log "[template] executing ($# params): gucci $@"
     ( cd "$( realpath "$WORKING_DIR" )" ; \
-        export ECS_CLUSTER=$CLUSTER ; \
-        export ECS_SERVICE=$SERVICE ; \
-        export ECS_TAG=$IMAGE_TAG ; \
+        export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE ; export ECS_IMAGE_TAG=$IMAGE_TAG ; \
         gucci "$@" > "$target" )
 }
 
@@ -135,7 +133,7 @@ function on_post_deploy() {
     local action="$LIFECYCLE_POST"
     if [[ -f "$action" ]]; then
         log "[post-deploy] executing $action";
-        export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE
+        export ECS_CLUSTER=$CLUSTER ; export ECS_SERVICE=$SERVICE ; export ECS_IMAGE_TAG=$IMAGE_TAG
 
         execute $action
         local action_result=$?

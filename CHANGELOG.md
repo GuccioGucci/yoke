@@ -4,7 +4,7 @@ Versions before 2.0 were only available on internal repository, before open-sour
 
 ## WIP
 
-* deploy: custom ECS env variables
+* deploy: ECS env variables
 
 ## 2.9
 
