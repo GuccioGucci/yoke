@@ -67,11 +67,27 @@ last_execution_output() {
     [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
 }
 
+@test 'install - task definition, with ECS environment variables' {
+    run ./yoke install -c nonprod -s hello-world -t bb255ec-93 -w test/deployments/task_definition_env_variables
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local task_definition="$( cat $YOKE_FAKES_LOGGING | grep -o '/tmp/task-definition\.json.\w*' )"
+
+    local service_cluster="$( cat $task_definition | jq -r '.taskDefinition | .environment[] | select(.name | test ("'SERVICE_CLUSTER'") ) | .value' )"
+    assert_equal "$service_cluster" "nonprod"
+    
+    local service_name="$( cat $task_definition | jq -r '.taskDefinition | .environment[] | select(.name | test ("'SERVICE_NAME'") ) | .value' )"
+    assert_equal "$service_name" "hello-world"
+
+    local service_version="$( cat $task_definition | jq -r '.taskDefinition | .environment[] | select(.name | test ("'SERVICE_VERSION'") ) | .value' )"
+    assert_equal "$service_version" "bb255ec-93"
+}
+
 @test 'install - task set, without values' {
     run ./yoke install -c any -s any -t bb255ec-93 -w test/deployments/task_set_template_only
-    assert_equal $status 0 || fail "$commands"
+    assert_equal $status 0 || fail "${lines[@]}"
 
-    local commands="$( cat $YOKE_FAKES_LOGGING )"    
+    local commands="$( cat $YOKE_FAKES_LOGGING )"
     local expected='--task-definition-file .*task-definition\.json.* --task-set-file .*task-set\.json.*'
     [[ $commands =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$commands\""
 }

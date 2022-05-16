@@ -1,0 +1,19 @@
+{
+	"taskDefinition": {
+        "family": "hello-world-dev",
+        "environment": [
+            {
+                "name": "SERVICE_CLUSTER",
+                "value": "{{ .ECS_CLUSTER }}"
+            },
+            {
+                "name": "SERVICE_NAME",
+                "value": "{{ .ECS_SERVICE }}"
+            },
+            {
+                "name": "SERVICE_VERSION",
+                "value": "{{ .ECS_TAG }}"
+            }
+        ]
+    }
+}

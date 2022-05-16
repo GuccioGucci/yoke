@@ -53,7 +53,11 @@ function log() {
 function template_on() {
     local target="$1" ; shift
     [[ "$DEBUG" != "false" ]] && log "[template] executing ($# params): gucci $@"
-    ( cd "$( realpath "$WORKING_DIR" )" ; gucci "$@" > "$target" )
+    ( cd "$( realpath "$WORKING_DIR" )" ; \
+        export ECS_CLUSTER=$CLUSTER ; \
+        export ECS_SERVICE=$SERVICE ; \
+        export ECS_TAG=$IMAGE_TAG ; \
+        gucci "$@" > "$target" )
 }
 
 function deployment_PATH() {
