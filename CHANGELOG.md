@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## 2.11
+
+* updated dependencies: ecs-deploy to 3.10.0.9 (fork) => forced retries on read API calls; polling period
+
 ## 2.10
 
 * deploy: ECS env variables
