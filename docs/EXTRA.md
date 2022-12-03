@@ -46,9 +46,9 @@ Here's a sample execution:
 ```
  ./yoke install -c cls01 -s hello-world-dev -t bb255ec-93 -w test/samples/hello-world/deployment -f values-dev.yaml
  
- (1) [2021-01-05 16:34:33] values: test/samples/hello-world/deployment/values-dev.yaml
- (2) [2021-01-05 16:34:33] task-definition: test/samples/hello-world/deployment/task-definition.json.tmpl
- (3) [2021-01-05 16:34:33] (current) task-definition: /tmp/task-definition.json.17213
+ (1) [2021-05-01 16:34:33] values: test/samples/hello-world/deployment/values-dev.yaml
+ (2) [2021-05-01 16:34:33] task-definition: test/samples/hello-world/deployment/task-definition.json.tmpl
+ (3) [2021-05-01 16:34:33] (current) task-definition: /tmp/task-definition.json.17213
  (4) Deployment controller: ECS
  (5) Using image name: bb255ec-93
  (6) Current task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-dev:10
@@ -103,13 +103,13 @@ Please, consider the impact on provisioning, once you configure `EXTERNAL` deplo
 Here's a sample execution:
 
 ```
- (1) [2021-01-05 16:38:00] values: test/samples/hello-world-x/deployment/values-dev.yaml
- (2) [2021-01-05 16:38:00] confirmation: test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl
- (3) [2021-01-05 16:38:00] (current) confirmation: /tmp/confirm.sh.7947
- (4) [2021-01-05 16:38:00] task-definition: test/samples/hello-world-x/deployment/task-definition.json.tmpl
- (5) [2021-01-05 16:38:00] (current) task-definition: /tmp/task-definition.json.12699
- (6) [2021-01-05 16:38:02] task-set: test/samples/hello-world-x/deployment/task-set.json.tmpl
- (7) [2021-01-05 16:38:02] (current) task-set: /tmp/task-set.json.25561
+ (1) [2021-05-01 16:38:00] values: test/samples/hello-world-x/deployment/values-dev.yaml
+ (2) [2021-05-01 16:38:00] confirmation: test/samples/hello-world-x/deployment/bin/confirm.sh.tmpl
+ (3) [2021-05-01 16:38:00] (current) confirmation: /tmp/confirm.sh.7947
+ (4) [2021-05-01 16:38:00] task-definition: test/samples/hello-world-x/deployment/task-definition.json.tmpl
+ (5) [2021-05-01 16:38:00] (current) task-definition: /tmp/task-definition.json.12699
+ (6) [2021-05-01 16:38:02] task-set: test/samples/hello-world-x/deployment/task-set.json.tmpl
+ (7) [2021-05-01 16:38:02] (current) task-set: /tmp/task-set.json.25561
  (8) Deployment controller: EXTERNAL
  (9) Using image name: bb255ec-93
 (10) Current task definition: arn:aws:ecs:us-east-1:1234567890:task-definition/hello-world-x-dev:11
