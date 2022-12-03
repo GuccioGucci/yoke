@@ -1,9 +1,9 @@
 # Extra
 
+* [Lifecyle Hooks](#lifecyle-hooks)
 * [Deployment Controllers](#deployment-controllers)
   * [ECS: Rolling Update](#ecs-rolling-update)
   * [EXTERNAL: Canary Release](#external-canary-release)
-* [Lifecyle Hooks](#lifecyle-hooks)
 * [Provisioning: Terraform](#provisioning-terraform)
   * [Mixed: managed and live (migrating to Update mode)](#mixed-managed-and-live-migrating-to-update-mode)
   * [Afterwards: live only (migrating to Install mode)](#afterwards-live-only-migrating-to-install-mode)
@@ -15,6 +15,20 @@
   * [Ktor and Jib](#ktor-and-jib)
   * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
   * [ReactJS](#reactjs)
+
+# Lifecyle Hooks
+
+Additional actions can be performed hooking into particular lifecycle events. Script templates are expected to be found in `bin` folder, under current working-dir. As for canary releases script template, you can use values from value file, if set in the command line.
+
+Currently the only supported hook is `post`, for post-deploy action:
+
+```
+deployment/
+└── bin
+    └── post.sh.tmpl
+```
+
+As an example, you could provide a `post` hook for invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](/README.md#aws_cf_distribution) helper script, to retrive distribution id.
 
 # Deployment Controllers
 
@@ -146,18 +160,6 @@ The script is expected to `exit 0` while ready to proceed, and to be found in `b
 deployment/
 └── bin
     └── confirm.sh.tmpl
-```
-
-# Lifecyle Hooks
-
-Additional actions can be performed hooking into particular lifecycle events. Again, script templates are expected to be found in `bin` folder, under current working-dir. As for canary releases script template, you can use values from value file, if set in the command line.
-
-Currently the only supported hook is `post`, for post-deploy action:
-
-```
-deployment/
-└── bin
-    └── post.sh.tmpl
 ```
 
 # Provisioning: Terraform
