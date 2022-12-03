@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## current
+## 2.12
 
 * updated dependencies: ecs-deploy to 3.10.0.10 (fork) => task definition tags: version and timestamp
 
