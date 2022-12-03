@@ -58,7 +58,7 @@ Then the analogy was: `helm` (the ship's wheel) is for `k8s` (again, whit a seve
 
 Anyway, if you don't get it, sounds like "joke".
 
-![logo](/docs/logo.png "Logo")
+![logo](/docs/logo-small.png "Logo")
 
 # Installation
 
