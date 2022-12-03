@@ -2,6 +2,10 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
+## current
+
+* updated dependencies: ecs-deploy to 3.10.0.10 (fork) => task definition tags: version and timestamp
+
 ## 2.11
 
 * updated dependencies: ecs-deploy to 3.10.0.9 (fork) => forced retries on read API calls; polling period
@@ -140,3 +144,4 @@ Versions before 2.0 were only available on internal repository, before open-sour
 * deploy scheduled tasks
 * support for secrets
 * helpers: cache invalidation, waiting for completion
+* contributing (rm -rf lib/ecs-deploy-3.10.0.9 ; ln -s ../ecs-deploy/ lib/ecs-deploy-3.10.0.9)
