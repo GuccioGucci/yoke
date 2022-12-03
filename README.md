@@ -13,6 +13,7 @@
 * [Usage](#usage)
   * [Update](#update)
   * [Install](#install)
+  * [Lifecyle Hooks](#lifecyle-hooks)
   * [Helpers](#helpers)
 * [Extra](#extra)
 * [Contributing](#contributing)
@@ -241,6 +242,20 @@ Expected `task-definition.json.tmpl` content is a JSON file, with a `taskDefinit
 ```
 
 Please, while preparing per-environment `environment` values in `containerDefinitions` nodes, consider if those environment variables could be part of proper application configuration (specific to your programming language or framework). In that case, see [Application configuration override](/docs/EXTRA.md#application-configuration-override) section in [Extra](/docs/EXTRA.md).
+
+## Lifecyle Hooks
+
+Additional actions can be performed hooking into particular lifecycle events. Script templates are expected to be found in `bin` folder, under current working-dir. As for canary releases script template, you can use values from value file, if set in the command line.
+
+Currently the only supported hook is `post`, for post-deploy action:
+
+```
+deployment/
+└── bin
+    └── post.sh.tmpl
+```
+
+As an example, you could provide a `post` hook for invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](#aws_cf_distribution) helper script, to retrive distribution id.
 
 ## Helpers
 

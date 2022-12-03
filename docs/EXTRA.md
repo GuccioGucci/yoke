@@ -1,6 +1,5 @@
 # Extra
 
-* [Lifecyle Hooks](#lifecyle-hooks)
 * [Deployment Controllers](#deployment-controllers)
   * [ECS: Rolling Update](#ecs-rolling-update)
   * [EXTERNAL: Canary Release](#external-canary-release)
@@ -16,19 +15,6 @@
   * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
   * [ReactJS](#reactjs)
 
-# Lifecyle Hooks
-
-Additional actions can be performed hooking into particular lifecycle events. Script templates are expected to be found in `bin` folder, under current working-dir. As for canary releases script template, you can use values from value file, if set in the command line.
-
-Currently the only supported hook is `post`, for post-deploy action:
-
-```
-deployment/
-└── bin
-    └── post.sh.tmpl
-```
-
-As an example, you could provide a `post` hook for invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](/README.md#aws_cf_distribution) helper script, to retrive distribution id.
 
 # Deployment Controllers
 
