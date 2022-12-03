@@ -58,7 +58,7 @@ Then the analogy was: `helm` (the ship's wheel) is for `k8s` (again, whit a seve
 
 Anyway, if you don't get it, sounds like "joke".
 
-![flight yoke system](/docs/flight-yoke-system.jpg "Flight yoke system")
+![logo](/docs/logo.png "Logo")
 
 # Installation
 
