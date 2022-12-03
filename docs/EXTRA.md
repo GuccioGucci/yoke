@@ -55,7 +55,7 @@ Once `yoke` execution is completed, ECS is still disposing previous deployment, 
 
 ## EXTERNAL: Canary Release
 
-Experimental support for `EXTERNAL` deployment controller is in progress, supporting [Canary Release](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, *managed* deployments). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](#contributions) section for details and [deployment.bats](/test/unit/deployment.bats) for sample usages).
+Experimental support for `EXTERNAL` deployment controller is in progress, supporting [Canary Release](https://martinfowler.com/bliki/CanaryRelease.html). This requires `yoke` to manage not only task definitions, but also task sets (actually, *managed* deployments). Once remote service is detected to be configured as `EXTERNAL`, both **update** and **install** modes would then manage the deployment lifecycle, enriching `ecs-deploy` command line to do so (see [contributions](/README.md#contributions) section for details and [deployment.bats](/test/unit/deployment.bats) for sample usages).
 
 For **install** mode only, in addition to `task-definition.json.tmpl`, you can provide a `task-set.json.tmpl` file as well, again expected to be found in the working directory, eg:
 
