@@ -245,7 +245,7 @@ Please, while preparing per-environment `environment` values in `containerDefini
 
 ## Lifecyle Hooks
 
-Additional actions can be performed hooking into particular lifecycle events. Script templates are expected to be found in `bin` folder, under current working-dir. As for canary releases script template, you can use values from value file, if set in the command line.
+Additional actions can be performed hooking into particular lifecycle events. Script templates are expected to be found in `bin` folder, under current working-dir. As usual, you can use values from value file, if set in the command line.
 
 Currently the only supported hook is `post`, for post-deploy action:
 
