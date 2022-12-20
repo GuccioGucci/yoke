@@ -501,9 +501,9 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = {
   ...
   plugins: [
-	  new CopyWebpackPlugin({ patterns: [ { from: 'public' } ] }),
-		...
-	]
+    new CopyWebpackPlugin({ patterns: [ { from: 'public' } ] }),
+    ...
+  ]
 }
 ```
 * `__webpack_public_path__` variable (see [here](https://webpack.js.org/guides/public-path/#on-the-fly) for reference) is the equivalent of `%PUBLIC_URL% `as in [previous example](#reactjs). This would support any output's `publicPath` options (for example, using a sub-folder of your web server document root folder). It can then also be used as part of the initialisation routine, eg:
