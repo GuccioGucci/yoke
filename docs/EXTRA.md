@@ -14,6 +14,7 @@
   * [Ktor and Jib](#ktor-and-jib)
   * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
   * [ReactJS](#reactjs)
+  * [Typescript and Webpack](#typescript-and-webpack)
 
 
 # Deployment Controllers
@@ -484,3 +485,32 @@ Then, [Nginx](https://www.nginx.com/) configuration can then be overriden to thi
 {{- $applicationConfigurationOverride := "config-override.js" -}}
 {{- $configurationPath := "/usr/share/nginx/html/env" -}}
 ```
+
+## TypeScript and Webpack
+
+This is mostly built on top of the [previous one](#reactjs), specific to the scenario of using TypeScript instead of plain JavaScript, and [Webpack](https://webpack.js.org/) as module bundler. The approach is very similar to that one, but there are few things to consider, while bundling your application, and some peculiarities of TS we can rely on.
+
+First, we can defer application initialisation, by loading a `config.json` first (see [here](https://profinit.eu/en/blog/build-once-deploy-many-in-react-dynamic-configuration-properties/) for reference). By placing that file under `public` folder (eg: `public/env/config.json`), we expected it to be outside of bundler process. This would mean, it's not going to be included in bundled resources. But we still need it to included into the distribution (eg: `build` folder).
+
+In order to achieve this, two tips to consider:
+* by configuring [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/), you can get all resources into public folder to be (recursively) copied into output folder, eg in `webpack.config.js`:
+```
+new CopyWebpackPlugin({ patterns: [ { from: 'public' } ] }),
+```
+* referring `__webpack_public_path__` variable (see [here](https://webpack.js.org/guides/public-path/#on-the-fly) for reference) is the equivalent of `%PUBLIC_URL% `as in [previous example](#reactjs), but used as part of the JS initialisation routine, eg:
+```
+axios
+  .get(__webpack_public_path__ + 'env/config.json')
+  .then((response) => { ... })
+  .catch(() => { ... });
+```
+
+Then, you can still use the same convention of
+* providing local *development* config values (to be used locally), eg: `config.js` in `public/env` folder
+* providing *per-environment* config values (to be used on deployment), eg: `config.js`, but in yoke working directory (eg: `deployment` folder)
+
+Finally, [Nginx](https://www.nginx.com/) configuration can then be overriden to this way:
+
+```
+{{- $applicationConfigurationOverride := "config.js" -}}
+{{- $configurationPath := "/usr/share/nginx/html/env" -}}
