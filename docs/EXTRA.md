@@ -13,8 +13,8 @@
 * [Application configuration override](#application-configuration-override)
   * [Ktor and Jib](#ktor-and-jib)
   * [Spring Boot and Dockerfile](#spring-boot-and-dockerfile)
-  * [ReactJS](#reactjs)
-  * [Webpack](#webpack)
+  * [ReactJS, vanilla](#reactjs-vanilla)
+  * [ReactJS and Webpack](#reactjs-and-webpack)
 
 
 # Deployment Controllers
@@ -455,7 +455,7 @@ java -jar service.jar ... \
 
 Please, note that on recent versions (such as `2.5.0`), there was a breaking change, so that resource set to that property is always expected to exist (while with older version such as `2.2.5.RELEASE`, it was allowed to set a non-existing resource).
 
-## ReactJS
+## ReactJS, vanilla
 
 For [ReactJS](https://reactjs.org/), few approaches have been proposed to achieve "build once, deploy anywhere" goal. Leveraging on application configuration override, instead of individual environment variables, is probably the easiest of the solutions (see [here](https://www.cotyhamilton.com/build-once-deploy-anywhere-for-react-applications/) for reference).
 
@@ -486,9 +486,9 @@ Then, [Nginx](https://www.nginx.com/) configuration can then be overriden to thi
 {{- $configurationPath := "/usr/share/nginx/html/env" -}}
 ```
 
-## Webpack
+## ReactJS and Webpack
 
-This is mostly built on top of the [previous one](#reactjs), specific to the scenario of using [Webpack](https://webpack.js.org/) as module bundler. The approach is very similar to that one, but there are few things to consider, while bundling your application.
+This is mostly built on top of the [previous one](#reactjs-vanilla), specific to the scenario of using [Webpack](https://webpack.js.org/) as module bundler. The approach is very similar to that one, but there are few things to consider, while bundling your application.
 
 First, we can defer application initialisation, by loading a `config.json` first (see [here](https://profinit.eu/en/blog/build-once-deploy-many-in-react-dynamic-configuration-properties/) for reference). By placing that file under `public` folder (eg: `public/env/config.json`), we expect it to be outside of bundler process. This would mean, it's not going to be included in bundled resources. But we still need it to included into the distribution (eg: `build` folder).
 
@@ -506,7 +506,7 @@ module.exports = {
   ]
 }
 ```
-* `__webpack_public_path__` variable (see [here](https://webpack.js.org/guides/public-path/#on-the-fly) for reference) is the equivalent of `%PUBLIC_URL% `as in [previous example](#reactjs). This would support any output's `publicPath` options (for example, using a sub-folder of your web server document root folder). It can then also be used as part of the initialisation routine, eg:
+* `__webpack_public_path__` variable (see [here](https://webpack.js.org/guides/public-path/#on-the-fly) for reference) is the equivalent of `%PUBLIC_URL% `as in [previous example](#reactjs-vanilla). This would support any output's `publicPath` options (for example, using a sub-folder of your web server document root folder). It can then also be used as part of the initialisation routine, eg:
 ```
 axios
   .get(__webpack_public_path__ + 'env/config.json')
