@@ -255,6 +255,12 @@ deployment/
     └── post.sh.tmpl
 ```
 
+Any already set environment variable would still be available. In addition, few other environment variables are set, for convenience (see [test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl) for a full example):
+
+* `ECS_CLUSTER`: current cluster (valued after `--cluster` parameter)
+* `ECS_SERVICE`: current service (valued after `--service` parameter)
+* `ECS_IMAGE_TAG`: current version (valued after `--tag` parameter)
+
 As an example, you could provide a `post` hook for invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](#aws_cf_distribution) helper script, to retrive distribution id.
 
 ## Helpers
