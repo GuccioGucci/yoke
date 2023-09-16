@@ -180,7 +180,48 @@ last_execution_output() {
     assert_equal "$family" "Hello"
 }
 
-@test 'lifecycle - post-deploy executed on success' {
+@test 'lifecycle - pre-deploy executed on deployment success' {
+    run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_pre_deploy
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local expected='On pre-deploy'
+    local output=$( last_execution_output )
+    [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
+}
+
+@test 'lifecycle - pre-deploy executed on deployment failure' {
+    YOKE_FAKES_ECSDEPLOY_EXIT=55 run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_pre_deploy
+    assert_equal $status 55 || fail "${lines[@]}"
+
+    local expected='On pre-deploy'
+    local output=$( last_execution_output )
+    [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
+}
+
+@test 'lifecycle - pre-deploy, with ECS environment variables' {
+    run ./yoke install -c my-cluster -s my-service -t 12345 -w test/deployments/lifecycle_pre_deploy
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local expected='ECS: my-cluster,my-service,12345'
+    local output=$( last_execution_output )
+    [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
+}
+
+@test 'lifecycle - pre-deploy, with custom YOKE environment variables' {
+    YOKE_MY_WEBSITE=my-website run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_pre_deploy
+    assert_equal $status 0 || fail "${lines[@]}"
+
+    local expected='CUSTOM: my-website'
+    local output=$( last_execution_output )
+    [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
+}
+
+@test 'lifecycle - pre-deploy error, as overall failure' {
+    YOKE_FAKES_PRE_DEPLOY_EXIT=99 run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_pre_deploy
+    assert_equal $status 99 || fail "${lines[@]}"
+}
+
+@test 'lifecycle - post-deploy executed on deployment success' {
     run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_post_deploy
     assert_equal $status 0 || fail "${lines[@]}"
 
@@ -189,7 +230,7 @@ last_execution_output() {
     [[ $output =~ $expected ]] || fail "not matching. expected: \"$expected\", actual: \"$output\""
 }
 
-@test 'lifecycle - post-deploy skipped on failure' {
+@test 'lifecycle - post-deploy skipped on deployment failure' {
     YOKE_FAKES_ECSDEPLOY_EXIT=55 run ./yoke install -c any -s any -t 12345 -w test/deployments/lifecycle_post_deploy
     assert_equal $status 55 || fail "${lines[@]}"
 

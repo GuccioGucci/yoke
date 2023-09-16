@@ -131,6 +131,22 @@ function variable_get() {
     echo "${!key}"
 }
 
+function on_pre_deploy() {
+    local action="$LIFECYCLE_PRE"
+    if [[ -f "$action" ]]; then
+        log "[pre-deploy] executing $action";
+        execute $action
+
+        local action_result=$?
+        [[ $action_result -eq 0 ]] || {
+            log "[pre-deploy] could not execute"; exit $action_result;
+        }
+    else
+        [[ "$DEBUG" != "false" ]] && log "[pre-deploy] skipping, not set";
+    fi
+    return 0
+}
+
 function on_post_deploy() {
     local action="$LIFECYCLE_POST"
     if [[ -f "$action" ]]; then
@@ -139,7 +155,7 @@ function on_post_deploy() {
 
         local action_result=$?
         [[ $action_result -eq 0 ]] || {
-            echo "[post-deploy] could not execute"; exit $action_result;
+            log "[post-deploy] could not execute"; exit $action_result;
         }
     else
         [[ "$DEBUG" != "false" ]] && log "[post-deploy] skipping, not set";
@@ -176,6 +192,7 @@ function do_initialize() {
     fi
     
     # additional resources
+    init_resource LIFECYCLE_PRE "$( deployment_PATH )"
     init_resource LIFECYCLE_CONFIRMATION "$( deployment_PATH )"
     init_resource LIFECYCLE_POST "$( deployment_PATH )"
 }
@@ -193,7 +210,7 @@ function do_deploy() {
 
     local ecs_deploy_result=$?
     [[ $ecs_deploy_result -eq 0 ]] || {
-        echo "could not deploy"; exit $ecs_deploy_result;
+        log "could not deploy"; exit $ecs_deploy_result;
     }
 }
 
@@ -202,6 +219,7 @@ if [ "$0" = "$BASH_SOURCE" ] ; then
 
     variable_set task-definition.json.tmpl TASK_DEFINITION
     variable_set task-set.json.tmpl TASK_SET
+    variable_set pre.sh.tmpl LIFECYCLE_PRE
     variable_set confirm.sh.tmpl LIFECYCLE_CONFIRMATION
     variable_set post.sh.tmpl LIFECYCLE_POST
 
@@ -265,6 +283,7 @@ if [ "$0" = "$BASH_SOURCE" ] ; then
     done
 
     do_initialize
+    on_pre_deploy
     do_deploy
     on_post_deploy
 fi

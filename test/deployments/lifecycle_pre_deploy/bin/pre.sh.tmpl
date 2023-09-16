@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+echo "On pre-deploy"
+echo "ECS: $ECS_CLUSTER,$ECS_SERVICE,$ECS_IMAGE_TAG"
+echo "CUSTOM: $YOKE_MY_WEBSITE"
+exit ${YOKE_FAKES_PRE_DEPLOY_EXIT:-0}

@@ -247,21 +247,24 @@ Please, while preparing per-environment `environment` values in `containerDefini
 
 Additional actions can be performed hooking into particular lifecycle events. Script templates are expected to be found in `bin` folder, under current working-dir. As usual, you can use values from value file, if set in the command line.
 
-Currently the only supported hook is `post`, for post-deploy action:
+Currently the only supported hooks are `pre` and `post`, for pre-deploy and post-deploy actions:
 
 ```
 deployment/
 └── bin
-    └── post.sh.tmpl
+    ├── post.sh.tmpl
+    └── pre.sh.tmpl
 ```
 
-Any already set environment variable would still be available. In addition, few other environment variables are set, for convenience (see [test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl) for a full example):
+Any already set environment variable would still be available. In addition, few other environment variables are set, for convenience (see [test/deployments/lifecycle_post_deploy/bin/pre.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/pre.sh.tmpl) and [test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl) for a full example):
 
 * `ECS_CLUSTER`: current cluster (valued after `--cluster` parameter)
 * `ECS_SERVICE`: current service (valued after `--service` parameter)
 * `ECS_IMAGE_TAG`: current version (valued after `--tag` parameter)
 
-As an example, you could provide a `post` hook for invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](#aws_cf_distribution) helper script, to retrive distribution id.
+As an example, you could provide a `pre` hook for validating [Application configuration override](/docs/EXTRA.md#application-configuration-override), before using it as part of a deployment. Say it's a plain JSON file, you could use `jq` to simply check it can be successfully parsed (see [here](https://stackoverflow.com/questions/46954692/check-if-string-is-a-valid-json-with-jq) for an hint).
+
+An example of `post` hook would be invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](#aws_cf_distribution) helper script, to retrive distribution id.
 
 ## Helpers
 
