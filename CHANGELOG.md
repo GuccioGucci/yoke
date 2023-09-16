@@ -2,7 +2,7 @@
 
 Versions before 2.0 were only available on internal repository, before open-sourcing the project.
 
-## current
+## 2.13
 
 * deployment lifecycle: pre-deploy (eg. config override validation)
 
