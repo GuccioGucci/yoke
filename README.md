@@ -262,9 +262,9 @@ Any already set environment variable would still be available. In addition, few 
 * `ECS_SERVICE`: current service (valued after `--service` parameter)
 * `ECS_IMAGE_TAG`: current version (valued after `--tag` parameter)
 
-As an example, you could provide a `pre` hook for validating [Application configuration override](/docs/EXTRA.md#application-configuration-override), before using it as part of a deployment. Say it's a plain JSON file, you could use `jq` to simply check it can be successfully parsed (see [here](https://stackoverflow.com/questions/46954692/check-if-string-is-a-valid-json-with-jq) for an hint).
+As an example, you could provide a `pre` hook for validating [Application configuration override](/docs/EXTRA.md#application-configuration-override), before using it as part of a deployment. Say it's a plain JSON file, you could use `jq` to simply check it can be successfully parsed (see [config-validation/bin/pre.sh.tmpl](samples/hooks/config-validation/bin/pre.sh.tmpl)).
 
-An example of `post` hook would be invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](#aws_cf_distribution) helper script, to retrive distribution id.
+An example of `post` hook would be invalidating a Cloudfront distribution, caching content for your ECS service. In that case, you can rely on [aws_cf_distribution](#aws_cf_distribution) helper script, to retrive distribution id (see [cache-invalidation/bin/post.sh.tmpl](samples/hooks/cache-invalidation/bin/post.sh.tmpl)).
 
 ## Helpers
 

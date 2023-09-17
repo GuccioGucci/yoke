@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Aligned application configuration override, in task definition template
+# eg: deployment/config/dev/config.json
+
+# Script executed from project root folder
+CONFIG_FILE="deployment/config/{{ .environment.name }}/config.json"
+
+echo "Validating $CONFIG_FILE"
+jq -e . "$CONFIG_FILE" > /dev/null

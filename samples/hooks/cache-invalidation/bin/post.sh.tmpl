@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+DISTRIBUTION_ID=$( aws_cf_distribution "{{ .environment.website }}" )
+
+echo "Invalidating cache, distribution: $DISTRIBUTION_ID, website: {{ .environment.website }}"
+CREATE_INVALIDATION_OUTPUT=$( aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths '/*' )
+echo "$CREATE_INVALIDATION_OUTPUT"
+
+INVALIDATION_ID=$( echo "$CREATE_INVALIDATION_OUTPUT" | jq -r '.Invalidation.Id' )
+echo "Waiting for completion, invalidation: $INVALIDATION_ID, distribution: $DISTRIBUTION_ID"
+aws cloudfront wait invalidation-completed --id $INVALIDATION_ID --distribution-id $DISTRIBUTION_ID
