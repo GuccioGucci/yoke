@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Expected variables:
+# .environment.website, such as 'dev.mysite.com'
+
 DISTRIBUTION_ID=$( aws_cf_distribution "{{ .environment.website }}" )
 
 echo "Invalidating cache, distribution: $DISTRIBUTION_ID, website: {{ .environment.website }}"
