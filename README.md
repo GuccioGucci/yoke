@@ -256,7 +256,7 @@ deployment/
     └── pre.sh.tmpl
 ```
 
-Any already set environment variable would still be available. In addition, few other environment variables are set, for convenience (see [test/deployments/lifecycle_post_deploy/bin/pre.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/pre.sh.tmpl) and [test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl) for a full example):
+Any already set environment variable would still be available. In addition, few other environment variables are set, for convenience (see [pre.sh.tmpl](test/deployments/lifecycle_pre_deploy/bin/pre.sh.tmpl) and [post.sh.tmpl](test/deployments/lifecycle_post_deploy/bin/post.sh.tmpl) for full examples):
 
 * `ECS_CLUSTER`: current cluster (valued after `--cluster` parameter)
 * `ECS_SERVICE`: current service (valued after `--service` parameter)
@@ -351,11 +351,11 @@ Get Subnet by name, then extract ARN.
 
 ### aws_cf_distribution
 
-Get [CloudFront](https://aws.amazon.com/cloudfront/) distribution id, by `Comment`. `Comment` usage is required since there is id is automatically generated, and not controlled by configuration. So, to be uniquely identified, please add this comment to desired distribution, in your provisioning configuration (eg: Terraform module). Note that, we're not using `Tags` node here, since it would require two API calls (see [list-distributions](https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-distributions.html) and [list-tags-for-resource](https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-tags-for-resource.html)).
+Get [CloudFront](https://aws.amazon.com/cloudfront/) distribution id, by `Comment`. `Comment` usage is required since `id` is automatically generated, and not controlled by configuration. So, to be uniquely identified, please add this comment to desired distribution, in your provisioning configuration (eg: Terraform module). Note that, we're not using `Tags` node here, since it would require two API calls (see [list-distributions](https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-distributions.html) and [list-tags-for-resource](https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-tags-for-resource.html)).
 
 
 * Usage: `aws_cf_distribution $VALUE`
-* Note: this is intended to be used as part of post-deploy actions
+* Note: this is intended to be used as part of post-deploy [lifecycle hook](#lifecyle-hooks)
 
 # Extra
 
