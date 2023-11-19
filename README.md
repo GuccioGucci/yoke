@@ -179,8 +179,8 @@ parameters:
     -w|--working-dir value  where to search for resources (default: deployment)
     -f|--values value       values file (eg: values-dev.yaml)
     --prune value           only keep given task definitions (eg: 5)
-    --timeout value         timeout (default: 300)
-    --dry-run               dry-run mode, avoid any deployment (default: true)
+    --timeout value         deployment timeout, in seconds (default: 300)
+    --dry-run               dry-run mode, avoid any deployment (default: false)
 ```
 
 `yoke` supports two different modes: **update** mode and **install** mode. Given your context (migrating an existing application, or developing a new application) you can choose the one that fits you best. Please, see next sections for details, and [Provisioning: Terraform](/docs/EXTRA.md#provisioning-terraform) section to understand the impact on resource provisioning.

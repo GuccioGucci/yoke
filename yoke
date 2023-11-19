@@ -35,7 +35,7 @@ parameters:
     -w|--working-dir value  where to search for resources (default: $WORKING_DIR)
     -f|--values value       values file (eg: values-dev.yaml)
     --prune value           only keep given task definitions (eg: 5)
-    --timeout value         timeout (default: $TIMEOUT)
+    --timeout value         deployment timeout, in seconds (default: $TIMEOUT)
     --dry-run               dry-run mode, avoid any deployment (default: $DRY_RUN)
 EOL
 }
